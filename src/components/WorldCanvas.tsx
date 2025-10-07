@@ -6,6 +6,7 @@ import { BALL_RADIUS, SECTION_X, CAMERA_LERP, type COLLIDERES_RECT } from "../ty
 import Ball from "./Ball";
 import GlassCard from "./GlassCard";
 import StarField from "./StarField";
+import Intro from "../sections/Intro";
 
 const WorldCanvas: React.FC = () => {
     const physicsRef = useRef<SimplePhysics | null>(null);
@@ -160,7 +161,7 @@ const WorldCanvas: React.FC = () => {
   
             {/* World container with camera transform */}
             <motion.div
-            className="absolute inset-0 border-2 border-solid border-amber-600"
+            className="absolute inset-0"
             style={{
                 // Shift world to left and center it based on cameraX
                 transform: `translateX(${0 - cameraX}px)`, 
@@ -169,6 +170,8 @@ const WorldCanvas: React.FC = () => {
 
                 {/* Starfield background */}
                 <StarField viewportHeight={viewportHeight} />
+
+                <Intro />
 
 
 

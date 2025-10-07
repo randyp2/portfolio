@@ -8,6 +8,8 @@ const Navbar: React.FC = () => {
     const jumpTo: 
     (section: "about" | "projects" | "skills" | "contact" | "thanks") => void 
     = useWorldStore((state) => state.jumpTo);
+
+    const resetTo: () => void = useWorldStore((state) => state.reset);  
   
     const sections: { id: SectionId; label: string }[] = [
       { id: 'about', label: 'About' },
@@ -26,15 +28,16 @@ const Navbar: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
-        <div className="absolute left-8 flex items-center gap-3">
+        <div className="absolute left-8 flex items-center gap-3 ">
           <motion.img
             src={profile2}
             alt="Profile"
             className="w-14 h-14 rounded-full border border-white/20 
               shadow-[0_0_20px_rgba(255,255,255,0.3)]
-              object-cover object-center"
+              object-cover object-center hover:cursor-pointer"
             whileHover={{ scale: 1.08, boxShadow: "0 0 25px rgba(255,255,255,0.6)" }}
             transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            onClick={() => resetTo()}
           />
           <span className="text-white/90 font-large tracking-wide">Randy Pahang II</span>
         </div>
@@ -42,6 +45,7 @@ const Navbar: React.FC = () => {
       {/* --- Center Navigation Buttons --- */}
       <div className="flex gap-6">
         {sections.map((section, index) => (
+          
           <motion.button
             key={section.id}
             onClick={() => jumpTo(section.id)}

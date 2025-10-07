@@ -19,16 +19,17 @@ export const useWorldStore = create<WorldState>((set) => ({
     cameraX: 0,
     isJumping: false,
     sections: {
-      about: { x: SECTION_X.about },
-      projects: { x: SECTION_X.projects },
-      skills: { x: SECTION_X.skills },
-      contact: { x: SECTION_X.contact },
-      thanks: { x: SECTION_X.thanks },
+        about: { x: SECTION_X.about },
+        projects: { x: SECTION_X.projects },
+        skills: { x: SECTION_X.skills },
+        contact: { x: SECTION_X.contact },
+        thanks: { x: SECTION_X.thanks },
     },
     setBallPosition: (x, y) => set({ ballX: x, ballY: y, isJumping: false }),
     setCameraX: (x) => set({ cameraX: x }),
-    reset: () => set({ ballX: 100, ballY: window.innerHeight - 100, cameraX: 0 }),
+    reset: () => set({ ballX: 0, ballY: window.innerHeight - 100, cameraX: 0, isJumping: true }),
     jumpTo: (section) => {
+        
         const targetX: number = SECTION_X[section];
         console.log(targetX);
         const ballOffset: number = 100;

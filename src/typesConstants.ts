@@ -9,7 +9,7 @@ export const SECTION_X = {
   thanks: 8000,
 } as const;
 
-export const FADE_RADIUS = 1300; // How far sections shoudl fade in/out based on distance from ball
+export const FADE_RADIUS = 2500; // How far sections shoudl fade in/out based on distance from ball
 export const BALL_RADIUS = 18;
 export const CAMERA_LERP = 0.08; // Move 8% of distance towards ball for each frame
 

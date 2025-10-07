@@ -6,7 +6,7 @@ import Footer from "./components/Footer";
 
 const App: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#15181c] text-white antialiased overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#101316] text-white antialiased overflow-hidden font-sans">
       <Navbar />
       <WorldCanvas />
       <Footer />
