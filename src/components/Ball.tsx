@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Arrow from './Arrow';
 import { SimplePhysics } from '../physics/SimplePhysics';
 import { BALL_RADIUS, MAX_LAUNCH_SPEED } from '../typesConstants';
+import thudSound from "../assets/ball-thud.mp3";
 
 interface BallProps {
     physics: SimplePhysics;
@@ -53,6 +54,36 @@ const Ball: React.FC<BallProps> = ({ physics, viewportCenterX, cameraX, onLaunch
         onLaunch(vx, vy);
         setIsDragging(false);
     }, [isDragging, dragStartPos, currentMouse, onLaunch]);
+
+
+    // Sound effect on collision
+    useEffect(() => {
+      // Initialize audio effect
+      const audio: HTMLAudioElement = new Audio(thudSound);
+      let impactVolume: number = 1; // Base value
+      const impactDamper: number = 0.7; // Reduce volume of subsequent impacts
+
+      // Connect to physics launch event to reset volume
+      physics.onLaunch = () => {
+        impactVolume = 1; // Reset volume on launch
+      };
+
+      // Connect to physics collision event
+      physics.onCollision = () => {
+        audio.volume = impactVolume;
+        audio.currentTime = 0; // Rewind to start
+        audio.play().catch((err) => console.warn("Playback error:", err));
+
+        impactVolume *= impactDamper; // Reduce volume for next impact
+        if(impactVolume <= 0.1) impactVolume = 0;
+      };
+
+      // Cleanup
+      return () => {
+        physics.onLaunch = undefined;
+        physics.onCollision = undefined;
+      };
+    }, [physics]);
   
     // Attach/detach global pointer move/up listeners when dragging
     useEffect(() => {

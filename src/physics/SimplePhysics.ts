@@ -23,6 +23,10 @@ export class SimplePhysics {
   viewportCenterX: number;
   colliders: ColliderRect[] = []; // Array of rectangles the ball can collide with
 
+  onCollision?: () => void; // Optional collision callback function
+  onLaunch?: () => void; // Optional launch callback function
+
+  private hasLaunched: boolean = false; // track if ball has been launched
   private t: number = 0; // track time since last launched
   private launch = {
     x0: 0,
@@ -59,6 +63,8 @@ export class SimplePhysics {
   setVelocity(vx: number, vy: number) {
     this.launch = { x0: this.body.x, y0: this.body.y, vx0: vx, vy0: vy };
     this.t = 0;
+    this.hasLaunched = true;
+    this.onLaunch?.(); // Trigger launch sound effect
   }
 
   setPosition(x: number, y: number) {
@@ -68,6 +74,7 @@ export class SimplePhysics {
     this.body.vy = 0;
     this.launch = { x0: x, y0: y, vx0: 0, vy0: 0 };
     this.t = 0;
+    this.hasLaunched = false;
   }
 
   update(dt: number) {
@@ -101,6 +108,8 @@ export class SimplePhysics {
       // start a new parabola from this point
       this.launch = { x0: this.body.x, y0: this.body.y, vx0: newVx, vy0: newVy };
       this.t = 0;
+
+      if(this.hasLaunched) this.onCollision?.(); // Trigger sound effect
     }
 
     // ceiling
@@ -109,6 +118,8 @@ export class SimplePhysics {
       const newVy = -this.body.vy * RESTITUTION;
       this.launch = { x0: this.body.x, y0: this.body.y, vx0: this.body.vx, vy0: newVy };
       this.t = 0;
+
+      if(this.hasLaunched) this.onCollision?.(); // Trigger sound effect
     }
 
     // left wall
@@ -117,6 +128,8 @@ export class SimplePhysics {
       const newVx = -this.body.vx * RESTITUTION;
       this.launch = { x0: this.body.x, y0: this.body.y, vx0: newVx, vy0: this.body.vy };
       this.t = 0;
+
+      if(this.hasLaunched) this.onCollision?.(); // Trigger sound effect
     }
 
     // right wall
@@ -125,17 +138,18 @@ export class SimplePhysics {
       const newVx = -this.body.vx * RESTITUTION;
       this.launch = { x0: this.body.x, y0: this.body.y, vx0: newVx, vy0: this.body.vy };
       this.t = 0;
+
+      if(this.hasLaunched) this.onCollision?.(); // Trigger sound effect
     }
 
     // stop tiny jitter
     if (Math.abs(this.body.vy) < 1 && this.body.y + radius >= this.worldHeight - 1) {
       this.body.vy = 0;
       this.launch.vy0 = 0;
+      this.hasLaunched = false;
     }
 
     // --- Glass Cards ---
-    
-    
     for(const rect of this.colliders) {
       if(
         this.body.x + radius >= rect.leftX &&
@@ -163,21 +177,25 @@ export class SimplePhysics {
 
           // Ensure vx is negative and dampen with restitution
           this.body.vx = -Math.abs(this.body.vx) * (RESTITUTION/2); 
+          if(this.hasLaunched) this.onCollision?.(); // Trigger sound effect
           break;
 
         case overlapLeftOfBall:
           this.body.x = rect.rightX + radius;
           this.body.vx = Math.abs(this.body.vx) * (RESTITUTION/2); 
+          if(this.hasLaunched) this.onCollision?.(); // Trigger sound effect
           break;  
         
         case overlapBelowBall:
           this.body.y = rect.topY - radius;
           this.body.vy = -Math.abs(this.body.vy) * (RESTITUTION/2); 
+          if(this.hasLaunched) this.onCollision?.(); // Trigger sound effect
           break;
         
         case overlapAboveBall:
           this.body.y = rect.bottomY + radius;
           this.body.vy = Math.abs(this.body.vy) * (RESTITUTION/2); 
+          if(this.hasLaunched) this.onCollision?.(); // Trigger sound effect
           break;
         
         default: break;
