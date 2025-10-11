@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import { SECTION_X } from "../typesConstants";
 
-const StarField: React.FC<{ viewportHeight: number }> = ({ viewportHeight }) => {
+
+const StarField: React.FC<{ worldWidth: number, viewportHeight: number }> = ({ worldWidth, viewportHeight }) => {
     // Generate stars only once when the component mounts
     const {stars, orbs} = useMemo(() => {
       const arr: {size: number, x: number, y: number, glow: number}[] = [];
@@ -9,7 +9,7 @@ const StarField: React.FC<{ viewportHeight: number }> = ({ viewportHeight }) => 
 
       for (let i = 0; i < 25; i++) {
         const size: number = Math.random() * 3 + 1;
-        const x: number = Math.random() * (SECTION_X.thanks + 400);
+        const x: number = Math.random() * (worldWidth + 400);
         const y: number = Math.random() * viewportHeight;
         const glow: number = size * 4;
         arr.push({ size, x, y, glow });
@@ -18,7 +18,7 @@ const StarField: React.FC<{ viewportHeight: number }> = ({ viewportHeight }) => 
       // Large glow orbs (soft white gradients)
       for (let i = 0; i < 6; i++) {
         const radius = Math.random() * 400 + 300; // big soft light
-        const x = Math.random() * (SECTION_X.thanks + 400);
+        const x = Math.random() * (worldWidth + 400);
         const y = Math.random() * viewportHeight;
         orbsArr.push({ radius, x, y });
       }

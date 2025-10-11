@@ -1,4 +1,4 @@
-import { GRAVITY_Y, RESTITUTION, SECTION_X } from "../typesConstants";
+import { GRAVITY_Y, RESTITUTION } from "../typesConstants";
 
 export interface PhysicsBody {
   x: number;
@@ -95,7 +95,7 @@ export class SimplePhysics {
     const radius: number = this.body.radius;
 
 
-    const rightBoundary = SECTION_X.thanks + 400;
+    const rightBoundary = this.worldWidth + 400;
 
     // floor
     if (this.body.y + radius > this.worldHeight) {

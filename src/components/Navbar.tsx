@@ -11,7 +11,7 @@ import { launchFireworks } from "../utils/firework";
 
 const Navbar: React.FC = () => {
     const jumpTo: 
-    (section: "about" | "projects" | "skills" | "contact" | "thanks") => void 
+    (section: "intro" | "about" | "projects" | "skills" | "contact" | "thanks") => void 
     = useWorldStore((state) => state.jumpTo);
 
     const resetTo: () => void = useWorldStore((state) => state.reset);  
@@ -30,7 +30,7 @@ const Navbar: React.FC = () => {
         // create both audio tracks
         const audio = new Audio(headlines);
         const audio2 = new Audio(headlinesBaby);
-        audio.volume = 0;
+        audio.volume = 0.0;
         audio.loop = false;
 
         
@@ -69,10 +69,10 @@ const Navbar: React.FC = () => {
       if (!isBaby) {
         // Switch to baby
         a1.volume = 0;
-        a2.volume = 0.8;
+        a2.volume = 0.0;
       } else {
         // Switch to normal
-        a1.volume = 0.8;
+        a1.volume = 0.0;
         a2.volume = 0;
       }
 

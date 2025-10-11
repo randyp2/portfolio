@@ -1,50 +1,81 @@
 import { motion } from "framer-motion";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SimplePhysics, type PhysicsBody, type ColliderRect } from "../physics/SimplePhysics";
 import { useWorldStore } from "../state/useWorldStore";
-import { BALL_RADIUS, SECTION_X, CAMERA_LERP, type COLLIDERES_RECT } from "../typesConstants";
+import { BALL_RADIUS, CAMERA_LERP, type COLLIDERES_RECT, SECTION_SPACING_MULTIPLIER, type SectionId, SECTION_ORDER } from "../typesConstants";
 import Ball from "./Ball";
 import GlassCard from "./GlassCard";
 import StarField from "./StarField";
 import Intro from "../sections/Intro";
+import About from "../sections/About";
 
 const WorldCanvas: React.FC = () => {
+    /* ====== PHYSICS AND LAUNCHING LOGIC VARIABLES ====== */
+    // use useRef to persist between renders (retain values between renders and dont re-render when changed)
     const physicsRef = useRef<SimplePhysics | null>(null);
     const animationFrameRef = useRef<number>(0);
     const lastTimeRef = useRef<number>(Date.now());
     const [isLaunching, setIsLaunching] = useState(false);
     const launchTimeoutRef = useRef<number>(0);
     
-    const { ballX, ballY, cameraX, isJumping, setBallPosition, setCameraX, sections } = useWorldStore(); // Pull the zustand store
+    /* ====== BALL POSITIONING AND CAMERA POSITION LOGIC VARIABLES ====== */
+    const { ballX, ballY, cameraX, isJumping, setBallPosition, setCameraX, setSections, sections } = useWorldStore(); // Pull the zustand store
     const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
     const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
     const viewportCenterX = viewportWidth / 2;
-    const [, forceUpdate] = useState({}); // Call force update to re-render compnent and sub components
     const [colliders, setColliders] = useState<COLLIDERES_RECT []>([]); // Store bounds of glass cards for collision detection
 
+    const [, forceUpdate] = useState({}); // Call force update to re-render compnent and sub components
 
-    // Initialize physics and run animation
+    
+    /**
+     * @brief Set up dynamic sections based on viewport width
+     * @dependencies viewportWidth - recalculate on resize
+     */
+    const SECTION_SPACING: number = viewportWidth * SECTION_SPACING_MULTIPLIER; // Section spacing
+    const dynamicSections = useMemo(() => {
+        let x: number = 0;
+        const map: Record<SectionId, { x: number }> = {} as any; // Map section ids to x positions
+        for (const id of SECTION_ORDER) {
+            map[id] = { x };
+            x += SECTION_SPACING; // Move over by screen-dependent spacing
+        }
+
+        return map;
+
+    }, [viewportWidth]);
+
+    
+
+    /**
+     * @brief Initialize physics engine and run animation loop
+     * @dependencies 
+     *  - viewportHeight 
+     *  - setCameraX 
+     *  - dynamicSections
+     */
     useEffect(() => {
 
-        // Initialize colliders 
+        
+        // Bound world width by last section position or viewport width
+        const worldWidth: number = Object.values(dynamicSections).at(-1)?.x ?? viewportWidth;
 
-        // Initalize physics
-        //  - ball position
-        //  - world size
+        // Initialize physics engine
         physicsRef.current = new SimplePhysics(
-            0,
-            viewportHeight - 100,
-            BALL_RADIUS,
-            SECTION_X.thanks + 400,
-            viewportHeight - 100,
-            viewportCenterX,
+            0, // start ballX
+            viewportHeight - 80, // start ballY
+            BALL_RADIUS, // ball radius
+            worldWidth + 400, // ending world position
+            viewportHeight - 80, // world height
+            viewportCenterX, // center of viewpointX
         );
         
         // Camera initial position x
-        let currentCameraX = -viewportCenterX;
-  
+        let currentCameraX: number = viewportCenterX;
+        
+
         // Physics/animation loop
-        const update = () => {
+        const update = (): void => {
             const now: number = Date.now();
 
             // Determine how many "frames" have passed since last time (capped to avoid large jumps)
@@ -52,20 +83,20 @@ const WorldCanvas: React.FC = () => {
             lastTimeRef.current = now; // Reset last time
             
             if (physicsRef.current) {
-                physicsRef.current.update(dt); // Update physics of ball
+                physicsRef.current.update(dt); // Update position/physics of ball
                 
                 const pos: PhysicsBody = physicsRef.current.body; // Get new position of ball
                 setBallPosition(pos.x, pos.y); // Store it in zustand store
                 
-                // Smooth camera follow with clamping
+                // target camera x is x position of the ball
                 const targetCameraX: number = pos.x;
+
                 // Add to camerax or decrement to camera x to reach ball final position
                 currentCameraX += (targetCameraX - currentCameraX) * CAMERA_LERP; 
-                const clampedCameraX: number = Math.max(0, Math.min(currentCameraX, SECTION_X.thanks));
+                const clampedCameraX: number = Math.max(0, Math.min(currentCameraX, dynamicSections.thanks.x)); // Maybe change?
                 setCameraX(clampedCameraX);
                 
-
-                // Update and reload this component and sub components
+                // Update and reload this component and child components
                 forceUpdate({});
             }
             
@@ -75,18 +106,29 @@ const WorldCanvas: React.FC = () => {
         update();
         
 
-        // Cleanup on unmount
-        // Cancel animation frame
+        // Cleanup on unmount & cancel animation frame
         return () => {
             if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current);
+                cancelAnimationFrame(animationFrameRef.current);
             }
         };
 
-    }, [viewportHeight, setCameraX]);
+    }, [viewportHeight, setCameraX, dynamicSections]);
+
+    /**
+     * @brief Update sections in zustand store when dynamicSections change
+     * @dependencies dynamicSections, setSections
+     */
+    useEffect(() => {
+        setSections(dynamicSections);
+      }, [dynamicSections, setSections]);
 
 
-    // Connect physics engine to zustand store
+
+    /**
+     * @brief If isJumping is true, set position of ball in physics engine to match zustand store
+     * @dependencies ballX, ballY, isJumping
+     */
     useEffect(() => {
         if(isJumping && physicsRef.current) {
             physicsRef.current.setPosition(ballX, ballY);
@@ -94,8 +136,10 @@ const WorldCanvas: React.FC = () => {
     }, [ballX, ballY, isJumping]);
 
 
-  
-    // Handle resize, run everytime when compnent renders
+    /**
+     * @brief Update viewport dimensions and physics world height on window resize
+     * @dependencies none
+     */
     useEffect(() => {
       const handleResize = () => {
         
@@ -106,22 +150,29 @@ const WorldCanvas: React.FC = () => {
         }
       };
       window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize); // Cleanup
     }, []);
   
     /* Add rectangles of possible colliders */
+    /**
+     * @brief Handle bounds reported by GlassCard components
+     * @dependencies none
+     */
     const handleCardBounds = useCallback((bounds: COLLIDERES_RECT) => {
         setColliders((prev: COLLIDERES_RECT[]) => {
-
             // Replace existing entry for this card
             const filtered = prev.filter((b) => b.title !== bounds.title);
             return [...filtered, bounds];
-
         });
     }, []);
     
-    // Add colliders to physics engine
+
+    /**
+     * @brief Update colliders in physics engine when colliders state changes
+     * @dependencies colliders
+     */
     useEffect(() => {
+        // Update colliders in physics engine to handle collisions
         if (physicsRef.current) {
             const simplifiedColliders: ColliderRect[] = colliders.map(({x1: leftX, x2: rightX, y1: topY, y2: bottomY}) => ({
                 leftX, rightX, topY, bottomY,
@@ -132,11 +183,15 @@ const WorldCanvas: React.FC = () => {
       }, [colliders]);
 
 
+    /**
+     * @brief Handle launch event from Ball component
+     * @dependencies none
+     */
     const handleLaunch = useCallback((vx: number, vy: number) => {
       if (physicsRef.current) {
+        // Set velocities computed by Ball component
         physicsRef.current.setVelocity(vx, vy);
-        
-        // Trigger launch animation styling
+
         // Slight glow/flare when launching
         setIsLaunching(true);
         
@@ -152,44 +207,48 @@ const WorldCanvas: React.FC = () => {
       }
     }, []);
     
-    if (!physicsRef.current) return null;
+    if (!physicsRef.current) return null; // Edge case - wait for physics to initialize
   
     return (
         <div className="fixed inset-0 overflow-hidden">
 
-           
-  
             {/* World container with camera transform */}
             <motion.div
-            className="absolute inset-0"
+            className="absolute inset-0 border-2 border-solid border-red-800"
             style={{
                 // Shift world to left and center it based on cameraX
-                transform: `translateX(${0 - cameraX}px)`, 
+                transform: `translateX(${-cameraX}px)`, 
             }}
             >
 
                 {/* Starfield background */}
-                <StarField viewportHeight={viewportHeight} />
+                <StarField worldWidth={physicsRef.current?.worldWidth} viewportHeight={viewportHeight} />
 
                 <Intro />
 
+                <About
+                    centerX={dynamicSections.about.x}
+                    ballX={ballX}
+                    cameraX={cameraX}
+                    viewportCenterX={viewportCenterX}
+                    onBoundsChange={handleCardBounds}
+                />
 
 
                 {/* Cards */}
-                <GlassCard title="About" centerX={sections.about.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
-                    <p>Hi! I'm a CS/SWE student passionate about building sustainable websites, and a niche interest in physics.</p>
-                    <p className="mt-3">I specialize in React, TypeScript, Tailwind CSS, and modern web technologies. I also work with Spring Boot, C++, and enjoy exploring creative coding.</p>
-                </GlassCard>
+                {/* <GlassCard title="About" centerX={dynamicSections.about.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
+                   
+                </GlassCard> */}
     
-                <GlassCard title="Projects" centerX={sections.projects.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
+                {/* <GlassCard title="Projects" centerX={dynamicSections.projects.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
                     <ul className="space-y-3">
                     <li><span className="font-semibold">Java Solitaire Game</span> - Built with Java, Java Swing.</li>
                     <li><span className="font-semibold">CRJ Website Services</span> - Built with React, Tailwind, Typescript, Springboot</li>
                     <li><span className="font-semibold">DSA Visualizer</span> - C# Winform</li>
                     </ul>
-                </GlassCard>
+                </GlassCard> */}
         
-                <GlassCard title="Skills" centerX={sections.skills.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
+                {/* <GlassCard title="Skills" centerX={dynamicSections.skills.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
                     <div className="space-y-4">
                     <div>
                         <h3 className="font-semibold text-white mb-2">Languages</h3>
@@ -204,18 +263,18 @@ const WorldCanvas: React.FC = () => {
                         <p>Docker, Git, AWS, PostgreSQL, Vite</p>
                     </div>
                     </div>
-                </GlassCard>
+                </GlassCard> */}
         
-                <GlassCard title="Contact" centerX={sections.contact.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
+                {/* <GlassCard title="Contact" centerX={dynamicSections.contact.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
                     <p className="text-xl mb-4">XXX</p>
                     <p>XXX</p>
                     <p className="mt-6 font-semibold text-white">XXX</p>
-                </GlassCard>
+                </GlassCard> */}
         
-                <GlassCard title="Thank You" centerX={sections.thanks.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
+                {/* <GlassCard title="Thank You" centerX={dynamicSections.thanks.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
                     <p className="text-4xl font-bold text-center">Thank You.</p>
                     <p className="text-center mt-4 text-gray-400">Thanks for exploring my portfolio!</p>
-                </GlassCard>
+                </GlassCard> */}
                 </motion.div>
         
                 {/* Ball */}
