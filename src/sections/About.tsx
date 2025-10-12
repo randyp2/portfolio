@@ -116,6 +116,7 @@ const About:React.FC<AboutProps> = ({
             {/* Photo card and social media links */}
             <PhotoCard imgSrc={ProfilePicture}/>
 
+            {/* About Content */}
             <div className="flex flex-col justify-center gap-3">
 
                 
@@ -148,7 +149,7 @@ const About:React.FC<AboutProps> = ({
                 {/* Work experience Cards */}
                 <div>
                     <Experience opacity={opacity} scale={scale}/>
-            
+
                     
                 </div>
                 

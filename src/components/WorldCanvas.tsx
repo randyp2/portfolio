@@ -4,10 +4,10 @@ import { SimplePhysics, type PhysicsBody, type ColliderRect } from "../physics/S
 import { useWorldStore } from "../state/useWorldStore";
 import { BALL_RADIUS, CAMERA_LERP, type COLLIDERES_RECT, SECTION_SPACING_MULTIPLIER, type SectionId, SECTION_ORDER } from "../typesConstants";
 import Ball from "./Ball";
-import GlassCard from "./GlassCard";
 import StarField from "./StarField";
 import Intro from "../sections/Intro";
 import About from "../sections/About";
+import Projects from "../sections/Projects";
 
 const WorldCanvas: React.FC = () => {
     /* ====== PHYSICS AND LAUNCHING LOGIC VARIABLES ====== */
@@ -233,6 +233,15 @@ const WorldCanvas: React.FC = () => {
                     viewportCenterX={viewportCenterX}
                     onBoundsChange={handleCardBounds}
                 />
+
+                <Projects
+                    centerX={dynamicSections.projects.x}
+                    ballX={ballX}
+                    cameraX={cameraX}
+                    viewportCenterX={viewportCenterX}
+                    onBoundsChange={handleCardBounds}
+                />
+                
 
 
                 {/* Cards */}

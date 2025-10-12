@@ -85,38 +85,6 @@ const Experience: React.FC<ExperienceProps> = ({ opacity, scale}) => {
                         </motion.div>
                     ))
                 }
-
-                {/* <ExperienceCard title="Frontend Intern" company="Nevada Help Desk" year="Summer 2022" >
-                    <ul>
-                        <li> - Collaborated with <span className="text-[#c5f9f5] font-semibold">5+ </span>developers to develop websites for local churches</li>
-                        <li> - Increased user engagement.</li>
-                        <li> - Participated in code reviews and performed sprint planning to help meet major milestones.</li>
-                    </ul>
-
-                    <span className="italic text-[#c5f9f5] font-semibold">Technologies Used: </span> Javascript, HTML, CSS, WordPress
-                    
-                </ExperienceCard>
-                <EducationCard title="Computer Science Tutor" company="Academic Success Center | UNLV" year="2024-Present"> 
-                    <ul>
-                        <li> - Assist <span className="text-[#c5f9f5] font-semibold">50+ </span>students in understanding data structures, algorithms, and programming languages.</li>
-                        <li> - Helped improve their coding skills and academic performance.</li>
-                    </ul>
-
-                    <span className="italic text-[#c5f9f5] font-semibold">Technologies Used: </span> C++, Python
-
-                </EducationCard>
-
-                <EducationCard title="Fullstack lead developer" company="CRJ Services" year="2025-Present"> 
-                    <ul>
-                        <li> - Lead developer for a fullstack online booking website with admin and user priveleges for a local accounting firm to cater to 
-                        <span className="text-[#c5f9f5] font-semibold"> 100+ </span>users. </li>
-                        <li> - Optimized website by <span className="text-[#c5f9f5] font-semibold">Y%</span> by implementing <span className="text-[#c5f9f5] font-semibold">Z</span></li>
-                    </ul>
-
-                    <span className="italic text-[#c5f9f5] font-semibold">Technologies Used: </span> React, Tailwind, Java Spring Boot, Postgres, Docker, AWS, OAuth 2.0 
-
-                </EducationCard> */}
-                {/* <EducationCard title="Senior Developer" company="Tech Corp" year="2022" description="Hello"/> */}
             </div>
 
         </ GlassCard>
