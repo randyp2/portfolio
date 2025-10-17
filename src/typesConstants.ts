@@ -1,6 +1,8 @@
 export const GRAVITY_Y = 0.8;
 export const RESTITUTION = 0.6;
+export const BLOCK_RESTITUTION = 0.2; // Amount to reduce speed on collision with blocks
 export const MAX_LAUNCH_SPEED = 60;
+export const COEFFICIENT_OF_FRICTION = 0.02; // Friction applied to horizontal movement
 // export const SECTION_X = {
 //   intro: 0,
 //   about: 1600,

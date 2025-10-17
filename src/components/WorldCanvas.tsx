@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { SimplePhysics, type PhysicsBody, type ColliderRect } from "../physics/SimplePhysics";
+import { SimplePhysics, type ColliderRect, type PhysicsEntity } from "../physics/SimplePhysics";
 import { useWorldStore } from "../state/useWorldStore";
 import { BALL_RADIUS, CAMERA_LERP, type COLLIDERES_RECT, SECTION_SPACING_MULTIPLIER, type SectionId, SECTION_ORDER } from "../typesConstants";
 import Ball from "./Ball";
@@ -8,6 +8,7 @@ import StarField from "./StarField";
 import Intro from "../sections/Intro";
 import About from "../sections/About";
 import Projects from "../sections/Projects";
+import MassBlock from "./MassBlock";
 
 const WorldCanvas: React.FC = () => {
     /* ====== PHYSICS AND LAUNCHING LOGIC VARIABLES ====== */
@@ -85,7 +86,7 @@ const WorldCanvas: React.FC = () => {
             if (physicsRef.current) {
                 physicsRef.current.update(dt); // Update position/physics of ball
                 
-                const pos: PhysicsBody = physicsRef.current.body; // Get new position of ball
+                const pos: PhysicsEntity = physicsRef.current.body; // Get new position of ball
                 setBallPosition(pos.x, pos.y); // Store it in zustand store
                 
                 // target camera x is x position of the ball
@@ -206,6 +207,25 @@ const WorldCanvas: React.FC = () => {
         }, 400);
       }
     }, []);
+
+
+    /**
+     * @brief Spawn in mass blocks
+     * @dependencies none
+     */
+    const handleSpawnMasses = useCallback(() => {
+        const physics = physicsRef.current;
+        if (!physics) return;
+      
+        // Only spawn once
+        if (physics.blocks.length > 0) return;
+        
+        // Add blocks 
+        physics.addBlock("block-5N-1", dynamicSections.projects.x + 200, -200, 60, 60, 5, "5kg");
+        physics.addBlock("block-5N-2", dynamicSections.projects.x + 300, -250, 60, 60, 5, "5kg");
+        physics.addBlock("block-10N", dynamicSections.projects.x + 450, -300, 60, 60, 5, "5kg");
+        physics.addBlock("block-20N", dynamicSections.projects.x + 600, -350, 60, 60, 5, "5kg");
+    }, [dynamicSections.projects.x]);
     
     if (!physicsRef.current) return null; // Edge case - wait for physics to initialize
   
@@ -240,60 +260,32 @@ const WorldCanvas: React.FC = () => {
                     cameraX={cameraX}
                     viewportCenterX={viewportCenterX}
                     onBoundsChange={handleCardBounds}
+                    onSpawnMasses={handleSpawnMasses}
                 />
                 
 
 
-                {/* Cards */}
-                {/* <GlassCard title="About" centerX={dynamicSections.about.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
-                   
-                </GlassCard> */}
-    
-                {/* <GlassCard title="Projects" centerX={dynamicSections.projects.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
-                    <ul className="space-y-3">
-                    <li><span className="font-semibold">Java Solitaire Game</span> - Built with Java, Java Swing.</li>
-                    <li><span className="font-semibold">CRJ Website Services</span> - Built with React, Tailwind, Typescript, Springboot</li>
-                    <li><span className="font-semibold">DSA Visualizer</span> - C# Winform</li>
-                    </ul>
-                </GlassCard> */}
-        
-                {/* <GlassCard title="Skills" centerX={dynamicSections.skills.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
-                    <div className="space-y-4">
-                    <div>
-                        <h3 className="font-semibold text-white mb-2">Languages</h3>
-                        <p>C++, C, C#, JavaScript/TypeScript, Java, Python, SQL</p>
-                    </div>
-                    <div>
-                        <h3 className="font-semibold text-white mb-2">Frameworks & Libraries</h3>
-                        <p>React, Next.js, Spring Boot, Tailwind CSS, Framer Motion</p>
-                    </div>
-                    <div>
-                        <h3 className="font-semibold text-white mb-2">Tools & Platforms</h3>
-                        <p>Docker, Git, AWS, PostgreSQL, Vite</p>
-                    </div>
-                    </div>
-                </GlassCard> */}
-        
-                {/* <GlassCard title="Contact" centerX={dynamicSections.contact.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
-                    <p className="text-xl mb-4">XXX</p>
-                    <p>XXX</p>
-                    <p className="mt-6 font-semibold text-white">XXX</p>
-                </GlassCard> */}
-        
-                {/* <GlassCard title="Thank You" centerX={dynamicSections.thanks.x} ballX={ballX} cameraX={cameraX} viewportCenterX={viewportCenterX} onBoundsChange={handleCardBounds}>
-                    <p className="text-4xl font-bold text-center">Thank You.</p>
-                    <p className="text-center mt-4 text-gray-400">Thanks for exploring my portfolio!</p>
-                </GlassCard> */}
-                </motion.div>
-        
-                {/* Ball */}
-                <Ball 
-                physics={physicsRef.current} 
-                viewportCenterX={viewportCenterX} 
-                cameraX={cameraX}
-                onLaunch={handleLaunch}
-                isLaunching={isLaunching}
+            </motion.div>
+                
+            {/* Block masses */}
+            {physicsRef.current?.blocks.map((block) => (
+                <MassBlock
+                    key={block.id}
+                    physics={physicsRef.current!}
+                    entity={block}
+                    viewportCenterX={viewportCenterX}
+                    cameraX={cameraX}
                 />
+            ))}
+            
+            {/* Ball */}
+            <Ball 
+            physics={physicsRef.current} 
+            viewportCenterX={viewportCenterX} 
+            cameraX={cameraX}
+            onLaunch={handleLaunch}
+            isLaunching={isLaunching}
+            />
         </div>
     );
 };

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FADE_RADIUS } from "../typesConstants";
 import MassBlock from "../components/MassBlock";
+import Atwood from "../projects-components/Atwood";
 
 interface ProjectsProps {
     centerX: number;
@@ -17,9 +18,11 @@ interface ProjectsProps {
         y1: number;
         y2: number;
     }) => void;
+
+    onSpawnMasses?: () => void;
 }
 
-const Projects: React.FC<ProjectsProps> = ({ centerX, ballX, cameraX, viewportCenterX, onBoundsChange}) => {
+const Projects: React.FC<ProjectsProps> = ({ centerX, ballX, cameraX, viewportCenterX, onBoundsChange, onSpawnMasses}) => {
     
     const sectionRef = useRef<HTMLDivElement>(null);
     const [sectionWidth, setSectionWidth] = useState<number>(0);
@@ -56,16 +59,17 @@ const Projects: React.FC<ProjectsProps> = ({ centerX, ballX, cameraX, viewportCe
     useEffect(() => {
         if (opacity > 0.5 && !spawnMasses) {
           setSpawnMasses(true);
+          onSpawnMasses?.(); // Spawn in mass blocks
         }
-    }, [opacity, spawnMasses]);
+    }, [opacity, spawnMasses, onSpawnMasses]);
 
     return(
         <motion.div
             ref={sectionRef}
-            className=" w-full h-screen flex flex-row items-center justify-start gap-10 absolute top-1/2 left-1/2 -translate-y-1/2  bg-white/5 rounded-3xl shadow-2xl p-10 max-h-[600px]"
+            className=" bg-white/5 min-w-screen h-screen flex flex-row justify-center items-start gap-10 absolute top-0 rounded-3xl shadow-2xl p-10 "
             style={{
                 left: `${centerX}px`,
-                width: "auto", // allows it to expand to fit both GlassCards
+                width: "auto", 
                 maxWidth: "none", // ensure no Tailwind limit constrains it
             }}
             animate={{
@@ -79,14 +83,7 @@ const Projects: React.FC<ProjectsProps> = ({ centerX, ballX, cameraX, viewportCe
                 mass: 0.5,
             }}
         >
-            {/* Falling masses */}
-            {spawnMasses && (
-                <div className=" flex flex-row gap-10">
-                {["5N", "5N", "10N", "20N"].map((label, i) => (
-                    <MassBlock key={i} label={label} index={i} />
-                ))}
-                </div>
-            )}
+            <Atwood />
         </motion.div>
     );
 }

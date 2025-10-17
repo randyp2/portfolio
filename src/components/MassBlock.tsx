@@ -1,30 +1,61 @@
-import { motion } from "framer-motion";
-import React from "react";
+import { motion, type PanInfo } from "framer-motion";
+import React, { useState } from "react";
+import type { SimplePhysics, PhysicsEntity } from "../physics/SimplePhysics";
 
 
 interface MassBlockProps {
-    label: string;
-    index: number;
+    physics: SimplePhysics;
+    entity: PhysicsEntity;   // reference to this block inside physics
+    viewportCenterX: number;
+    cameraX: number;
+    onDrop?: (entity: PhysicsEntity, dropX: number, dropY: number) => void;
 }
 
 
-const MassBlock: React.FC<MassBlockProps> = ({ label, index }) => {
+const MassBlock: React.FC<MassBlockProps> = ({ physics, entity, viewportCenterX, cameraX, onDrop }) => {
+
+    const [impact, setImpact] = useState<boolean>(false); // Optional for styling
+    const [dragging, setDragging] = useState<boolean>(false);
+
+    // Coordinate of mass (in respect to WorldCanvas) - cameraX + viewportCenterX
+    const screenX: number = entity.x + viewportCenterX - cameraX;
+    const screenY: number = entity.y;
+
+
+    const handleDragEnd = (e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => { 
+        setImpact(false);
+
+        // Compute drop coordinates
+        const dropX = screenX + info.offset.x;
+        const dropY = screenY + info.offset.y;
+
+        // Report to parent (Projects)
+        onDrop?.(entity, dropX, dropY);
+    }
+
     return (
         <motion.div
-        initial={{ y: -400, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{
-            type: "spring",
-            stiffness: 180,
-            damping: 12,
-            mass: 0.8,
-            delay: index * 0.25,
-        }}
-        className="w-16 h-16 rounded-xl bg-cyan-500/60 border border-cyan-400/40
-                flex items-center justify-center text-white font-semibold
-                shadow-[0_0_15px_#00ffff90] select-none"
+            drag
+            dragMomentum = {false}
+            onDragStart = {() => setDragging(true)}
+            onDragEnd = {handleDragEnd}
+            className={`absolute rounded-xl border flex items-center justify-center 
+                        text-white font-semibold select-none ${dragging ? "hover:cursor-grabbing" : "hover:cursor-pointer"}`}
+            style={{
+                width: `${entity.width}px`,
+                height: `${entity.height}px`,
+                left: `${screenX - entity.width! / 2}px`,
+                top: `${screenY - entity.height! / 2}px`,
+                backgroundColor: impact ? "rgba(0,255,255,0.7)" : "rgba(0,255,255,0.4)",
+                borderColor: "rgba(0,255,255,0.25)",
+                boxShadow: impact
+                ? "0 0 20px rgba(0,255,255,0.9)"
+                : "0 0 12px rgba(0,255,255,0.5)",
+            }}
+            animate={{ scale: impact ? 1.1 : 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
         >
-            {label}
+            {entity.label}
         </motion.div>
   );
 }
