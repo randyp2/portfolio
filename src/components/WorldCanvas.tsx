@@ -28,6 +28,16 @@ const WorldCanvas: React.FC = () => {
 
     const [, forceUpdate] = useState({}); // Call force update to re-render compnent and sub components
 
+    /* ====== ATWOOD USESTATES ====== */
+    type DropZoneRect = {
+        leftX: number;
+        rightX: number;
+        topY: number;
+        bottomY: number;
+    } 
+
+    const [dropZoneRect, setDropZoneRect] = useState<DropZoneRect | null>(null);
+
     
     /**
      * @brief Set up dynamic sections based on viewport width
@@ -226,6 +236,45 @@ const WorldCanvas: React.FC = () => {
         physics.addBlock("block-10N", dynamicSections.projects.x + 450, -300, 60, 60, 5, "5kg");
         physics.addBlock("block-20N", dynamicSections.projects.x + 600, -350, 60, 60, 5, "5kg");
     }, [dynamicSections.projects.x]);
+
+
+    /**
+     * @brief Handle block movement when dragged and dropped
+     * 
+     * @param entity - Physics entity being moved
+     * @param dropX - X coordinate where block was dropped
+     * @param dropY - Y coordinate where block was dropped
+     */
+    const handleMassDrop = useCallback((entity: PhysicsEntity, dropX: number, dropY: number) => {   
+        if(!physicsRef.current) return;
+
+        // If drop zone is not defined
+        if(!dropZoneRect) return;
+
+        // Determine whether mass was dropped within dropzone
+        const insideZone: boolean = 
+        dropX >= dropZoneRect.leftX &&
+        dropX <= dropZoneRect.rightX &&
+        dropY >= dropZoneRect.topY &&
+        dropY <= dropZoneRect.bottomY;
+
+        if(insideZone) {
+            // snap entity into position if you want
+            entity.x = dropX - viewportCenterX + cameraX;
+            entity.y = dropY;
+            entity.vx = 0;
+            entity.vy = 0;
+            return;
+        }
+
+        // Otherwise — free fall in physics world
+        entity.x = dropX - viewportCenterX + cameraX;
+        entity.y = dropY;
+        entity.vx = 0;
+        entity.vy = 0;
+
+
+    }, [viewportCenterX, cameraX]);
     
     if (!physicsRef.current) return null; // Edge case - wait for physics to initialize
   
@@ -259,6 +308,7 @@ const WorldCanvas: React.FC = () => {
                     ballX={ballX}
                     cameraX={cameraX}
                     viewportCenterX={viewportCenterX}
+                    setDropZoneRect={setDropZoneRect}
                     onBoundsChange={handleCardBounds}
                     onSpawnMasses={handleSpawnMasses}
                 />
@@ -275,6 +325,7 @@ const WorldCanvas: React.FC = () => {
                     entity={block}
                     viewportCenterX={viewportCenterX}
                     cameraX={cameraX}
+                    onDrop={handleMassDrop}
                 />
             ))}
             

@@ -1,6 +1,31 @@
-import React from "react";
+import React, { useLayoutEffect, useRef } from "react";
 
-const Atwood: React.FC = () => { 
+interface AtwoodProps {
+    onBoundsChange?: (rect: DOMRect) => void;
+}
+
+
+const Atwood: React.FC<AtwoodProps> = ({ onBoundsChange }) => { 
+
+    const dropZoneRef = useRef<HTMLDivElement>(null);
+
+    useLayoutEffect(() => {
+        if (!dropZoneRef.current || !onBoundsChange) return;
+    
+        const updateRect = () => {
+          const rect = dropZoneRef.current!.getBoundingClientRect();
+          onBoundsChange(rect);
+        };
+    
+        // initial measure
+        updateRect();
+    
+        // update on resize
+        window.addEventListener("resize", updateRect);
+        return () => window.removeEventListener("resize", updateRect);
+      }, [onBoundsChange]); // safe: only re-run if callback identity changes
+      
+    
     return (
         <div>
             {/* Main container */}
@@ -54,7 +79,9 @@ const Atwood: React.FC = () => {
                         <div className="absolute inset-4 border-2 border-dashed border-white/10 rounded-xl"></div>
                         
                         {/* Mass label */}
-                        <div className="relative z-10 text-white/60 font-light text-sm tracking-wider">
+                        <div 
+                        ref={dropZoneRef}
+                        className="relative z-10 text-white/60 font-light text-sm tracking-wider">
                             DROP ZONE
                         </div>
                         

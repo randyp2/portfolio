@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FADE_RADIUS } from "../typesConstants";
 import MassBlock from "../components/MassBlock";
 import Atwood from "../projects-components/Atwood";
@@ -9,6 +9,11 @@ interface ProjectsProps {
     ballX: number;
     cameraX: number;
     viewportCenterX: number;
+
+
+
+    // setDropZoneRect: (rect: { leftX: number; rightx: number; topY: number; bottomY: number } | null) => void;
+    setDropZoneRect: React.Dispatch<React.SetStateAction<{ leftX: number; rightX: number; topY: number; bottomY: number } | null>>;
 
     // Update bounds of glasscard
     onBoundsChange?: (bounds: {
@@ -22,7 +27,7 @@ interface ProjectsProps {
     onSpawnMasses?: () => void;
 }
 
-const Projects: React.FC<ProjectsProps> = ({ centerX, ballX, cameraX, viewportCenterX, onBoundsChange, onSpawnMasses}) => {
+const Projects: React.FC<ProjectsProps> = ({ centerX, ballX, cameraX, viewportCenterX, setDropZoneRect, onBoundsChange, onSpawnMasses}) => {
     
     const sectionRef = useRef<HTMLDivElement>(null);
     const [sectionWidth, setSectionWidth] = useState<number>(0);
@@ -63,6 +68,18 @@ const Projects: React.FC<ProjectsProps> = ({ centerX, ballX, cameraX, viewportCe
         }
     }, [opacity, spawnMasses, onSpawnMasses]);
 
+    const handleBoundsChange = useCallback(
+        (rect: DOMRect) => {
+          setDropZoneRect({
+            leftX: rect.left,
+            rightX: rect.right,
+            topY: rect.top,
+            bottomY: rect.bottom,
+          });
+        },
+        [setDropZoneRect]
+      );
+
     return(
         <motion.div
             ref={sectionRef}
@@ -83,7 +100,7 @@ const Projects: React.FC<ProjectsProps> = ({ centerX, ballX, cameraX, viewportCe
                 mass: 0.5,
             }}
         >
-            <Atwood />
+            <Atwood onBoundsChange={handleBoundsChange}/>
         </motion.div>
     );
 }

@@ -168,17 +168,6 @@ export class SimplePhysics {
       
     }
 
-    // for(let i = 0; i < this.blocks.length; i++) { 
-    //   for(let j = 0; j < this.blocks.length; j++) {
-    //     if(i === j) continue; // Don't check collision with itself
-    //     const block1 = this.blocks[i];
-    //     const block2 = this.blocks[j];
-
-    //     if(this.blockCollision(block1, block2)) {
-    //       this.resolveBlockBlockCollision(block1, block2, BLOCK_RESTITUTION);
-    //     }
-    //   }
-    // }
 
     for (let i = 0; i < this.blocks.length; i++) {
       for (let j = i + 1; j < this.blocks.length; j++) {
@@ -328,8 +317,6 @@ export class SimplePhysics {
      BLOCK LOGIC
      ============================================================ */
   updateBlocks(dt: number) {
-
-    
 
     for(const block of this.blocks) {
 

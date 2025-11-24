@@ -30,7 +30,7 @@ const MassBlock: React.FC<MassBlockProps> = ({ physics, entity, viewportCenterX,
         const dropY = screenY + info.offset.y;
 
         // Report to parent (Projects)
-        onDrop?.(entity, dropX, dropY);
+        onDrop?.(entity, dropX, dropY); // If onDrop is defined
     }
 
     return (
