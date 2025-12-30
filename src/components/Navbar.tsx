@@ -10,18 +10,22 @@ import { useEffect, useRef, useState } from "react";
 import { launchFireworks } from "../utils/firework";
 
 const Navbar: React.FC = () => {
-    const jumpTo: 
-    (section: "intro" | "about" | "projects" | "skills" | "contact" | "thanks") => void 
-    = useWorldStore((state) => state.jumpTo);
+    const jumpTo = useWorldStore((state) => state.jumpTo);
 
-    const resetTo: () => void = useWorldStore((state) => state.reset);  
-    const [isBaby, setIsBaby] = useState<boolean>(false); 
-  
+    const resetTo: () => void = useWorldStore((state) => state.reset);
+    const [isBaby, setIsBaby] = useState<boolean>(false);
+
+    // Main nav sections (Skills is handled separately as dropdown)
     const sections: { id: SectionId; label: string }[] = [
       { id: 'about', label: 'About' },
       { id: 'projects', label: 'Projects' },
-      { id: 'skills', label: 'Skills' },
-      { id: 'contact', label: 'Contact' },
+    ];
+
+    // Skills dropdown sub-sections
+    const skillSections: { id: SectionId; label: string }[] = [
+      { id: 'languages', label: 'Languages' },
+      { id: 'tools', label: 'Developer Tools' },
+      { id: 'frameworks', label: 'Frameworks' },
     ];
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const audio2Ref = useRef<HTMLAudioElement | null>(null);
@@ -117,7 +121,6 @@ const Navbar: React.FC = () => {
       {/* --- Center Navigation Buttons --- */}
       <div className="flex gap-6">
         {sections.map((section, index) => (
-          
           <motion.button
             key={section.id}
             onClick={() => jumpTo(section.id)}
@@ -149,6 +152,97 @@ const Navbar: React.FC = () => {
             />
           </motion.button>
         ))}
+
+        {/* Skills Dropdown */}
+        <div className="relative group">
+          <motion.button
+            onClick={() => jumpTo('languages')}
+            className="
+              text-white/80 hover:text-white px-4 py-2 rounded-lg relative font-medium tracking-wide
+              transition-colors hover:cursor-pointer flex items-center gap-1
+            "
+            whileHover={{
+              scale: 1.08,
+              textShadow: "0 0 15px rgba(255,255,255,0.4)",
+            }}
+            whileTap={{ scale: 0.85 }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              opacity: { duration: 0.25, delay: 0.2 },
+              y: { duration: 0.25, delay: 0.2 },
+              type: "spring",
+              stiffness: 200,
+              damping: 15,
+            }}
+          >
+            Skills
+            <svg
+              className="w-4 h-4 transition-transform group-hover:rotate-180"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+            <motion.div
+              className="absolute inset-0 rounded-lg bg-white/10 z-0"
+              initial={{ opacity: 0 }}
+              whileHover={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+            />
+          </motion.button>
+
+          {/* Dropdown Menu */}
+          <div className="absolute top-full left-0 mt-2 py-2 min-w-[160px] rounded-lg
+            bg-white/10 backdrop-blur-xl border border-white/10
+            shadow-[0_0_20px_rgba(255,255,255,0.1)]
+            opacity-0 invisible group-hover:opacity-100 group-hover:visible
+            transition-all duration-200 z-50"
+          >
+            {skillSections.map((skill) => (
+              <button
+                key={skill.id}
+                onClick={() => jumpTo(skill.id)}
+                className="w-full text-left px-4 py-2 text-white/80 hover:text-white
+                  hover:bg-white/10 transition-colors text-sm font-medium"
+              >
+                {skill.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Contact Button */}
+        <motion.button
+          onClick={() => jumpTo('contact')}
+          className="
+            text-white/80 hover:text-white px-4 py-2 rounded-lg relative font-medium tracking-wide
+            transition-colors hover:cursor-pointer
+          "
+          whileHover={{
+            scale: 1.08,
+            textShadow: "0 0 15px rgba(255,255,255,0.4)",
+          }}
+          whileTap={{ scale: 0.85 }}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            opacity: { duration: 0.25, delay: 0.3 },
+            y: { duration: 0.25, delay: 0.3 },
+            type: "spring",
+            stiffness: 200,
+            damping: 15,
+          }}
+        >
+          Contact
+          <motion.div
+            className="absolute inset-0 rounded-lg bg-white/10 z-0"
+            initial={{ opacity: 0 }}
+            whileHover={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+          />
+        </motion.button>
       </div>
       </motion.nav>
     );

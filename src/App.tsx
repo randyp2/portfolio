@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import Navbar from "./components/Navbar";
 import WorldCanvas from "./components/WorldCanvas";
 import Footer from "./components/Footer";
-
 
 const App: React.FC = () => {
   return (
@@ -15,3 +14,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
