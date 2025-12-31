@@ -167,7 +167,7 @@ const Projects: React.FC<ProjectsProps> = ({
         projects={[
           {
             id: "p1",
-            image: "/portfolio/media/portfolio-gen-prev.mp4",
+            image: "/media/portfolio-gen-prev.mp4",
             title: "Portfolio Generator",
             description:
               "Generates a portfolio based on user form and user resume",
@@ -184,7 +184,7 @@ const Projects: React.FC<ProjectsProps> = ({
           },
           {
             id: "p2",
-            image: "/portfolio/media/dsa_prev.mp4",
+            image: "/media/dsa_prev.mp4",
             title: "DSA Visualizer",
             description:
               "Sorting visualizer and linked list visualizer that analyzes sorting algorithms, comparisons, and run times",
@@ -194,7 +194,7 @@ const Projects: React.FC<ProjectsProps> = ({
           },
           {
             id: "p3",
-            image: "/portfolio/media/conway_prev.mp4",
+            image: "/media/conway_prev.mp4",
             title: "Conway's Game of Life",
             description: "Cellular automaton simulation",
             tags: ["C++", "Raylib"],
@@ -211,7 +211,7 @@ const Projects: React.FC<ProjectsProps> = ({
         projects={[
           {
             id: "w1",
-            image: "/portfolio/media/crj_prev.mp4",
+            image: "/media/crj_prev.mp4",
             title: "CRJ Website",
             description:
               "Lead Full Stack Developer for client website redesign and development",
@@ -221,7 +221,7 @@ const Projects: React.FC<ProjectsProps> = ({
           },
           {
             id: "w2",
-            image: "/portfolio/media/portfolio-gen-prev.mp4",
+            image: "/media/portfolio-gen-prev.mp4",
             title: "Portfolio Generator",
             description:
               "Startup venture: AI-powered portfolio generator that creates personalized portfolios from user forms and resumes",
