@@ -1,8 +1,8 @@
-export declare const GRAVITY_Y = 0.8;
+export declare const GRAVITY_Y = 2880;
 export declare const RESTITUTION = 0.6;
 export declare const BLOCK_RESTITUTION = 0.5;
-export declare const MAX_LAUNCH_SPEED = 60;
-export declare const COEFFICIENT_OF_FRICTION = 0.02;
+export declare const MAX_LAUNCH_SPEED = 3600;
+export declare const COEFFICIENT_OF_FRICTION = 0.0005;
 export declare const SECTION_SPACING_MULTIPLIER = 1.6;
 export declare const SKILL_SECTION_SPACING_MULTIPLIER = 0.5;
 export declare const SECTION_ORDER: readonly ["intro", "about", "projects", "languages", "tools", "frameworks", "contact", "thanks"];

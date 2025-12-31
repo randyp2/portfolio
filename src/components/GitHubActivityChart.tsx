@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from "react";
+import React, { useEffect, useState, memo, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 
 interface GitHubEvent {
@@ -12,6 +12,7 @@ interface ChartData {
 }
 
 const GitHubActivityChart: React.FC<{ username: string }> = memo(({ username }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +47,11 @@ const GitHubActivityChart: React.FC<{ username: string }> = memo(({ username }) 
           .reverse()
           .slice(0, 30);
 
+        console.log("[GitHubActivityChart] fetched events", {
+          username,
+          eventsCount: events.length,
+          chartPoints: chartData.length,
+        });
         setData(chartData);
         setLoading(false);
       } catch (err) {
@@ -56,6 +62,21 @@ const GitHubActivityChart: React.FC<{ username: string }> = memo(({ username }) 
 
     fetchGitHubActivity();
   }, [username]);
+
+  useEffect(() => {
+    const logSize = () => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        console.log("[GitHubActivityChart] container size", {
+          width: rect.width,
+          height: rect.height,
+        });
+      }
+    };
+    logSize();
+    window.addEventListener("resize", logSize);
+    return () => window.removeEventListener("resize", logSize);
+  }, []);
 
   if (loading) {
     return (
@@ -73,8 +94,18 @@ const GitHubActivityChart: React.FC<{ username: string }> = memo(({ username }) 
     );
   }
 
+  // Guard against zero-size containers which Recharts treats as -1 width/height
+  const containerRect = containerRef.current?.getBoundingClientRect();
+  const hasSize = containerRect && containerRect.width > 0 && containerRect.height > 0;
+  if (!hasSize) {
+    console.warn("[GitHubActivityChart] no measurable size, skipping render", {
+      width: containerRect?.width,
+      height: containerRect?.height,
+    });
+  }
+
   return (
-    <div className="w-full h-full">
+    <div ref={containerRef} className="w-full h-full min-h-40">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
