@@ -36,6 +36,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [sourceRect, setSourceRect] = useState<DOMRect | null>(null)
   const [hiddenCardId, setHiddenCardId] = useState<string | null>(null)
+  const [isHovered, setIsHovered] = useState(false)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
 
   // Handle collision trigger - one-time folder opening (only if not disabled)
@@ -83,9 +84,14 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
           "p-8 rounded-2xl",
           "bg-card border border-border",
           "transition-all duration-500 ease-out",
-          "group",
+          "group cursor-pointer",
           className,
         )}
+        onMouseEnter={() => !isDisabled && setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => {
+          if (!isDisabled) setIsOpen(true)
+        }}
         style={{
           minWidth: "280px",
           minHeight: "320px",
@@ -97,7 +103,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
           className="absolute inset-0 rounded-2xl transition-opacity duration-500"
           style={{
             background: "radial-gradient(circle at 50% 70%, oklch(0.75 0.10 225) 0%, transparent 70%)",
-            opacity: isOpen ? 0.08 : 0,
+            opacity: isOpen || isHovered ? 0.12 : 0,
           }}
         />
 
