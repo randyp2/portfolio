@@ -10,6 +10,16 @@ interface Project {
   id: string
   image: string
   title: string
+  description?: string
+  tags?: string[]
+  status?: "In Development" | "Finished" | "Archived"
+  link?: string
+}
+
+// Helper to detect if media is a video file
+const isVideoFile = (url: string): boolean => {
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov']
+  return videoExtensions.some(ext => url.toLowerCase().endsWith(ext))
 }
 
 interface AnimatedFolderProps {
@@ -429,14 +439,28 @@ function ImageLightbox({
               }}
             >
               {projects.map((project) => (
-                <img
-                  key={project.id}
-                  src={project.image || "/placeholder.svg"}
-                  alt={project.title}
-                  className="w-full h-auto max-h-[70vh] object-contain bg-background flex-shrink-0"
-                  style={{ minWidth: "100%" }}
-                  onClick={(e) => e.stopPropagation()}
-                />
+                isVideoFile(project.image) ? (
+                  <video
+                    key={project.id}
+                    src={project.image}
+                    className="w-full h-auto max-h-[70vh] object-contain bg-background flex-shrink-0"
+                    style={{ minWidth: "100%" }}
+                    onClick={(e) => e.stopPropagation()}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                  />
+                ) : (
+                  <img
+                    key={project.id}
+                    src={project.image || "/placeholder.svg"}
+                    alt={project.title}
+                    className="w-full h-auto max-h-[70vh] object-contain bg-background flex-shrink-0"
+                    style={{ minWidth: "100%" }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                )
               ))}
             </div>
 
@@ -525,19 +549,43 @@ function ImageLightbox({
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-medium text-foreground tracking-tight truncate h-7">
-                  {currentProject?.title}
-                </h3>
-                <div className="flex items-center gap-3 mt-1">
-                  <p className="text-sm text-muted-foreground">
-                    <kbd className="px-1.5 py-0.5 mx-0.5 text-xs font-medium bg-muted text-muted-foreground rounded border border-border">
-                      ←
-                    </kbd>
-                    <kbd className="px-1.5 py-0.5 mx-0.5 text-xs font-medium bg-muted text-muted-foreground rounded border border-border">
-                      →
-                    </kbd>{" "}
-                    to navigate
+                <div className="flex items-center gap-3">
+                  <h3 className="text-lg font-medium text-foreground tracking-tight truncate">
+                    {currentProject?.title}
+                  </h3>
+                  {currentProject?.status && (
+                    <span
+                      className={cn(
+                        "px-2 py-0.5 text-xs font-medium rounded-full whitespace-nowrap",
+                        currentProject.status === "Finished"
+                          ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                          : currentProject.status === "In Development"
+                          ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                          : "bg-zinc-500/20 text-zinc-400 border border-zinc-500/30"
+                      )}
+                    >
+                      {currentProject.status}
+                    </span>
+                  )}
+                </div>
+                {currentProject?.description && (
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    {currentProject.description}
                   </p>
+                )}
+                {currentProject?.tags && currentProject.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {currentProject.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded border border-border"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center gap-3 mt-2">
                   <div className="flex items-center gap-1.5">
                     {projects.map((_, idx) => (
                       <button
@@ -555,19 +603,24 @@ function ImageLightbox({
                 </div>
               </div>
 
-              <button
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2",
-                  "text-sm font-medium text-muted-foreground",
-                  "bg-muted/50 hover:bg-muted",
-                  "rounded-lg border border-border",
-                  "transition-all duration-200 ease-out",
-                  "hover:text-foreground",
-                )}
-              >
-                <span>View</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </button>
+              {currentProject?.link && (
+                <a
+                  href={currentProject.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2",
+                    "text-sm font-medium text-muted-foreground",
+                    "bg-muted/50 hover:bg-muted",
+                    "rounded-lg border border-border",
+                    "transition-all duration-200 ease-out",
+                    "hover:text-foreground",
+                  )}
+                >
+                  <span>View</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -615,7 +668,11 @@ export const ProjectCard = forwardRef<HTMLDivElement, ProjectCardProps>(
           onClick()
         }}
       >
-        <img src={image || "/placeholder.svg"} alt={title} className="w-full h-full object-cover" />
+{isVideoFile(image) ? (
+          <video src={image} className="w-full h-full object-cover" autoPlay loop muted playsInline />
+        ) : (
+          <img src={image || "/placeholder.svg"} alt={title} className="w-full h-full object-cover" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
         <p className="absolute bottom-1.5 left-1.5 right-1.5 text-[10px] font-medium text-primary-foreground truncate">
           {title}

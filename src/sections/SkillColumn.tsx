@@ -72,8 +72,8 @@ const SkillColumn: React.FC<SkillColumnProps> = ({
           y,
           70 + Math.random() * 20, // Width
           70 + Math.random() * 20, // Height
-          4 + Math.random() * 3, // Mass
-          skill // Label for icon
+          4, // Mass
+          skill, // Label for icon
         );
       });
       setHasSpawned(true);

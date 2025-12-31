@@ -1,6 +1,10 @@
 export const GRAVITY_Y = 0.8;
 export const RESTITUTION = 0.6;
-export const BLOCK_RESTITUTION = 0.2;
+// Coefficient of restitution for block-block collisions
+// e = 1.0 = perfectly elastic (no energy loss)
+// e = 0.0 = perfectly inelastic (maximum energy loss)
+// Higher values create a "Newton's cradle" effect where momentum propagates through stacked blocks
+export const BLOCK_RESTITUTION = 0.5;
 export const MAX_LAUNCH_SPEED = 60;
 export const COEFFICIENT_OF_FRICTION = 0.02; // Friction applied to horizontal movement
 // export const SECTION_X = {

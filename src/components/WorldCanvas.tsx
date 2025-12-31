@@ -70,7 +70,8 @@ const WorldCanvas: React.FC = () => {
    * @dependencies viewportWidth - recalculate on resize
    */
   const SECTION_SPACING: number = viewportWidth * SECTION_SPACING_MULTIPLIER; // Section spacing
-  const SKILL_SECTION_SPACING: number = viewportWidth * SKILL_SECTION_SPACING_MULTIPLIER; // Smaller spacing for skill sections
+  const SKILL_SECTION_SPACING: number =
+    viewportWidth * SKILL_SECTION_SPACING_MULTIPLIER; // Smaller spacing for skill sections
   const dynamicSections = useMemo(() => {
     let x: number = 0;
     const map: Record<SectionId, { x: number }> = {} as any; // Map section ids to x positions
@@ -161,7 +162,8 @@ const WorldCanvas: React.FC = () => {
         physicsRef.current.blocks.forEach((block) => {
           const blockEl = blockRefsMap.current.get(block.id);
           if (blockEl) {
-            const screenX = block.x + viewportCenterX - clampedCameraX - block.width! / 2;
+            const screenX =
+              block.x + viewportCenterX - clampedCameraX - block.width! / 2;
             const screenY = block.y - block.height! / 2;
             blockEl.style.transform = `translate(${screenX}px, ${screenY}px)`;
           }
@@ -314,7 +316,7 @@ const WorldCanvas: React.FC = () => {
       {/* World container with camera transform - using direct DOM manipulation for smooth animation */}
       <div
         ref={worldContainerRef}
-        className="absolute inset-0 border-2 border-solid border-red-800"
+        className="absolute inset-0"
         style={{ willChange: "transform" }}
       >
         {/* Starfield background */}

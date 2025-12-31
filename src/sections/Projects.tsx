@@ -69,9 +69,8 @@ const Projects: React.FC<ProjectsProps> = ({
       const worldLeft = cameraX - viewportCenterX + rect.left;
       const worldRight = cameraX - viewportCenterX + rect.right;
 
-      // Expand collision area by adding padding to account for timing/state lag
-      // The ball state updates every 50ms but physics runs at 60fps
-      const padding = 50;
+      // Small padding to catch fast-moving ball (state updates lag behind physics)
+      const padding = 15;
       const ballIntersectsX = ballX + BALL_RADIUS >= worldLeft - padding &&
                               ballX - BALL_RADIUS <= worldRight + padding;
       const ballIntersectsY = ballY + BALL_RADIUS >= rect.top - padding &&
@@ -139,18 +138,21 @@ const Projects: React.FC<ProjectsProps> = ({
         projects={[
           {
             id: "p1",
-            image: "https://picsum.photos/seed/personal1/800/600",
-            title: "Portfolio Website",
+            image: "/portfolio/media/portfolio-gen-prev.mp4",
+            title: "Portfolio Generator",
+            description: "Generates a portfolio based on user form and user resume",
+            tags: ["Next.js", "TailwindCSS", "Java", "Spring Boot", "Docker", "AWS"],
+            status: "In Development",
+            link: "https://example.com",
           },
           {
             id: "p2",
-            image: "https://picsum.photos/seed/personal2/800/600",
-            title: "Side Project 1",
-          },
-          {
-            id: "p3",
-            image: "https://picsum.photos/seed/personal3/800/600",
-            title: "Side Project 2",
+            image: "/portfolio/media/dsa_prev.mp4",
+            title: "DSA Visualizer",
+            description: "Sorting visualizer and linked list visualizer that analyzes sorting algorithms, comparisons, and run times",
+            tags: ["C#", ".NET Framework"],
+            status: "Finished",
+            link: "https://github.com/randyp2",
           },
         ]}
       />
