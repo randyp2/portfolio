@@ -1,11 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import type { SectionId } from "../typesConstants";
 import { useWorldStore } from "../state/useWorldStore";
-import headlines from "../assets/headlines.mp3";
-import headlinesBaby from "../assets/headlinesBaby.mp3";
 
 import profile2 from "../assets/profile-pic.png";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { FileDown } from "lucide-react";
 
 const Navbar: React.FC = () => {
@@ -29,40 +27,6 @@ const Navbar: React.FC = () => {
       { id: 'tools', label: 'Developer Tools' },
       { id: 'frameworks', label: 'Frameworks' },
     ];
-    const audioRef = useRef<HTMLAudioElement | null>(null);
-    const audio2Ref = useRef<HTMLAudioElement | null>(null);
-    useEffect(() => {
-        
-        // create both audio tracks
-        const audio = new Audio(headlines);
-        const audio2 = new Audio(headlinesBaby);
-        audio.volume = 0.0;
-        audio.loop = false;
-
-        
-        audio2.volume = 0;
-        audio.loop = false;
-
-        // store them
-        audioRef.current = audio;
-        audio2Ref.current = audio2;
-      
-        const handleUserInteraction = () => {
-          audio.play().catch((err) => console.warn("Playback error:", err));
-          audio2.play().catch((err) => console.warn("Playback error:", err));
-          // remove listener so it only runs once
-          document.removeEventListener("click", handleUserInteraction);
-        };
-      
-        // wait for a click (could also use 'keydown' or 'touchstart')
-        document.addEventListener("click", handleUserInteraction);
-      
-        return () => {
-          document.removeEventListener("click", handleUserInteraction);
-          audio.pause();
-          audio2.pause();
-        };
-      }, []);
   
 
     const handleProfileClick = () => {
