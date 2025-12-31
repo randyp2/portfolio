@@ -1,17 +1,21 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import type { SectionId } from "../typesConstants";
 import { useWorldStore } from "../state/useWorldStore";
 import headlines from "../assets/headlines.mp3";
 import headlinesBaby from "../assets/headlinesBaby.mp3";
 
 import profile2 from "../assets/profile-pic.png";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { FileDown } from "lucide-react";
 
 const Navbar: React.FC = () => {
     const jumpTo = useWorldStore((state) => state.jumpTo);
 
     const resetTo: () => void = useWorldStore((state) => state.reset);
+    const [showResumePreview, setShowResumePreview] = useState(false);
    
+    const resumeUrl = `${import.meta.env.BASE_URL}files/resume.pdf`;
+    const resumePreview = `${import.meta.env.BASE_URL}images/resume-photo.png`;
 
     // Main nav sections (Skills is handled separately as dropdown)
     const sections: { id: SectionId; label: string }[] = [
@@ -96,7 +100,7 @@ const Navbar: React.FC = () => {
               <span className="text-white/90 font-large font-bold tracking-wide">Randy Pahang II</span>
             
           
-        </div>
+      </div>
 
       {/* --- Center Navigation Buttons --- */}
       <div className="flex gap-6">
@@ -223,6 +227,43 @@ const Navbar: React.FC = () => {
             transition={{ duration: 0.2 }}
           />
         </motion.button>
+      </div>
+
+      {/* Resume quick download on right */}
+      <div className="absolute right-16 flex items-center">
+        <motion.a
+          href={resumeUrl}
+          download
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative p-2 rounded-full bg-white/10 border border-white/15 shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+          whileHover={{ rotate: -6, scale: 1.08 }}
+          whileTap={{ scale: 0.9, rotate: 0 }}
+          onMouseEnter={() => setShowResumePreview(true)}
+          onMouseLeave={() => setShowResumePreview(false)}
+        >
+          <FileDown className="w-6 h-6 text-white" strokeWidth={1.8} />
+        </motion.a>
+
+        <AnimatePresence>
+          {showResumePreview && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.18 }}
+              className="fixed top-16 right-6 z-50 pointer-events-none"
+            >
+              <div className="rounded-lg overflow-hidden border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_15px_35px_rgba(0,0,0,0.35)]">
+                <img
+                  src={resumePreview}
+                  alt="Resume preview"
+                  className="w-80 h-48 object-cover"
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       </motion.nav>
     );

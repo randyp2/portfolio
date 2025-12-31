@@ -80,11 +80,11 @@ const Contact: React.FC<ContactProps> = ({
     }
   };
 
-  // Respect Vite base (/portfolio/) so images resolve in prod
+  // Respect Vite base
   const githubPreviewImage = `${import.meta.env.BASE_URL}images/github-photo.png`;
   const linkedinPreviewImage = `${import.meta.env.BASE_URL}images/linkedin-photo.png`;
   const resumePreviewImage = `${import.meta.env.BASE_URL}images/resume-photo.png`;
-  const resumeUrl = `${import.meta.env.BASE_URL}files/resume.pdf`; // place your PDF at public/files/resume.pdf
+  const resumeUrl = `${import.meta.env.BASE_URL}files/resume.pdf`; 
 
   const socialLinks = [
     {
