@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { img } from "framer-motion/client";
 import { FaGithubSquare } from "react-icons/fa";
 import { FaSquareInstagram } from "react-icons/fa6";
 import { FaLinkedin } from "react-icons/fa";

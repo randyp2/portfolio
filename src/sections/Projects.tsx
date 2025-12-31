@@ -59,7 +59,7 @@ const Projects: React.FC<ProjectsProps> = ({
       title: string,
       hasCollided: boolean,
       setHasCollided: React.Dispatch<React.SetStateAction<boolean>>,
-      setIsColliding: React.Dispatch<React.SetStateAction<boolean>>
+      setIsColliding: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
       if (!folderRef.current) return;
 
@@ -71,10 +71,12 @@ const Projects: React.FC<ProjectsProps> = ({
 
       // Small padding to catch fast-moving ball (state updates lag behind physics)
       const padding = 15;
-      const ballIntersectsX = ballX + BALL_RADIUS >= worldLeft - padding &&
-                              ballX - BALL_RADIUS <= worldRight + padding;
-      const ballIntersectsY = ballY + BALL_RADIUS >= rect.top - padding &&
-                              ballY - BALL_RADIUS <= rect.bottom + padding;
+      const ballIntersectsX =
+        ballX + BALL_RADIUS >= worldLeft - padding &&
+        ballX - BALL_RADIUS <= worldRight + padding;
+      const ballIntersectsY =
+        ballY + BALL_RADIUS >= rect.top - padding &&
+        ballY - BALL_RADIUS <= rect.bottom + padding;
       const ballIntersects = ballIntersectsX && ballIntersectsY;
 
       if (ballIntersects && !hasCollided) {
@@ -92,10 +94,37 @@ const Projects: React.FC<ProjectsProps> = ({
       });
     };
 
-    checkAndReportBounds(folder1Ref, "Projects-Personal", hasCollided1, setHasCollided1, setIsColliding1);
-    checkAndReportBounds(folder2Ref, "Projects-Work", hasCollided2, setHasCollided2, setIsColliding2);
-    checkAndReportBounds(folder3Ref, "Projects-Learning", hasCollided3, setHasCollided3, setIsColliding3);
-  }, [ballX, ballY, cameraX, viewportCenterX, hasCollided1, hasCollided2, hasCollided3, onBoundsChange]);
+    checkAndReportBounds(
+      folder1Ref,
+      "Projects-Personal",
+      hasCollided1,
+      setHasCollided1,
+      setIsColliding1,
+    );
+    checkAndReportBounds(
+      folder2Ref,
+      "Projects-Work",
+      hasCollided2,
+      setHasCollided2,
+      setIsColliding2,
+    );
+    checkAndReportBounds(
+      folder3Ref,
+      "Projects-Learning",
+      hasCollided3,
+      setHasCollided3,
+      setIsColliding3,
+    );
+  }, [
+    ballX,
+    ballY,
+    cameraX,
+    viewportCenterX,
+    hasCollided1,
+    hasCollided2,
+    hasCollided3,
+    onBoundsChange,
+  ]);
 
   const leftEdge = centerX;
   const rightEdge = centerX + sectionWidth - 1200;
@@ -140,8 +169,16 @@ const Projects: React.FC<ProjectsProps> = ({
             id: "p1",
             image: "/portfolio/media/portfolio-gen-prev.mp4",
             title: "Portfolio Generator",
-            description: "Generates a portfolio based on user form and user resume",
-            tags: ["Next.js", "TailwindCSS", "Java", "Spring Boot", "Docker", "AWS"],
+            description:
+              "Generates a portfolio based on user form and user resume",
+            tags: [
+              "Next.js",
+              "TailwindCSS",
+              "Java",
+              "Spring Boot",
+              "Docker",
+              "AWS",
+            ],
             status: "In Development",
             link: "https://example.com",
           },
@@ -149,10 +186,20 @@ const Projects: React.FC<ProjectsProps> = ({
             id: "p2",
             image: "/portfolio/media/dsa_prev.mp4",
             title: "DSA Visualizer",
-            description: "Sorting visualizer and linked list visualizer that analyzes sorting algorithms, comparisons, and run times",
+            description:
+              "Sorting visualizer and linked list visualizer that analyzes sorting algorithms, comparisons, and run times",
             tags: ["C#", ".NET Framework"],
             status: "Finished",
-            link: "https://github.com/randyp2",
+            link: "https://github.com/randyp2/DSA_Visualizer",
+          },
+          {
+            id: "p3",
+            image: "/portfolio/media/conway_prev.mp4",
+            title: "Conway's Game of Life",
+            description: "Cellular automaton simulation",
+            tags: ["C++", "Raylib"],
+            status: "Finished",
+            link: "https://github.com/randyp2/conways-game-of-life-cpp",
           },
         ]}
       />
@@ -164,18 +211,30 @@ const Projects: React.FC<ProjectsProps> = ({
         projects={[
           {
             id: "w1",
-            image: "https://picsum.photos/seed/work1/800/600",
-            title: "Client Project 1",
+            image: "/portfolio/media/crj_prev.mp4",
+            title: "CRJ Website",
+            description:
+              "Lead Full Stack Developer for client website redesign and development",
+            tags: ["Next.js", "Supabase", "Vercel"],
+            status: "In Development",
+            link: "https://example.com",
           },
           {
             id: "w2",
-            image: "https://picsum.photos/seed/work2/800/600",
-            title: "Client Project 2",
-          },
-          {
-            id: "w3",
-            image: "https://picsum.photos/seed/work3/800/600",
-            title: "Client Project 3",
+            image: "/portfolio/media/portfolio-gen-prev.mp4",
+            title: "Portfolio Generator",
+            description:
+              "Startup venture: AI-powered portfolio generator that creates personalized portfolios from user forms and resumes",
+            tags: [
+              "Next.js",
+              "Supabase",
+              "Spring Boot",
+              "AWS",
+              "Docker",
+              "Vercel",
+            ],
+            status: "In Development",
+            link: "https://example.com",
           },
         ]}
       />
@@ -184,23 +243,8 @@ const Projects: React.FC<ProjectsProps> = ({
         ref={folder3Ref}
         title="Learning"
         isColliding={isColliding3}
-        projects={[
-          {
-            id: "l1",
-            image: "https://picsum.photos/seed/learn1/800/600",
-            title: "Tutorial Project",
-          },
-          {
-            id: "l2",
-            image: "https://picsum.photos/seed/learn2/800/600",
-            title: "Course Project",
-          },
-          {
-            id: "l3",
-            image: "https://picsum.photos/seed/learn3/800/600",
-            title: "Experiment",
-          },
-        ]}
+        isDisabled={true}
+        projects={[]}
       />
 
       {/* Navigation arrow - keep going indicator */}

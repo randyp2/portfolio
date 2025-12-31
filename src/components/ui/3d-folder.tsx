@@ -27,22 +27,23 @@ interface AnimatedFolderProps {
   projects: Project[]
   className?: string
   isColliding?: boolean  // External collision trigger from physics
+  isDisabled?: boolean   // Disable folder interaction (shows "0 projects")
 }
 
 export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
-  function AnimatedFolder({ title, projects, className, isColliding }, ref) {
+  function AnimatedFolder({ title, projects, className, isColliding, isDisabled }, ref) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [sourceRect, setSourceRect] = useState<DOMRect | null>(null)
   const [hiddenCardId, setHiddenCardId] = useState<string | null>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
 
-  // Handle collision trigger - one-time folder opening
+  // Handle collision trigger - one-time folder opening (only if not disabled)
   useEffect(() => {
-    if (isColliding && !isOpen) {
+    if (isColliding && !isOpen && !isDisabled) {
       setIsOpen(true)  // Once open, stays open
     }
-  }, [isColliding, isOpen])
+  }, [isColliding, isOpen, isDisabled])
 
   const setLightboxOpen = useWorldStore((state) => state.setLightboxOpen)
 
@@ -195,45 +196,47 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
             opacity: isOpen ? 0.7 : 1,
           }}
         >
-          {projects.length} projects
+          {isDisabled ? "0 projects" : `${projects.length} projects`}
         </p>
 
-        {/* Collision hint - visual indicator */}
-        <div
-          className="absolute -bottom-16 left-1/2 flex flex-col items-center gap-2 transition-all duration-300 pointer-events-none"
-          style={{
-            opacity: isOpen ? 0 : 1,
-            transform: isOpen ? "translateX(-50%) translateY(10px)" : "translateX(-50%) translateY(0)",
-          }}
-        >
-          {/* Arrow pointing up */}
-          <svg
-            className="w-6 h-6 text-white animate-bounce"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            style={{
-              filter: "drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))",
-            }}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
-          </svg>
-          {/* Bouncing ball indicator */}
+        {/* Collision hint - visual indicator (hidden when disabled) */}
+        {!isDisabled && (
           <div
-            className="w-4 h-4 rounded-full bg-white animate-bounce"
+            className="absolute -bottom-16 left-1/2 flex flex-col items-center gap-2 transition-all duration-300 pointer-events-none"
             style={{
-              boxShadow: "0 0 12px rgba(255, 255, 255, 0.9), 0 0 24px rgba(255, 255, 255, 0.5)",
-            }}
-          />
-          <span
-            className="text-sm font-medium text-white whitespace-nowrap mt-1"
-            style={{
-              textShadow: "0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.4)",
+              opacity: isOpen ? 0 : 1,
+              transform: isOpen ? "translateX(-50%) translateY(10px)" : "translateX(-50%) translateY(0)",
             }}
           >
-            Hit to open
-          </span>
-        </div>
+            {/* Arrow pointing up */}
+            <svg
+              className="w-6 h-6 text-white animate-bounce"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              style={{
+                filter: "drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))",
+              }}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
+            </svg>
+            {/* Bouncing ball indicator */}
+            <div
+              className="w-4 h-4 rounded-full bg-white animate-bounce"
+              style={{
+                boxShadow: "0 0 12px rgba(255, 255, 255, 0.9), 0 0 24px rgba(255, 255, 255, 0.5)",
+              }}
+            />
+            <span
+              className="text-sm font-medium text-white whitespace-nowrap mt-1"
+              style={{
+                textShadow: "0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.4)",
+              }}
+            >
+              Hit to open
+            </span>
+          </div>
+        )}
       </div>
 
       <ImageLightbox
@@ -424,7 +427,7 @@ function ImageLightbox({
         }}
       >
         <div
-          className={cn("relative overflow-hidden", "rounded-2xl", "bg-card", "ring-1 ring-border", "shadow-2xl")}
+          className={cn("relative overflow-hidden", "rounded-2xl", "bg-black", "ring-1 ring-zinc-800", "shadow-2xl")}
           style={{
             borderRadius: animationPhase === "initial" && !isClosing ? "8px" : "16px",
             transition: "border-radius 500ms cubic-bezier(0.16, 1, 0.3, 1)",
@@ -540,7 +543,7 @@ function ImageLightbox({
           </div>
 
           <div
-            className={cn("px-6 py-5", "bg-card", "border-t border-border")}
+            className={cn("px-6 py-5", "bg-black", "border-t border-zinc-800")}
             style={{
               opacity: animationPhase === "complete" && !isClosing ? 1 : 0,
               transform: animationPhase === "complete" && !isClosing ? "translateY(0)" : "translateY(20px)",
@@ -550,7 +553,7 @@ function ImageLightbox({
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-lg font-medium text-foreground tracking-tight truncate">
+                  <h3 className="text-lg font-semibold text-white tracking-tight truncate">
                     {currentProject?.title}
                   </h3>
                   {currentProject?.status && (
@@ -569,7 +572,7 @@ function ImageLightbox({
                   )}
                 </div>
                 {currentProject?.description && (
-                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                  <p className="text-sm text-zinc-400 mt-1 line-clamp-2">
                     {currentProject.description}
                   </p>
                 )}
@@ -578,7 +581,7 @@ function ImageLightbox({
                     {currentProject.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded border border-border"
+                        className="px-2 py-0.5 text-xs font-medium bg-zinc-800 text-zinc-300 rounded border border-zinc-700"
                       >
                         {tag}
                       </span>
@@ -594,8 +597,8 @@ function ImageLightbox({
                         className={cn(
                           "w-2 h-2 rounded-full transition-all duration-300",
                           idx === internalIndex
-                            ? "bg-foreground scale-110"
-                            : "bg-muted-foreground/40 hover:bg-muted-foreground/60",
+                            ? "bg-white scale-110"
+                            : "bg-zinc-600 hover:bg-zinc-500",
                         )}
                       />
                     ))}
@@ -610,11 +613,11 @@ function ImageLightbox({
                   rel="noopener noreferrer"
                   className={cn(
                     "flex items-center gap-2 px-4 py-2",
-                    "text-sm font-medium text-muted-foreground",
-                    "bg-muted/50 hover:bg-muted",
-                    "rounded-lg border border-border",
+                    "text-sm font-medium text-zinc-300",
+                    "bg-zinc-800 hover:bg-zinc-700",
+                    "rounded-lg border border-zinc-700",
                     "transition-all duration-200 ease-out",
-                    "hover:text-foreground",
+                    "hover:text-white",
                   )}
                 >
                   <span>View</span>
@@ -649,7 +652,7 @@ export const ProjectCard = forwardRef<HTMLDivElement, ProjectCardProps>(
         ref={ref}
         className={cn(
           "absolute w-20 h-28 rounded-lg overflow-hidden shadow-xl",
-          "bg-card border border-border",
+          "bg-zinc-900 border border-zinc-700",
           "cursor-pointer hover:ring-2 hover:ring-blue-400/50",
           isSelected && "opacity-0",
         )}
@@ -673,8 +676,11 @@ export const ProjectCard = forwardRef<HTMLDivElement, ProjectCardProps>(
         ) : (
           <img src={image || "/placeholder.svg"} alt={title} className="w-full h-full object-cover" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
-        <p className="absolute bottom-1.5 left-1.5 right-1.5 text-[10px] font-medium text-primary-foreground truncate">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+        <p
+          className="absolute bottom-1.5 left-1.5 right-1.5 text-[10px] font-semibold text-white truncate"
+          style={{ textShadow: "0 1px 2px rgba(0, 0, 0, 0.8)" }}
+        >
           {title}
         </p>
       </div>

@@ -263,14 +263,6 @@ export class SimplePhysics {
 
     // --- Glass Cards ---
     for (const rect of this.colliders) {
-      if (
-        this.body.x + radius >= rect.leftX &&
-        this.body.x - radius <= rect.rightX &&
-        this.body.y + radius >= rect.topY &&
-        this.body.y - radius <= rect.bottomY
-      ) {
-      }
-
       // Calculate how much the ball is overlapping onto the rectangle on all sides
       const overlapRightOfBall: number = this.body.x + radius - rect.leftX;
       const overlapLeftOfBall: number = rect.rightX - (this.body.x - radius);
@@ -351,8 +343,8 @@ export class SimplePhysics {
             COEFFICIENT_OF_FRICTION * block.mass * GRAVITY_Y; // F_friction = umg
           const sign: number = Math.sign(block.vx); // Direction of motion
 
-          // Apply deceleration
-          block.vx -= sign * frictionForce;
+          // Apply deceleration scaled by dt for frame-rate independence
+          block.vx -= sign * frictionForce * dt;
 
           // Prevent direction flip / overshoot
           if (Math.sign(block.vx) !== sign) block.vx = 0;

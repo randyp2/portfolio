@@ -3,17 +3,15 @@ import type { SectionId } from "../typesConstants";
 import { useWorldStore } from "../state/useWorldStore";
 import headlines from "../assets/headlines.mp3";
 import headlinesBaby from "../assets/headlinesBaby.mp3";
-import babyPfp from "../assets/baby.png";
 
 import profile2 from "../assets/profile-pic.png";
-import { useEffect, useRef, useState } from "react";
-import { launchFireworks } from "../utils/firework";
+import { useEffect, useRef } from "react";
 
 const Navbar: React.FC = () => {
     const jumpTo = useWorldStore((state) => state.jumpTo);
 
     const resetTo: () => void = useWorldStore((state) => state.reset);
-    const [isBaby, setIsBaby] = useState<boolean>(false);
+   
 
     // Main nav sections (Skills is handled separately as dropdown)
     const sections: { id: SectionId; label: string }[] = [
@@ -64,23 +62,7 @@ const Navbar: React.FC = () => {
   
 
     const handleProfileClick = () => {
-      resetTo();
-
-      const a1 = audioRef.current;
-      const a2 = audio2Ref.current;
-      if (!a1 || !a2) return;
-
-      if (!isBaby) {
-        // Switch to baby
-        a1.volume = 0;
-        a2.volume = 0.0;
-      } else {
-        // Switch to normal
-        a1.volume = 0.0;
-        a2.volume = 0;
-      }
-
-      setIsBaby(!isBaby);
+      resetTo(); 
     };
       
     return (
@@ -95,7 +77,7 @@ const Navbar: React.FC = () => {
       >
         <div className="absolute left-8 flex items-center gap-3 ">
           <motion.img
-            src={isBaby ? babyPfp : profile2}
+            src={profile2}
             alt="Profile"
             className="w-14 h-14 rounded-full border border-white/20 
               shadow-[0_0_20px_rgba(255,255,255,0.3)]
@@ -107,15 +89,13 @@ const Navbar: React.FC = () => {
               
             }}
           />
-          {
-            isBaby ? (
-              <span className="text-white/90 font-large font-bold tracking-wide">Baby</span>
-            ) : 
-            (
+          
+            
+            
 
               <span className="text-white/90 font-large font-bold tracking-wide">Randy Pahang II</span>
-            )
-          }
+            
+          
         </div>
 
       {/* --- Center Navigation Buttons --- */}

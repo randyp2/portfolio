@@ -1,12 +1,12 @@
-export const GRAVITY_Y = 0.8;
+export const GRAVITY_Y = 2880; // pixels/sec² (was 0.8 pixels/frame² * 60² fps)
 export const RESTITUTION = 0.6;
 // Coefficient of restitution for block-block collisions
 // e = 1.0 = perfectly elastic (no energy loss)
 // e = 0.0 = perfectly inelastic (maximum energy loss)
 // Higher values create a "Newton's cradle" effect where momentum propagates through stacked blocks
 export const BLOCK_RESTITUTION = 0.5;
-export const MAX_LAUNCH_SPEED = 60;
-export const COEFFICIENT_OF_FRICTION = 0.02; // Friction applied to horizontal movement
+export const MAX_LAUNCH_SPEED = 3600; // pixels/sec (was 60 pixels/frame * 60 fps)
+export const COEFFICIENT_OF_FRICTION = 0.0005; // Friction coefficient for seconds-based physics (tuned for smooth deceleration)
 // export const SECTION_X = {
 //   intro: 0,
 //   about: 1600,

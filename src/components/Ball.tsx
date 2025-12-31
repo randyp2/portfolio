@@ -7,29 +7,24 @@ import { useWorldStore } from "../state/useWorldStore";
 
 interface BallProps {
   physics: SimplePhysics;
-  viewportCenterX: number;
-  cameraX: number;
   onLaunch: (vx: number, vy: number) => void;
   isLaunching: boolean;
   ballRef: React.RefObject<HTMLDivElement | null>;
+  isScrolling?: boolean;
 }
 
 const Ball: React.FC<BallProps> = ({
   physics,
-  viewportCenterX,
-  cameraX,
   onLaunch,
   isLaunching,
   ballRef,
+  isScrolling = false,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
   const [currentMouse, setCurrentMouse] = useState({ x: 0, y: 0 });
   const isLightboxOpen = useWorldStore((state) => state.isLightboxOpen);
 
-  // Coordinate of ball (in respect to WorldCanvas) - cameraX + viewportCenterX
-  const ballScreenX: number = physics.body.x + viewportCenterX - cameraX;
-  const ballScreenY: number = physics.body.y;
 
   const handlePointerDown = (e: React.PointerEvent) => {
     // Disable dragging when lightbox is open
@@ -37,9 +32,9 @@ const Ball: React.FC<BallProps> = ({
 
     setIsDragging(true);
 
-    // Save start position (ball center in screen coords)
-    // Save current mouse position
-    setDragStartPos({ x: ballScreenX, y: ballScreenY });
+    // Save mouse start position for consistent coordinate space
+    // Both dragStartPos and currentMouse use clientX/clientY
+    setDragStartPos({ x: e.clientX, y: e.clientY });
     setCurrentMouse({ x: e.clientX, y: e.clientY });
   };
 
@@ -60,17 +55,18 @@ const Ball: React.FC<BallProps> = ({
 
     // Magnitude of velocity vector
     let magnitude: number = Math.sqrt(dx * dx + dy * dy); // v = sqrt(vx^2 + vy^2)
-    magnitude = Math.min(magnitude, MAX_LAUNCH_SPEED * 10); // Cap the velocity
+    // Scale drag distance to velocity (pixels/sec) - multiply by 12 to get good feel
+    magnitude = Math.min(magnitude * 12, MAX_LAUNCH_SPEED); // Cap at max speed
     const theta: number = Math.atan2(dy, dx); // angle of vector
 
-    const vx = (magnitude * Math.cos(theta)) / 5;
-    const vy = (magnitude * Math.sin(theta)) / 5;
+    const vx = magnitude * Math.cos(theta);
+    const vy = magnitude * Math.sin(theta);
 
     onLaunch(vx, vy);
     setIsDragging(false);
   }, [isDragging, dragStartPos, currentMouse, onLaunch]);
 
-  // Sound effect on collision
+  // Sound effect on collision (muted when scrolling)
   useEffect(() => {
     // Initialize audio effect
     const audio: HTMLAudioElement = new Audio(thudSound);
@@ -84,6 +80,9 @@ const Ball: React.FC<BallProps> = ({
 
     // Connect to physics collision event
     physics.onCollision = () => {
+      // Mute sound when user is scrolling via scrollbar
+      if (isScrolling) return;
+
       audio.volume = impactVolume;
       audio.currentTime = 0; // Rewind to start
       audio.play().catch((err) => console.warn("Playback error:", err));
@@ -97,7 +96,7 @@ const Ball: React.FC<BallProps> = ({
       physics.onLaunch = undefined;
       physics.onCollision = undefined;
     };
-  }, [physics]);
+  }, [physics, isScrolling]);
 
   // Attach/detach global pointer move/up listeners when dragging
   useEffect(() => {
@@ -110,9 +109,20 @@ const Ball: React.FC<BallProps> = ({
     };
   }, [isDragging, handlePointerMove, handlePointerUp]);
 
-  // Calculate arrow end point (opposite to drag direction, from ball center)
-  const arrowEndX = dragStartPos.x - (currentMouse.x - dragStartPos.x);
-  const arrowEndY = dragStartPos.y - (currentMouse.y - dragStartPos.y);
+  // Get ball center position from the ref for arrow drawing
+  const getBallCenter = () => {
+    if (!ballRef.current) return { x: 0, y: 0 };
+    const rect = ballRef.current.getBoundingClientRect();
+    return { x: rect.left + BALL_RADIUS, y: rect.top + BALL_RADIUS };
+  };
+
+  // Calculate arrow: starts at ball center, points opposite to drag direction
+  const ballCenter = getBallCenter();
+  const dragDeltaX = currentMouse.x - dragStartPos.x;
+  const dragDeltaY = currentMouse.y - dragStartPos.y;
+  const arrowEndX = ballCenter.x - dragDeltaX;
+  const arrowEndY = ballCenter.y - dragDeltaY;
+
   return (
     <>
       <div
@@ -134,8 +144,8 @@ const Ball: React.FC<BallProps> = ({
       />
       {isDragging && (
         <Arrow
-          startX={dragStartPos.x}
-          startY={dragStartPos.y}
+          startX={ballCenter.x}
+          startY={ballCenter.y}
           endX={arrowEndX}
           endY={arrowEndY}
           isVisible={isDragging}

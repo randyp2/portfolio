@@ -25,6 +25,8 @@ import StarField from "./StarField";
 import Intro from "../sections/Intro";
 import About from "../sections/About";
 import Projects from "../sections/Projects";
+import Contact from "../sections/Contact";
+import Thanks from "../sections/Thanks";
 
 import MassBlock from "./MassBlock";
 import SkillColumn from "@/sections/SkillColumn";
@@ -74,7 +76,10 @@ const WorldCanvas: React.FC = () => {
     viewportWidth * SKILL_SECTION_SPACING_MULTIPLIER; // Smaller spacing for skill sections
   const dynamicSections = useMemo(() => {
     let x: number = 0;
-    const map: Record<SectionId, { x: number }> = {} as any; // Map section ids to x positions
+    const map: Record<SectionId, { x: number }> = {} as Record<
+      SectionId,
+      { x: number }
+    >; // Map section ids to x positions
     for (const id of SECTION_ORDER) {
       map[id] = { x };
 
@@ -118,16 +123,14 @@ const WorldCanvas: React.FC = () => {
     // This prevents the ball from briefly appearing at (0,0)
     if (ballRef.current) {
       const initialBallScreenX = 0 + viewportCenterX - currentCameraX;
-      ballRef.current.style.transform = `translate(${initialBallScreenX - BALL_RADIUS}px, ${viewportHeight - 80 - BALL_RADIUS}px)`;
+      ballRef.current.style.transform = `translate3d(${initialBallScreenX - BALL_RADIUS}px, ${viewportHeight - 80 - BALL_RADIUS}px, 0)`;
     }
 
-    // Physics/animation loop
-    const update = (): void => {
-      const now: number = Date.now();
-
-      // Determine how many "frames" have passed since last time (capped to avoid large jumps)
-      const dt: number = Math.min((now - lastTimeRef.current) / 16.67, 2);
-      lastTimeRef.current = now; // Reset last time
+    // Physics/animation loop - using rAF timestamp for frame-rate independent physics
+    const update = (now: number): void => {
+      // Delta time in seconds, capped at 50ms to prevent physics explosion after tab pause
+      const dt: number = Math.min((now - lastTimeRef.current) / 1000, 0.05);
+      lastTimeRef.current = now;
 
       if (physicsRef.current) {
         physicsRef.current.update(dt); // Update position/physics of ball
@@ -137,8 +140,10 @@ const WorldCanvas: React.FC = () => {
         // target camera x is x position of the ball
         const targetCameraX: number = pos.x;
 
-        // Add to camerax or decrement to camera x to reach ball final position
-        currentCameraX += (targetCameraX - currentCameraX) * CAMERA_LERP;
+        // Time-based lerp: convert per-frame 0.18 to per-second equivalent
+        // This keeps camera tracking consistent across frame rates
+        const cameraLerp = 1 - Math.pow(1 - CAMERA_LERP, dt * 60);
+        currentCameraX += (targetCameraX - currentCameraX) * cameraLerp;
         const clampedCameraX: number = Math.max(
           0,
           Math.min(currentCameraX, dynamicSections.thanks.x),
@@ -148,14 +153,15 @@ const WorldCanvas: React.FC = () => {
         cameraXRef.current = clampedCameraX;
 
         // Direct DOM manipulation - bypasses React re-renders for smooth animation
+        // Using translate3d forces GPU compositing for smoother rendering
         if (worldContainerRef.current) {
-          worldContainerRef.current.style.transform = `translateX(${-clampedCameraX}px)`;
+          worldContainerRef.current.style.transform = `translate3d(${-clampedCameraX}px, 0, 0)`;
         }
 
-        // Update ball position directly via DOM using transform (GPU-accelerated)
+        // Update ball position directly via DOM using translate3d (GPU-accelerated)
         if (ballRef.current) {
           const ballScreenX = pos.x + viewportCenterX - clampedCameraX;
-          ballRef.current.style.transform = `translate(${ballScreenX - BALL_RADIUS}px, ${pos.y - BALL_RADIUS}px)`;
+          ballRef.current.style.transform = `translate3d(${ballScreenX - BALL_RADIUS}px, ${pos.y - BALL_RADIUS}px, 0)`;
         }
 
         // Update block positions directly via DOM (60fps smooth animation)
@@ -165,7 +171,7 @@ const WorldCanvas: React.FC = () => {
             const screenX =
               block.x + viewportCenterX - clampedCameraX - block.width! / 2;
             const screenY = block.y - block.height! / 2;
-            blockEl.style.transform = `translate(${screenX}px, ${screenY}px)`;
+            blockEl.style.transform = `translate3d(${screenX}px, ${screenY}px, 0)`;
           }
         });
 
@@ -180,7 +186,9 @@ const WorldCanvas: React.FC = () => {
       animationFrameRef.current = requestAnimationFrame(update);
     };
 
-    update();
+    // Initialize lastTimeRef and start the loop with rAF timestamp
+    lastTimeRef.current = performance.now();
+    animationFrameRef.current = requestAnimationFrame(update);
 
     // Cleanup on unmount & cancel animation frame
     return () => {
@@ -371,6 +379,20 @@ const WorldCanvas: React.FC = () => {
           onSpawn={handleSpawn}
           showArrow={false}
         />
+
+        <Contact
+          centerX={dynamicSections.contact.x}
+          ballX={ballX}
+          ballY={ballY}
+          cameraX={cameraX}
+          viewportCenterX={viewportCenterX}
+          onBoundsChange={handleCardBounds}
+        />
+
+        <Thanks
+          centerX={dynamicSections.thanks.x}
+          ballX={ballX}
+        />
       </div>
 
       {/* Block masses - using direct DOM manipulation for smooth 60fps animation */}
@@ -391,8 +413,6 @@ const WorldCanvas: React.FC = () => {
       {/* Ball */}
       <Ball
         physics={physicsRef.current}
-        viewportCenterX={viewportCenterX}
-        cameraX={cameraX}
         onLaunch={handleLaunch}
         isLaunching={isLaunching}
         ballRef={ballRef}

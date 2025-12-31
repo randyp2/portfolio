@@ -11,8 +11,8 @@ import { useWorldStore } from "../state/useWorldStore";
 interface AboutProps {
   centerX: number;
   ballX: number;
-  cameraX: number;
-  viewportCenterX: number;
+  cameraX?: number;
+  viewportCenterX?: number;
 
   // Update bounds of glasscard
   onBoundsChange?: (bounds: {
@@ -60,9 +60,6 @@ const GridItem = ({ area, children }: GridItemProps) => {
 const About: React.FC<AboutProps> = ({
   centerX,
   ballX,
-  cameraX,
-  viewportCenterX,
-  onBoundsChange,
 }) => {
   const jumpTo = useWorldStore((state) => state.jumpTo);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -247,7 +244,7 @@ const About: React.FC<AboutProps> = ({
                 <Github className="w-8 h-8 text-zinc-200" />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://linkedin.com/in/randypahangii"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-4 rounded-full bg-zinc-800/60 border border-zinc-700 hover:bg-zinc-700/60 hover:scale-110 transition-all duration-200"
@@ -255,7 +252,7 @@ const About: React.FC<AboutProps> = ({
                 <Linkedin className="w-8 h-8 text-zinc-200" />
               </a>
               <a
-                href="mailto:contact@example.com"
+                href="mailto:rpahang2@gmail.com"
                 className="p-4 rounded-full bg-zinc-800/60 border border-zinc-700 hover:bg-zinc-700/60 hover:scale-110 transition-all duration-200"
               >
                 <Mail className="w-8 h-8 text-zinc-200" />

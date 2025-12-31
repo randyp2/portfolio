@@ -79,10 +79,9 @@ const GitHubActivityChart: React.FC<{ username: string }> = memo(({ username }) 
         <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#dd7bbb" />
-              <stop offset="33%" stopColor="#d79f1e" />
-              <stop offset="66%" stopColor="#5a922c" />
-              <stop offset="100%" stopColor="#4c7894" />
+              <stop offset="0%" stopColor="rgba(255, 255, 255, 0.4)" />
+              <stop offset="50%" stopColor="rgba(255, 255, 255, 1)" />
+              <stop offset="100%" stopColor="rgba(255, 255, 255, 0.4)" />
             </linearGradient>
           </defs>
           <XAxis

@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import GlassCard from "../components/GlassCard";
-import ExperienceCard from "./ExperienceCard";
 import EducationCard from "./ExperienceCard";
 import { motion } from "framer-motion";
 
