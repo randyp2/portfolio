@@ -1,63 +1,70 @@
-import { motion, type PanInfo } from "framer-motion";
-import React, { useState } from "react";
-import type { SimplePhysics, PhysicsEntity } from "../physics/SimplePhysics";
+import React from "react";
+import type { PhysicsEntity } from "../physics/SimplePhysics";
+import {
+  SiTypescript,
+  SiCplusplus,
+  SiC,
+  SiDotnet,
+  SiPython,
+  SiSwift,
+  SiGit,
+  SiDocker,
+  SiAmazonwebservices,
+  SiSupabase,
+  SiPostman,
+  SiSpringboot,
+  SiReact,
+  SiNextdotjs,
+  SiNodedotjs,
+  SiDjango,
+  SiPostgresql,
+} from "react-icons/si";
+import { FaJava, FaDatabase } from "react-icons/fa";
 
+// Map skill IDs to icons with brand colors (matching InfiniteIconCarousel)
+const skillIcons: Record<string, React.ReactNode> = {
+  java: <FaJava size={40} color="#ED8B00" />,
+  typescript: <SiTypescript size={40} color="#3178C6" />,
+  cpp: <SiCplusplus size={40} color="#00599C" />,
+  c: <SiC size={40} color="#A8B9CC" />,
+  csharp: <SiDotnet size={40} color="#512BD4" />,
+  python: <SiPython size={40} color="#3776AB" />,
+  sql: <FaDatabase size={40} color="#F29111" />,
+  swift: <SiSwift size={40} color="#F05138" />,
+  git: <SiGit size={40} color="#F05032" />,
+  docker: <SiDocker size={40} color="#2496ED" />,
+  aws: <SiAmazonwebservices size={40} color="#FF9900" />,
+  supabase: <SiSupabase size={40} color="#3FCF8E" />,
+  postman: <SiPostman size={40} color="#FF6C37" />,
+  springboot: <SiSpringboot size={40} color="#6DB33F" />,
+  react: <SiReact size={40} color="#61DAFB" />,
+  nextjs: <SiNextdotjs size={40} color="#FFFFFF" />,
+  nodejs: <SiNodedotjs size={40} color="#339933" />,
+  django: <SiDjango size={40} color="#092E20" />,
+  postgresql: <SiPostgresql size={40} color="#4169E1" />,
+};
 
 interface MassBlockProps {
-    physics: SimplePhysics;
-    entity: PhysicsEntity;   // reference to this block inside physics
-    viewportCenterX: number;
-    cameraX: number;
-    onDrop?: (entity: PhysicsEntity, dropX: number, dropY: number) => void;
+  entity: PhysicsEntity;
+  blockRef: (el: HTMLDivElement | null) => void;
 }
 
+const MassBlock: React.FC<MassBlockProps> = ({ entity, blockRef }) => {
+  const icon = skillIcons[entity.label ?? ""] || entity.label;
 
-const MassBlock: React.FC<MassBlockProps> = ({ physics, entity, viewportCenterX, cameraX, onDrop }) => {
-
-    const [impact, setImpact] = useState<boolean>(false); // Optional for styling
-    const [dragging, setDragging] = useState<boolean>(false);
-
-    // Coordinate of mass (in respect to WorldCanvas) - cameraX + viewportCenterX
-    const screenX: number = entity.x + viewportCenterX - cameraX;
-    const screenY: number = entity.y;
-
-
-    const handleDragEnd = (e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => { 
-        setImpact(false);
-
-        // Compute drop coordinates
-        const dropX = screenX + info.offset.x;
-        const dropY = screenY + info.offset.y;
-
-        // Report to parent (Projects)
-        onDrop?.(entity, dropX, dropY); // If onDrop is defined
-    }
-
-    return (
-        <motion.div
-            drag
-            dragMomentum = {false}
-            onDragStart = {() => setDragging(true)}
-            onDragEnd = {handleDragEnd}
-            className={`absolute rounded-xl border flex items-center justify-center 
-                        text-white font-semibold select-none ${dragging ? "hover:cursor-grabbing" : "hover:cursor-pointer"}`}
-            style={{
-                width: `${entity.width}px`,
-                height: `${entity.height}px`,
-                left: `${screenX - entity.width! / 2}px`,
-                top: `${screenY - entity.height! / 2}px`,
-                backgroundColor: impact ? "rgba(0,255,255,0.7)" : "rgba(0,255,255,0.4)",
-                borderColor: "rgba(0,255,255,0.25)",
-                boxShadow: impact
-                ? "0 0 20px rgba(0,255,255,0.9)"
-                : "0 0 12px rgba(0,255,255,0.5)",
-            }}
-            animate={{ scale: impact ? 1.1 : 1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-        >
-            {entity.label}
-        </motion.div>
+  return (
+    <div
+      ref={blockRef}
+      className="absolute rounded-lg flex items-center justify-center select-none bg-zinc-800/50 border border-zinc-700/50"
+      style={{
+        width: `${entity.width}px`,
+        height: `${entity.height}px`,
+        willChange: "transform",
+      }}
+    >
+      {icon}
+    </div>
   );
-}
+};
 
 export default MassBlock;

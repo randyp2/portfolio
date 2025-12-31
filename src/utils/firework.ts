@@ -1,3 +1,4 @@
+// @ts-expect-error - canvas-confetti lacks type definitions
 import confetti from "canvas-confetti"
 
 export const launchFireworks = () => {

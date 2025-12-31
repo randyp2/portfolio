@@ -1,8 +1,12 @@
-export const GRAVITY_Y = 0.8;
+export const GRAVITY_Y = 2880; // pixels/sec² (was 0.8 pixels/frame² * 60² fps)
 export const RESTITUTION = 0.6;
-export const BLOCK_RESTITUTION = 0.2; // Amount to reduce speed on collision with blocks
-export const MAX_LAUNCH_SPEED = 60;
-export const COEFFICIENT_OF_FRICTION = 0.02; // Friction applied to horizontal movement
+// Coefficient of restitution for block-block collisions
+// e = 1.0 = perfectly elastic (no energy loss)
+// e = 0.0 = perfectly inelastic (maximum energy loss)
+// Higher values create a "Newton's cradle" effect where momentum propagates through stacked blocks
+export const BLOCK_RESTITUTION = 0.5;
+export const MAX_LAUNCH_SPEED = 3600; // pixels/sec (was 60 pixels/frame * 60 fps)
+export const COEFFICIENT_OF_FRICTION = 0.0005; // Friction coefficient for seconds-based physics (tuned for smooth deceleration)
 // export const SECTION_X = {
 //   intro: 0,
 //   about: 1600,
@@ -12,12 +16,22 @@ export const COEFFICIENT_OF_FRICTION = 0.02; // Friction applied to horizontal m
 //   thanks: 8000,
 // } as const;
 export const SECTION_SPACING_MULTIPLIER = 1.6; // Multiplier for spacing between sections
-export const SECTION_ORDER = ["intro", "about", "projects", "skills", "contact", "thanks"] as const;
-export type SectionId = typeof SECTION_ORDER[number];
+export const SKILL_SECTION_SPACING_MULTIPLIER = 0.5; // Smaller spacing for skill sections (closer together)
+export const SECTION_ORDER = [
+  "intro",
+  "about",
+  "projects",
+  "languages",
+  "tools",
+  "frameworks",
+  "contact",
+  "thanks",
+] as const;
+export type SectionId = (typeof SECTION_ORDER)[number];
 
 export const FADE_RADIUS = 1500; // How far sections shoudl fade in/out based on distance from ball
 export const BALL_RADIUS = 18;
-export const CAMERA_LERP = 0.08; // Move 8% of distance towards ball for each frame
+export const CAMERA_LERP = 0.18; // Move 18% of distance towards ball for each frame
 
 // export type SectionId = keyof typeof SECTION_X;
 
@@ -27,4 +41,5 @@ export type COLLIDERES_RECT = {
   x2: number;
   y1: number;
   y2: number;
-}
+};
+

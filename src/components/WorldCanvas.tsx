@@ -1,344 +1,424 @@
-import { motion } from "framer-motion";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { SimplePhysics, type ColliderRect, type PhysicsEntity } from "../physics/SimplePhysics";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  SimplePhysics,
+  type ColliderRect,
+  type PhysicsEntity,
+} from "../physics/SimplePhysics";
 import { useWorldStore } from "../state/useWorldStore";
-import { BALL_RADIUS, CAMERA_LERP, type COLLIDERES_RECT, SECTION_SPACING_MULTIPLIER, type SectionId, SECTION_ORDER } from "../typesConstants";
+import {
+  BALL_RADIUS,
+  CAMERA_LERP,
+  type COLLIDERES_RECT,
+  SECTION_SPACING_MULTIPLIER,
+  SKILL_SECTION_SPACING_MULTIPLIER,
+  type SectionId,
+  SECTION_ORDER,
+} from "../typesConstants";
 import Ball from "./Ball";
 import StarField from "./StarField";
 import Intro from "../sections/Intro";
 import About from "../sections/About";
 import Projects from "../sections/Projects";
+import Contact from "../sections/Contact";
+import Thanks from "../sections/Thanks";
+
 import MassBlock from "./MassBlock";
+import SkillColumn from "@/sections/SkillColumn";
 
 const WorldCanvas: React.FC = () => {
-    /* ====== PHYSICS AND LAUNCHING LOGIC VARIABLES ====== */
-    // use useRef to persist between renders (retain values between renders and dont re-render when changed)
-    const physicsRef = useRef<SimplePhysics | null>(null);
-    const animationFrameRef = useRef<number>(0);
-    const lastTimeRef = useRef<number>(Date.now());
-    const [isLaunching, setIsLaunching] = useState(false);
-    const launchTimeoutRef = useRef<number>(0);
-    
-    /* ====== BALL POSITIONING AND CAMERA POSITION LOGIC VARIABLES ====== */
-    const { ballX, ballY, cameraX, isJumping, setBallPosition, setCameraX, setSections, sections } = useWorldStore(); // Pull the zustand store
-    const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
-    const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
-    const viewportCenterX = viewportWidth / 2;
-    const [colliders, setColliders] = useState<COLLIDERES_RECT []>([]); // Store bounds of glass cards for collision detection
+  /* ====== PHYSICS AND LAUNCHING LOGIC VARIABLES ====== */
+  // use useRef to persist between renders (retain values between renders and dont re-render when changed)
+  const physicsRef = useRef<SimplePhysics | null>(null);
+  const animationFrameRef = useRef<number>(0);
+  const lastTimeRef = useRef<number>(Date.now());
+  const [isLaunching, setIsLaunching] = useState(false);
+  const launchTimeoutRef = useRef<number>(0);
 
-    const [, forceUpdate] = useState({}); // Call force update to re-render compnent and sub components
+  // Ref for direct DOM manipulation of camera and ball (avoids re-renders)
+  const worldContainerRef = useRef<HTMLDivElement>(null);
+  const ballRef = useRef<HTMLDivElement>(null);
+  const cameraXRef = useRef<number>(0);
+  const lastStoreUpdateRef = useRef<number>(0);
 
-    /* ====== ATWOOD USESTATES ====== */
-    type DropZoneRect = {
-        leftX: number;
-        rightX: number;
-        topY: number;
-        bottomY: number;
-    } 
+  // Ref map for block DOM elements (for direct DOM manipulation)
+  const blockRefsMap = useRef<Map<string, HTMLDivElement>>(new Map());
 
-    const [dropZoneRect, setDropZoneRect] = useState<DropZoneRect | null>(null);
+  // Force update state to trigger re-render when blocks spawn
+  const [, forceUpdate] = useState({});
 
-    
-    /**
-     * @brief Set up dynamic sections based on viewport width
-     * @dependencies viewportWidth - recalculate on resize
-     */
-    const SECTION_SPACING: number = viewportWidth * SECTION_SPACING_MULTIPLIER; // Section spacing
-    const dynamicSections = useMemo(() => {
-        let x: number = 0;
-        const map: Record<SectionId, { x: number }> = {} as any; // Map section ids to x positions
-        for (const id of SECTION_ORDER) {
-            map[id] = { x };
-            x += SECTION_SPACING; // Move over by screen-dependent spacing
-        }
+  /* ====== BALL POSITIONING AND CAMERA POSITION LOGIC VARIABLES ====== */
+  const {
+    ballX,
+    ballY,
+    cameraX,
+    isJumping,
+    setBallPosition,
+    setCameraX,
+    setSections,
+  } = useWorldStore(); // Pull the zustand store
+  const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+  const viewportCenterX = viewportWidth / 2;
+  const [colliders, setColliders] = useState<COLLIDERES_RECT[]>([]); // Store bounds of glass cards for collision detection
 
-        return map;
+  /**
+   * @brief Set up dynamic sections based on viewport width
+   * @dependencies viewportWidth - recalculate on resize
+   */
+  const SECTION_SPACING: number = viewportWidth * SECTION_SPACING_MULTIPLIER; // Section spacing
+  const SKILL_SECTION_SPACING: number =
+    viewportWidth * SKILL_SECTION_SPACING_MULTIPLIER; // Smaller spacing for skill sections
+  const dynamicSections = useMemo(() => {
+    let x: number = 0;
+    const map: Record<SectionId, { x: number }> = {} as Record<
+      SectionId,
+      { x: number }
+    >; // Map section ids to x positions
+    for (const id of SECTION_ORDER) {
+      map[id] = { x };
 
-    }, [viewportWidth]);
-
-    
-
-    /**
-     * @brief Initialize physics engine and run animation loop
-     * @dependencies 
-     *  - viewportHeight 
-     *  - setCameraX 
-     *  - dynamicSections
-     */
-    useEffect(() => {
-
-        
-        // Bound world width by last section position or viewport width
-        const worldWidth: number = Object.values(dynamicSections).at(-1)?.x ?? viewportWidth;
-
-        // Initialize physics engine
-        physicsRef.current = new SimplePhysics(
-            0, // start ballX
-            viewportHeight - 80, // start ballY
-            BALL_RADIUS, // ball radius
-            worldWidth + 400, // ending world position
-            viewportHeight - 80, // world height
-            viewportCenterX, // center of viewpointX
-        );
-        
-        // Camera initial position x
-        let currentCameraX: number = viewportCenterX;
-        
-
-        // Physics/animation loop
-        const update = (): void => {
-            const now: number = Date.now();
-
-            // Determine how many "frames" have passed since last time (capped to avoid large jumps)
-            const dt: number = Math.min((now - lastTimeRef.current) / 16.67, 2); 
-            lastTimeRef.current = now; // Reset last time
-            
-            if (physicsRef.current) {
-                physicsRef.current.update(dt); // Update position/physics of ball
-                
-                const pos: PhysicsEntity = physicsRef.current.body; // Get new position of ball
-                setBallPosition(pos.x, pos.y); // Store it in zustand store
-                
-                // target camera x is x position of the ball
-                const targetCameraX: number = pos.x;
-
-                // Add to camerax or decrement to camera x to reach ball final position
-                currentCameraX += (targetCameraX - currentCameraX) * CAMERA_LERP; 
-                const clampedCameraX: number = Math.max(0, Math.min(currentCameraX, dynamicSections.thanks.x)); // Maybe change?
-                setCameraX(clampedCameraX);
-                
-                // Update and reload this component and child components
-                forceUpdate({});
-            }
-            
-            animationFrameRef.current = requestAnimationFrame(update);
-        };
-  
-        update();
-        
-
-        // Cleanup on unmount & cancel animation frame
-        return () => {
-            if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-            }
-        };
-
-    }, [viewportHeight, setCameraX, dynamicSections]);
-
-    /**
-     * @brief Update sections in zustand store when dynamicSections change
-     * @dependencies dynamicSections, setSections
-     */
-    useEffect(() => {
-        setSections(dynamicSections);
-      }, [dynamicSections, setSections]);
-
-
-
-    /**
-     * @brief If isJumping is true, set position of ball in physics engine to match zustand store
-     * @dependencies ballX, ballY, isJumping
-     */
-    useEffect(() => {
-        if(isJumping && physicsRef.current) {
-            physicsRef.current.setPosition(ballX, ballY);
-        }
-    }, [ballX, ballY, isJumping]);
-
-
-    /**
-     * @brief Update viewport dimensions and physics world height on window resize
-     * @dependencies none
-     */
-    useEffect(() => {
-      const handleResize = () => {
-        
-        setViewportWidth(window.innerWidth);
-        setViewportHeight(window.innerHeight);
-        if (physicsRef.current) {
-          physicsRef.current.worldHeight = window.innerHeight;
-        }
-      };
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize); // Cleanup
-    }, []);
-  
-    /* Add rectangles of possible colliders */
-    /**
-     * @brief Handle bounds reported by GlassCard components
-     * @dependencies none
-     */
-    const handleCardBounds = useCallback((bounds: COLLIDERES_RECT) => {
-        setColliders((prev: COLLIDERES_RECT[]) => {
-            // Replace existing entry for this card
-            const filtered = prev.filter((b) => b.title !== bounds.title);
-            return [...filtered, bounds];
-        });
-    }, []);
-    
-
-    /**
-     * @brief Update colliders in physics engine when colliders state changes
-     * @dependencies colliders
-     */
-    useEffect(() => {
-        // Update colliders in physics engine to handle collisions
-        if (physicsRef.current) {
-            const simplifiedColliders: ColliderRect[] = colliders.map(({x1: leftX, x2: rightX, y1: topY, y2: bottomY}) => ({
-                leftX, rightX, topY, bottomY,
-            }));
-
-            physicsRef.current.setColliders(simplifiedColliders);
-        }
-      }, [colliders]);
-
-
-    /**
-     * @brief Handle launch event from Ball component
-     * @dependencies none
-     */
-    const handleLaunch = useCallback((vx: number, vy: number) => {
-      if (physicsRef.current) {
-        // Set velocities computed by Ball component
-        physicsRef.current.setVelocity(vx, vy);
-
-        // Slight glow/flare when launching
-        setIsLaunching(true);
-        
-        // Clear any existing timeout
-        if (launchTimeoutRef.current) {
-          clearTimeout(launchTimeoutRef.current);
-        }
-        
-        // Reset launch state after animation
-        launchTimeoutRef.current = window.setTimeout(() => {
-          setIsLaunching(false);
-        }, 400);
+      // Use smaller spacing for skill sections (languages, tools) so they're closer together
+      if (id === "languages" || id === "tools") {
+        x += SKILL_SECTION_SPACING;
+      } else {
+        x += SECTION_SPACING;
       }
-    }, []);
+    }
 
+    return map;
+  }, [viewportWidth]);
 
-    /**
-     * @brief Spawn in mass blocks
-     * @dependencies none
-     */
-    const handleSpawnMasses = useCallback(() => {
-        const physics = physicsRef.current;
-        if (!physics) return;
-      
-        // Only spawn once
-        if (physics.blocks.length > 0) return;
-        
-        // Add blocks 
-        physics.addBlock("block-5N-1", dynamicSections.projects.x + 200, -200, 60, 60, 5, "5kg");
-        physics.addBlock("block-5N-2", dynamicSections.projects.x + 300, -250, 60, 60, 5, "5kg");
-        physics.addBlock("block-10N", dynamicSections.projects.x + 450, -300, 60, 60, 5, "5kg");
-        physics.addBlock("block-20N", dynamicSections.projects.x + 600, -350, 60, 60, 5, "5kg");
-    }, [dynamicSections.projects.x]);
+  /**
+   * @brief Initialize physics engine and run animation loop
+   * @dependencies
+   *  - viewportHeight
+   *  - setCameraX
+   *  - dynamicSections
+   */
+  useEffect(() => {
+    // Bound world width by last section position or viewport width
+    const worldWidth: number =
+      Object.values(dynamicSections).at(-1)?.x ?? viewportWidth;
 
+    // Initialize physics engine
+    physicsRef.current = new SimplePhysics(
+      0, // start ballX
+      viewportHeight - 80, // start ballY
+      BALL_RADIUS, // ball radius
+      worldWidth + 400, // ending world position
+      viewportHeight - 80, // world height
+      viewportCenterX, // center of viewpointX
+    );
 
-    /**
-     * @brief Handle block movement when dragged and dropped
-     * 
-     * @param entity - Physics entity being moved
-     * @param dropX - X coordinate where block was dropped
-     * @param dropY - Y coordinate where block was dropped
-     */
-    const handleMassDrop = useCallback((entity: PhysicsEntity, dropX: number, dropY: number) => {   
-        if(!physicsRef.current) return;
+    // Camera initial position x
+    let currentCameraX: number = viewportCenterX;
 
-        // If drop zone is not defined
-        if(!dropZoneRect) return;
+    // Set initial ball position immediately (before first animation frame)
+    // This prevents the ball from briefly appearing at (0,0)
+    if (ballRef.current) {
+      const initialBallScreenX = 0 + viewportCenterX - currentCameraX;
+      ballRef.current.style.transform = `translate3d(${initialBallScreenX - BALL_RADIUS}px, ${viewportHeight - 80 - BALL_RADIUS}px, 0)`;
+    }
 
-        // Determine whether mass was dropped within dropzone
-        const insideZone: boolean = 
-        dropX >= dropZoneRect.leftX &&
-        dropX <= dropZoneRect.rightX &&
-        dropY >= dropZoneRect.topY &&
-        dropY <= dropZoneRect.bottomY;
+    // Physics/animation loop - using rAF timestamp for frame-rate independent physics
+    const update = (now: number): void => {
+      // Delta time in seconds, capped at 50ms to prevent physics explosion after tab pause
+      const dt: number = Math.min((now - lastTimeRef.current) / 1000, 0.05);
+      lastTimeRef.current = now;
 
-        if(insideZone) {
-            // snap entity into position if you want
-            entity.x = dropX - viewportCenterX + cameraX;
-            entity.y = dropY;
-            entity.vx = 0;
-            entity.vy = 0;
-            return;
+      if (physicsRef.current) {
+        physicsRef.current.update(dt); // Update position/physics of ball
+
+        const pos: PhysicsEntity = physicsRef.current.body; // Get new position of ball
+
+        // target camera x is x position of the ball
+        const targetCameraX: number = pos.x;
+
+        // Time-based lerp: convert per-frame 0.18 to per-second equivalent
+        // This keeps camera tracking consistent across frame rates
+        const cameraLerp = 1 - Math.pow(1 - CAMERA_LERP, dt * 60);
+        currentCameraX += (targetCameraX - currentCameraX) * cameraLerp;
+        const clampedCameraX: number = Math.max(
+          0,
+          Math.min(currentCameraX, dynamicSections.thanks.x),
+        );
+
+        // Store in ref for direct DOM manipulation
+        cameraXRef.current = clampedCameraX;
+
+        // Direct DOM manipulation - bypasses React re-renders for smooth animation
+        // Using translate3d forces GPU compositing for smoother rendering
+        if (worldContainerRef.current) {
+          worldContainerRef.current.style.transform = `translate3d(${-clampedCameraX}px, 0, 0)`;
         }
 
-        // Otherwise — free fall in physics world
-        entity.x = dropX - viewportCenterX + cameraX;
-        entity.y = dropY;
-        entity.vx = 0;
-        entity.vy = 0;
+        // Update ball position directly via DOM using translate3d (GPU-accelerated)
+        if (ballRef.current) {
+          const ballScreenX = pos.x + viewportCenterX - clampedCameraX;
+          ballRef.current.style.transform = `translate3d(${ballScreenX - BALL_RADIUS}px, ${pos.y - BALL_RADIUS}px, 0)`;
+        }
 
+        // Update block positions directly via DOM (60fps smooth animation)
+        physicsRef.current.blocks.forEach((block) => {
+          const blockEl = blockRefsMap.current.get(block.id);
+          if (blockEl) {
+            const screenX =
+              block.x + viewportCenterX - clampedCameraX - block.width! / 2;
+            const screenY = block.y - block.height! / 2;
+            blockEl.style.transform = `translate3d(${screenX}px, ${screenY}px, 0)`;
+          }
+        });
 
-    }, [viewportCenterX, cameraX]);
-    
-    if (!physicsRef.current) return null; // Edge case - wait for physics to initialize
-  
-    return (
-        <div className="fixed inset-0 overflow-hidden">
+        // Update Zustand store less frequently (every 50ms) for components that need it
+        if (now - lastStoreUpdateRef.current > 50) {
+          lastStoreUpdateRef.current = now;
+          setBallPosition(pos.x, pos.y);
+          setCameraX(clampedCameraX);
+        }
+      }
 
-            {/* World container with camera transform */}
-            <motion.div
-            className="absolute inset-0 border-2 border-solid border-red-800"
-            style={{
-                // Shift world to left and center it based on cameraX
-                transform: `translateX(${-cameraX}px)`, 
-            }}
-            >
+      animationFrameRef.current = requestAnimationFrame(update);
+    };
 
-                {/* Starfield background */}
-                <StarField worldWidth={physicsRef.current?.worldWidth} viewportHeight={viewportHeight} />
+    // Initialize lastTimeRef and start the loop with rAF timestamp
+    lastTimeRef.current = performance.now();
+    animationFrameRef.current = requestAnimationFrame(update);
 
-                <Intro />
+    // Cleanup on unmount & cancel animation frame
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [viewportHeight, setCameraX, dynamicSections]);
 
-                <About
-                    centerX={dynamicSections.about.x}
-                    ballX={ballX}
-                    cameraX={cameraX}
-                    viewportCenterX={viewportCenterX}
-                    onBoundsChange={handleCardBounds}
-                />
+  /**
+   * @brief Update sections in zustand store when dynamicSections change
+   * @dependencies dynamicSections, setSections
+   */
+  useEffect(() => {
+    setSections(dynamicSections);
+  }, [dynamicSections, setSections]);
 
-                <Projects
-                    centerX={dynamicSections.projects.x}
-                    ballX={ballX}
-                    cameraX={cameraX}
-                    viewportCenterX={viewportCenterX}
-                    setDropZoneRect={setDropZoneRect}
-                    onBoundsChange={handleCardBounds}
-                    onSpawnMasses={handleSpawnMasses}
-                />
-                
+  /**
+   * @brief If isJumping is true, set position of ball in physics engine to match zustand store
+   * @dependencies ballX, ballY, isJumping
+   */
+  useEffect(() => {
+    if (isJumping && physicsRef.current) {
+      physicsRef.current.setPosition(ballX, ballY);
+    }
+  }, [ballX, ballY, isJumping]);
 
+  /**
+   * @brief Update viewport dimensions and physics world height on window resize
+   * @dependencies none
+   */
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportWidth(window.innerWidth);
+      setViewportHeight(window.innerHeight);
+      if (physicsRef.current) {
+        physicsRef.current.worldHeight = window.innerHeight;
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize); // Cleanup
+  }, []);
 
-            </motion.div>
-                
-            {/* Block masses */}
-            {physicsRef.current?.blocks.map((block) => (
-                <MassBlock
-                    key={block.id}
-                    physics={physicsRef.current!}
-                    entity={block}
-                    viewportCenterX={viewportCenterX}
-                    cameraX={cameraX}
-                    onDrop={handleMassDrop}
-                />
-            ))}
-            
-            {/* Ball */}
-            <Ball 
-            physics={physicsRef.current} 
-            viewportCenterX={viewportCenterX} 
-            cameraX={cameraX}
-            onLaunch={handleLaunch}
-            isLaunching={isLaunching}
-            />
-        </div>
-    );
+  /* Add rectangles of possible colliders */
+  /**
+   * @brief Handle bounds reported by GlassCard components
+   * @dependencies none
+   */
+  const handleCardBounds = useCallback((bounds: COLLIDERES_RECT) => {
+    setColliders((prev: COLLIDERES_RECT[]) => {
+      // Replace existing entry for this card
+      const filtered = prev.filter((b) => b.title !== bounds.title);
+      return [...filtered, bounds];
+    });
+  }, []);
+
+  /**
+   * @brief Update colliders in physics engine when colliders state changes
+   * @dependencies colliders
+   */
+  useEffect(() => {
+    // Update colliders in physics engine to handle collisions
+    if (physicsRef.current) {
+      const simplifiedColliders: ColliderRect[] = colliders.map(
+        ({ x1: leftX, x2: rightX, y1: topY, y2: bottomY }) => ({
+          leftX,
+          rightX,
+          topY,
+          bottomY,
+        }),
+      );
+
+      physicsRef.current.setColliders(simplifiedColliders);
+    }
+  }, [colliders]);
+
+  /**
+   * @brief Handle launch event from Ball component
+   * @dependencies none
+   */
+  const handleLaunch = useCallback((vx: number, vy: number) => {
+    if (physicsRef.current) {
+      // Set velocities computed by Ball component
+      physicsRef.current.setVelocity(vx, vy);
+
+      // Slight glow/flare when launching
+      setIsLaunching(true);
+
+      // Clear any existing timeout
+      if (launchTimeoutRef.current) {
+        clearTimeout(launchTimeoutRef.current);
+      }
+
+      // Reset launch state after animation
+      launchTimeoutRef.current = window.setTimeout(() => {
+        setIsLaunching(false);
+      }, 400);
+    }
+  }, []);
+
+  // Skill categories for each SkillColumn
+  const languageSkills = [
+    "java",
+    "typescript",
+    "cpp",
+    "c",
+    "csharp",
+    "python",
+    "sql",
+    "swift",
+  ];
+
+  const toolSkills = ["git", "docker", "aws", "supabase", "postman"];
+
+  const frameworkSkills = [
+    "springboot",
+    "react",
+    "nextjs",
+    "nodejs",
+    "django",
+    "postgresql",
+  ];
+
+  // Callback to force re-render when blocks spawn
+  const handleSpawn = useCallback(() => {
+    forceUpdate({});
+  }, []);
+
+  if (!physicsRef.current) return null; // Edge case - wait for physics to initialize
+
+  return (
+    <div className="fixed inset-0 overflow-hidden">
+      {/* World container with camera transform - using direct DOM manipulation for smooth animation */}
+      <div
+        ref={worldContainerRef}
+        className="absolute inset-0"
+        style={{ willChange: "transform" }}
+      >
+        {/* Starfield background */}
+        <StarField
+          worldWidth={physicsRef.current?.worldWidth}
+          viewportHeight={viewportHeight}
+        />
+
+        <Intro />
+
+        <About
+          centerX={dynamicSections.about.x}
+          ballX={ballX}
+          cameraX={cameraX}
+          viewportCenterX={viewportCenterX}
+          onBoundsChange={handleCardBounds}
+        />
+
+        <Projects
+          centerX={dynamicSections.projects.x}
+          ballX={ballX}
+          ballY={ballY}
+          cameraX={cameraX}
+          viewportCenterX={viewportCenterX}
+          onBoundsChange={handleCardBounds}
+        />
+
+        <SkillColumn
+          centerX={dynamicSections.languages.x}
+          ballX={ballX}
+          title="LANGUAGES"
+          skills={languageSkills}
+          physics={physicsRef.current}
+          onSpawn={handleSpawn}
+        />
+
+        <SkillColumn
+          centerX={dynamicSections.tools.x}
+          ballX={ballX}
+          title="DEVELOPER TOOLS"
+          skills={toolSkills}
+          physics={physicsRef.current}
+          onSpawn={handleSpawn}
+        />
+
+        <SkillColumn
+          centerX={dynamicSections.frameworks.x}
+          ballX={ballX}
+          title="FRAMEWORKS"
+          skills={frameworkSkills}
+          physics={physicsRef.current}
+          onSpawn={handleSpawn}
+          showArrow={false}
+        />
+
+        <Contact
+          centerX={dynamicSections.contact.x}
+          ballX={ballX}
+          ballY={ballY}
+          cameraX={cameraX}
+          viewportCenterX={viewportCenterX}
+          onBoundsChange={handleCardBounds}
+        />
+
+        <Thanks
+          centerX={dynamicSections.thanks.x}
+          ballX={ballX}
+        />
+      </div>
+
+      {/* Block masses - using direct DOM manipulation for smooth 60fps animation */}
+      {physicsRef.current?.blocks.map((block) => (
+        <MassBlock
+          key={block.id}
+          entity={block}
+          blockRef={(el) => {
+            if (el) {
+              blockRefsMap.current.set(block.id, el);
+            } else {
+              blockRefsMap.current.delete(block.id);
+            }
+          }}
+        />
+      ))}
+
+      {/* Ball */}
+      <Ball
+        physics={physicsRef.current}
+        onLaunch={handleLaunch}
+        isLaunching={isLaunching}
+        ballRef={ballRef}
+      />
+    </div>
+  );
 };
 
 export default WorldCanvas;
