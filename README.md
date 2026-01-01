@@ -16,7 +16,7 @@ Interactive portfolio built with React and Vite. On desktop it renders a physics
 - React 19 + TypeScript, Vite
 - Tailwind CSS v4
 - framer-motion animations
-- matter-js physics
+- custom physics engine
 - Zustand for shared state
 - lucide-react / react-icons for icons
 
@@ -32,7 +32,7 @@ Interactive portfolio built with React and Vite. On desktop it renders a physics
    pnpm dev
    # or npm run dev
    ```
-4) Open http://localhost:5173.
+4) Open localhost
 
 ## Scripts
 - `pnpm dev` — start the dev server.
