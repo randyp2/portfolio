@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { GlowingEffect } from "../components/ui/glowing-effect";
 import { cn } from "@/lib/utils";
 import GitHubActivityChart from "../components/GitHubActivityChart";
-import { Github, Linkedin, Mail, ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import InfiniteIconCarousel from "../components/InfiniteIconCarousel";
 import { useWorldStore } from "../state/useWorldStore";
 
@@ -94,10 +94,10 @@ const About: React.FC<AboutProps> = ({
   return (
     <motion.div
       ref={sectionRef}
-      className="absolute top-1/2 -translate-y-1/2 p-10"
+      className="absolute top-1/2 -translate-y-1/2 p-4 md:p-6 lg:p-10"
       style={{
         left: `${centerX}px`,
-        width: "1600px",
+        width: "min(1400px, calc(100vw - 80px))",
       }}
       animate={{
         opacity,
@@ -110,11 +110,11 @@ const About: React.FC<AboutProps> = ({
         mass: 0.5,
       }}
     >
-      <ul className="grid grid-cols-1 md:grid-cols-6 gap-6 auto-rows-[180px]">
+      <ul className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5 lg:gap-6 auto-rows-[minmax(200px,1fr)] md:auto-rows-[minmax(240px,1fr)] lg:auto-rows-[200px]">
         {/* About Me - Tall (2x2) */}
-        <GridItem area="md:col-span-2 md:row-span-2">
-          <div className="flex flex-col justify-center h-full px-8 py-10 md:px-10 md:py-30">
-            <h1 className="text-2xl md:text-3xl text-white font-bold mb-3 tracking-tight">
+        <GridItem area="md:col-span-2 md:row-span-3 lg:row-span-2">
+          <div className="flex flex-col h-full gap-3 px-5 py-6 sm:px-6 sm:py-7 md:px-7 md:py-8 lg:px-8 lg:py-9 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/70 md:max-h-[70vh]">
+            <h1 className="text-2xl md:text-3xl text-white font-bold tracking-tight">
               Randy Pahang II
             </h1>
             <p className="text-base md:text-lg text-zinc-300 mb-1">
@@ -174,23 +174,8 @@ const About: React.FC<AboutProps> = ({
           </div>
         </GridItem>
 
-        {/* Education - Standard (2x1) */}
-        <GridItem area="md:col-span-2">
-          <div className="flex items-center justify-between h-full px-6 py-4">
-            <div>
-              <h3 className="text-xl text-white font-medium">Education</h3>
-              <p className="text-zinc-300">BS Computer Science @ UNLV</p>
-              <p className="text-sm text-zinc-400">Minor in Accounting</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xl text-white font-bold">4.0 GPA</p>
-              <p className="text-zinc-400 text-sm">Class of 2027</p>
-            </div>
-          </div>
-        </GridItem>
-
-        {/* Skills - GitHub Activity Chart (2x1) */}
-        <GridItem area="md:col-span-2">
+        {/* Skills - GitHub Activity Chart (2x2) */}
+        <GridItem area="md:col-span-2 md:row-span-2">
           <div className="flex flex-col h-full p-4">
             <h3 className="text-xl text-white font-medium mb-2">
               GitHub Activity
@@ -202,7 +187,7 @@ const About: React.FC<AboutProps> = ({
         </GridItem>
 
         {/* Experience - Wide (3x1) */}
-        <GridItem area="md:col-span-3">
+        <GridItem area="md:col-span-2 lg:col-span-3">
           <div className="flex flex-col h-full p-6">
             <h3 className="text-2xl text-white font-medium mb-4">
               Experience
@@ -228,35 +213,17 @@ const About: React.FC<AboutProps> = ({
           </div>
         </GridItem>
 
-        {/* Contact - Wide (3x1) */}
-        <GridItem area="md:col-span-3">
-          <div className="flex flex-col items-center justify-center h-full p-6">
-            <h3 className="text-2xl text-white font-medium mb-6">
-              Get in Touch
-            </h3>
-            <div className="flex gap-6">
-              <a
-                href="https://github.com/randyp2"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-4 rounded-full bg-zinc-800/60 border border-zinc-700 hover:bg-zinc-700/60 hover:scale-110 transition-all duration-200"
-              >
-                <Github className="w-8 h-8 text-zinc-200" />
-              </a>
-              <a
-                href="https://linkedin.com/in/randypahangii"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-4 rounded-full bg-zinc-800/60 border border-zinc-700 hover:bg-zinc-700/60 hover:scale-110 transition-all duration-200"
-              >
-                <Linkedin className="w-8 h-8 text-zinc-200" />
-              </a>
-              <a
-                href="mailto:rpahang2@gmail.com"
-                className="p-4 rounded-full bg-zinc-800/60 border border-zinc-700 hover:bg-zinc-700/60 hover:scale-110 transition-all duration-200"
-              >
-                <Mail className="w-8 h-8 text-zinc-200" />
-              </a>
+        {/* Education - Wide (3x1) */}
+        <GridItem area="md:col-span-2 lg:col-span-3">
+          <div className="flex items-center justify-between h-full px-6 py-4">
+            <div>
+              <h3 className="text-xl text-white font-medium">Education</h3>
+              <p className="text-zinc-300">BS Computer Science @ UNLV</p>
+              <p className="text-sm text-zinc-400">Minor in Accounting</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xl text-white font-bold">4.0 GPA</p>
+              <p className="text-zinc-400 text-sm">Class of 2027</p>
             </div>
           </div>
         </GridItem>
