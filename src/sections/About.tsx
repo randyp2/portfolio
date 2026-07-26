@@ -39,7 +39,7 @@ const GridItem = ({ area, children }: GridItemProps) => {
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-zinc-800 p-2 md:rounded-[1.5rem] md:p-3">
+      <div className="relative h-full border border-[var(--terminal-line)] bg-black/70 p-2 md:p-3">
         <GlowingEffect
           spread={40}
           glow={true}
@@ -47,9 +47,9 @@ const GridItem = ({ area, children }: GridItemProps) => {
           proximity={64}
           inactiveZone={0.01}
           borderWidth={3}
-          variant="white"
+          variant="terminal"
         />
-        <div className="relative flex h-full flex-col overflow-hidden rounded-xl border-[0.75px] border-zinc-800 bg-zinc-950/90 backdrop-blur-sm shadow-sm">
+        <div className="relative flex h-full flex-col overflow-hidden border border-[var(--terminal-line)] bg-black/90 backdrop-blur-sm shadow-[inset_0_0_30px_rgba(0,29,0,0.45)]">
           {children}
         </div>
       </div>
@@ -166,7 +166,7 @@ const About: React.FC<AboutProps> = ({
             </div>
             <button
               onClick={() => jumpTo("languages")}
-              className="mt-4 flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-zinc-800/60 border border-zinc-700 text-zinc-200 hover:bg-zinc-700/60 hover:text-white transition-all duration-200 group text-base font-medium"
+              className="terminal-button group mt-4 flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium"
             >
               See More
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -235,18 +235,18 @@ const About: React.FC<AboutProps> = ({
           animate={{ x: [0, 10, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           style={{
-            filter: "drop-shadow(0 0 15px rgba(255, 255, 255, 0.6))",
+            filter: "drop-shadow(0 0 15px rgba(70, 255, 123, 0.55))",
           }}
         >
-          <ChevronRight className="w-16 h-16 text-white" strokeWidth={2} />
+          <ChevronRight className="h-16 w-16 text-[var(--terminal-green)]" strokeWidth={1.5} />
         </motion.div>
         <span
-          className="text-sm text-white/70 font-medium"
+          className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--terminal-muted)]"
           style={{
-            textShadow: "0 0 10px rgba(255, 255, 255, 0.5)",
+            textShadow: "0 0 10px rgba(70, 255, 123, 0.35)",
           }}
         >
-          Keep going
+          next process
         </span>
       </div>
     </motion.div>

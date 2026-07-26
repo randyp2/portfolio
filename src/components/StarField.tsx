@@ -24,7 +24,7 @@ const StarField: React.FC<{ worldWidth: number, viewportHeight: number }> = ({ w
       }
 
       return {stars: arr, orbs: orbsArr};
-    }, [viewportHeight]); // re-generate only if the screen height changes
+    }, [viewportHeight, worldWidth]);
   
     return (
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -33,7 +33,7 @@ const StarField: React.FC<{ worldWidth: number, viewportHeight: number }> = ({ w
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08), rgba(255,255,255,0) 70%)",
+              "radial-gradient(circle at 50% 50%, rgba(0,59,10,0.28), rgba(0,0,0,0) 70%)",
             mixBlendMode: "screen",
           }}
         />
@@ -49,7 +49,7 @@ const StarField: React.FC<{ worldWidth: number, viewportHeight: number }> = ({ w
                     width: `${radius}px`,
                     height: `${radius}px`,
                     background:
-                      "radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%)",
+                      "radial-gradient(circle, rgba(70,255,123,0.16) 0%, rgba(0,29,0,0) 70%)",
                     filter: "blur(60px)",
                     opacity: 0.6,
                     mixBlendMode: "screen",
@@ -60,13 +60,14 @@ const StarField: React.FC<{ worldWidth: number, viewportHeight: number }> = ({ w
           {stars.map(({ size, x, y, glow }, i) => (
             <div
               key={i}
-              className="absolute rounded-full bg-white opacity-80"
+              className="absolute rounded-full opacity-80"
               style={{
                 width: `${size}px`,
                 height: `${size}px`,
                 left: `${x}px`,
                 top: `${y}px`,
-                boxShadow: `0 0 ${glow}px ${glow / 3}px rgba(255,255,255,0.8)`,
+                background: "#46ff7b",
+                boxShadow: `0 0 ${glow}px ${glow / 3}px rgba(70,255,123,0.75)`,
                 filter: "blur(0.5px)",
               }}
             />

@@ -253,18 +253,18 @@ const Projects: React.FC<ProjectsProps> = ({
           animate={{ x: [0, 10, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           style={{
-            filter: "drop-shadow(0 0 15px rgba(255, 255, 255, 0.6))",
+            filter: "drop-shadow(0 0 15px rgba(70, 255, 123, 0.55))",
           }}
         >
-          <ChevronRight className="w-20 h-20 text-white" strokeWidth={2} />
+          <ChevronRight className="h-20 w-20 text-[var(--terminal-green)]" strokeWidth={1.5} />
         </motion.div>
         <span
-          className="text-sm text-white/70 font-medium"
+          className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--terminal-muted)]"
           style={{
-            textShadow: "0 0 10px rgba(255, 255, 255, 0.5)",
+            textShadow: "0 0 10px rgba(70, 255, 123, 0.35)",
           }}
         >
-          Keep going
+          continue
         </span>
       </div>
     </motion.div>

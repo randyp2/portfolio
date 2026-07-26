@@ -103,7 +103,7 @@ const SkillColumn: React.FC<SkillColumnProps> = ({
     >
       {/* Title */}
       <motion.span
-        className="text-[60px] text-white [text-shadow:_0_0_4px_white] font-alfa absolute top-24 text-center"
+        className="absolute top-24 border border-[var(--terminal-line)] bg-black/80 px-6 py-3 text-center font-alfa text-[48px] text-[var(--terminal-green-bright)] [text-shadow:0_0_18px_rgba(70,255,123,0.2)]"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.5 }}
@@ -118,18 +118,18 @@ const SkillColumn: React.FC<SkillColumnProps> = ({
             animate={{ x: [0, 10, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             style={{
-              filter: "drop-shadow(0 0 15px rgba(255, 255, 255, 0.6))",
+              filter: "drop-shadow(0 0 15px rgba(70, 255, 123, 0.55))",
             }}
           >
-            <ChevronRight className="w-16 h-16 text-white" strokeWidth={2} />
+            <ChevronRight className="h-16 w-16 text-[var(--terminal-green)]" strokeWidth={1.5} />
           </motion.div>
           <span
-            className="text-sm text-white/70 font-medium"
+            className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--terminal-muted)]"
             style={{
-              textShadow: "0 0 10px rgba(255, 255, 255, 0.5)",
+              textShadow: "0 0 10px rgba(70, 255, 123, 0.35)",
             }}
           >
-            Keep going
+            next process
           </span>
         </div>
       )}

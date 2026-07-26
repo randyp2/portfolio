@@ -20,9 +20,9 @@ const SocialButton = ({
   copied,
 }: SocialButtonProps) => {
   const content = (
-    <div className="flex items-center gap-3 p-4 rounded-xl border border-zinc-800 bg-zinc-950/90 active:bg-zinc-800/60 transition-colors">
-      <Icon className="w-6 h-6 text-zinc-300" />
-      <span className="text-white font-medium">
+    <div className="terminal-button flex items-center gap-3 p-4">
+      <Icon className="h-5 w-5 text-[var(--terminal-green)]" />
+      <span className="text-sm font-medium text-[var(--terminal-text)]">
         {label === "Email" && copied ? "Copied!" : label}
       </span>
     </div>
@@ -77,7 +77,13 @@ const MobileContact: React.FC = () => {
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        <h2 className="text-2xl font-bold text-white mb-2">Let's Connect</h2>
+        <div className="mb-6 flex items-center gap-3">
+          <span className="terminal-kicker">04 // contact</span>
+          <span className="h-px flex-1 bg-[var(--terminal-line)]" />
+        </div>
+        <h2 className="terminal-command mb-2 text-xl font-bold">
+          open connection
+        </h2>
         <p className="text-zinc-400 text-sm mb-6">
           Open to opportunities, collaborations, and new connections.
         </p>

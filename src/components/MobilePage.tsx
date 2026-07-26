@@ -7,7 +7,7 @@ import MobileFooter from "./mobile/MobileFooter";
 
 const MobilePage: React.FC = () => {
   return (
-    <div className="pt-14">
+    <div className="relative">
       <MobileIntro />
       <MobileAbout />
       <MobileProjects />

@@ -36,7 +36,7 @@ const Arrow: React.FC<ArrowProps> = ({ startX, startY, endX, endY, isVisible }) 
       }}
     >
       <div
-        className="relative bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.6)]"
+        className="relative rounded-full bg-[#46ff7b] shadow-[0_0_12px_rgba(70,255,123,0.75)]"
         style={{
           width: `${length}px`,
           height: "3px",
@@ -47,7 +47,7 @@ const Arrow: React.FC<ArrowProps> = ({ startX, startY, endX, endY, isVisible }) 
           style={{
             width: 0,
             height: 0,
-            borderLeft: "12px solid white",
+            borderLeft: "12px solid #46ff7b",
             borderTop: "6px solid transparent",
             borderBottom: "6px solid transparent",
           }}

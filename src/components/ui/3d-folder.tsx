@@ -81,8 +81,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
         ref={ref}
         className={cn(
           "relative flex flex-col items-center justify-center",
-          "p-8 rounded-2xl",
-          "bg-card border border-border",
+          "terminal-panel p-8",
           "transition-all duration-500 ease-out",
           "group cursor-pointer",
           className,
@@ -102,7 +101,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
         <div
           className="absolute inset-0 rounded-2xl transition-opacity duration-500"
           style={{
-            background: "radial-gradient(circle at 50% 70%, oklch(0.75 0.10 225) 0%, transparent 70%)",
+            background: "radial-gradient(circle at 50% 70%, rgba(70,255,123,0.35) 0%, transparent 70%)",
             opacity: isOpen || isHovered ? 0.12 : 0,
           }}
         />
@@ -187,7 +186,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
 
         {/* Folder title */}
         <h3
-          className="text-3xl font-bold text-white mt-4 transition-all duration-300"
+          className="mt-4 font-alfa text-3xl font-bold text-[var(--terminal-green-bright)] transition-all duration-300"
           style={{
             transform: isOpen ? "translateY(4px)" : "translateY(0)",
           }}
@@ -216,27 +215,27 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
           >
             {/* Arrow pointing up */}
             <svg
-              className="w-6 h-6 text-white animate-bounce"
+              className="h-6 w-6 animate-bounce text-[var(--terminal-green)]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
               style={{
-                filter: "drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))",
+                filter: "drop-shadow(0 0 8px rgba(70, 255, 123, 0.75))",
               }}
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
             </svg>
             {/* Bouncing ball indicator */}
             <div
-              className="w-4 h-4 rounded-full bg-white animate-bounce"
+              className="h-4 w-4 animate-bounce rounded-full bg-[var(--terminal-green)]"
               style={{
-                boxShadow: "0 0 12px rgba(255, 255, 255, 0.9), 0 0 24px rgba(255, 255, 255, 0.5)",
+                boxShadow: "0 0 12px rgba(70, 255, 123, 0.9), 0 0 24px rgba(70, 255, 123, 0.45)",
               }}
             />
             <span
-              className="text-sm font-medium text-white whitespace-nowrap mt-1"
+              className="mt-1 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.12em] text-[var(--terminal-green-bright)]"
               style={{
-                textShadow: "0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.4)",
+                textShadow: "0 0 10px rgba(70, 255, 123, 0.7), 0 0 20px rgba(70, 255, 123, 0.35)",
               }}
             >
               Hit to open
@@ -433,7 +432,7 @@ function ImageLightbox({
         }}
       >
         <div
-          className={cn("relative overflow-hidden", "rounded-2xl", "bg-black", "ring-1 ring-zinc-800", "shadow-2xl")}
+          className={cn("relative overflow-hidden", "bg-black", "ring-1 ring-[#46ff7b]/30", "shadow-2xl")}
           style={{
             borderRadius: animationPhase === "initial" && !isClosing ? "8px" : "16px",
             transition: "border-radius 500ms cubic-bezier(0.16, 1, 0.3, 1)",
@@ -658,8 +657,8 @@ export const ProjectCard = forwardRef<HTMLDivElement, ProjectCardProps>(
         ref={ref}
         className={cn(
           "absolute w-20 h-28 rounded-lg overflow-hidden shadow-xl",
-          "bg-zinc-900 border border-zinc-700",
-          "cursor-pointer hover:ring-2 hover:ring-blue-400/50",
+          "bg-black border border-[#46ff7b]/25",
+          "cursor-pointer hover:ring-2 hover:ring-[#46ff7b]/50",
           isSelected && "opacity-0",
         )}
         style={{

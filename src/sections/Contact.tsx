@@ -91,8 +91,8 @@ const Contact: React.FC<ContactProps> = ({
       name: "GitHub",
       icon: Github,
       href: "https://github.com/randyp2",
-      hoverBg: "#000",
-      hoverShadow: "0 0 25px rgba(0, 0, 0, 0.45)",
+      hoverBg: "#001d00",
+      hoverShadow: "0 0 25px rgba(70, 255, 123, 0.28)",
       iconColor: "#fff",
       previewUrl: "https://github.com/randyp2",
       previewImage: githubPreviewImage,
@@ -101,8 +101,8 @@ const Contact: React.FC<ContactProps> = ({
       name: "LinkedIn",
       icon: Linkedin,
       href: "https://linkedin.com/in/randypahangii",
-      hoverBg: "#0077b5",
-      hoverShadow: "0 0 25px rgba(0, 119, 181, 0.6)",
+      hoverBg: "#001d00",
+      hoverShadow: "0 0 25px rgba(70, 255, 123, 0.28)",
       iconColor: "#fff",
       previewUrl: "https://linkedin.com/in/randypahangii",
       previewImage: linkedinPreviewImage,
@@ -111,8 +111,8 @@ const Contact: React.FC<ContactProps> = ({
       name: "Resume",
       icon: FileDown,
       href: resumeUrl,
-      hoverBg: "#084f92", // even darker blue
-      hoverShadow: "0 0 25px rgba(8, 79, 146, 0.65)",
+      hoverBg: "#001d00",
+      hoverShadow: "0 0 25px rgba(70, 255, 123, 0.28)",
       iconColor: "#fff",
       previewUrl: resumeUrl,
       download: true,
@@ -123,8 +123,8 @@ const Contact: React.FC<ContactProps> = ({
       icon: copied ? Check : Mail,
       href: "#",
       onClick: handleCopyEmail,
-      hoverBg: "#ea4335",
-      hoverShadow: "0 0 25px rgba(234, 67, 53, 0.5)",
+      hoverBg: "#001d00",
+      hoverShadow: "0 0 25px rgba(70, 255, 123, 0.28)",
       iconColor: "#fff",
       previewUrl: "mailto:rpahang2@gmail.com",
     },
@@ -164,7 +164,7 @@ const Contact: React.FC<ContactProps> = ({
         <motion.div
           className="absolute w-[500px] h-[500px] rounded-full opacity-20"
           style={{
-            background: "radial-gradient(circle, rgba(161,161,170,0.3) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(0,59,10,0.38) 0%, transparent 70%)",
             left: "10%",
             top: "20%",
           }}
@@ -182,7 +182,7 @@ const Contact: React.FC<ContactProps> = ({
         <motion.div
           className="absolute w-[400px] h-[400px] rounded-full opacity-20"
           style={{
-            background: "radial-gradient(circle, rgba(113,113,122,0.4) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(70,255,123,0.16) 0%, transparent 70%)",
             right: "15%",
             bottom: "25%",
           }}
@@ -200,7 +200,7 @@ const Contact: React.FC<ContactProps> = ({
         <motion.div
           className="absolute w-[300px] h-[300px] rounded-full opacity-15"
           style={{
-            background: "radial-gradient(circle, rgba(82,82,91,0.4) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(0,29,0,0.5) 0%, transparent 70%)",
             left: "50%",
             top: "10%",
             transform: "translateX(-50%)",
@@ -219,24 +219,21 @@ const Contact: React.FC<ContactProps> = ({
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center text-center mb-12">
-        {/* Heading with gradient */}
+        <p className="terminal-command mb-4 text-sm text-[var(--terminal-muted)]">
+          open ./contact
+        </p>
         <motion.h1
-          className="text-6xl md:text-7xl font-alfa mb-6"
+          className="mb-6 font-alfa text-6xl text-[var(--terminal-green-bright)] [text-shadow:0_0_28px_rgba(70,255,123,0.2)] md:text-7xl"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.6 }}
         >
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-300 via-white to-zinc-400">
-            LET'S
-          </span>{" "}
-          <span className="text-white" style={{ textShadow: "0 0 30px rgba(255,255,255,0.4)" }}>
-            CONNECT
-          </span>
+          LET&apos;S CONNECT
         </motion.h1>
 
         {/* Tagline */}
         <motion.p
-          className="text-xl text-zinc-400 max-w-2xl mx-auto"
+          className="mx-auto max-w-2xl text-lg text-[var(--terminal-muted)]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
@@ -253,13 +250,12 @@ const Contact: React.FC<ContactProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.6 }}
       >
-        <div
-          className="rounded-3xl bg-gradient-to-br from-zinc-800/80 to-zinc-900/90 border border-zinc-700/50 shadow-2xl backdrop-blur-xl overflow-hidden p-8 transition-all duration-500 hover:scale-[1.02]"
-          style={{
-            boxShadow: "0 0 50px rgba(161, 161, 170, 0.15), 0 0 80px rgba(113, 113, 122, 0.1)",
-          }}
-        >
-          <div className="flex flex-wrap justify-center gap-8">
+        <div className="terminal-panel overflow-hidden">
+          <div className="terminal-titlebar">
+            <span className="terminal-dot" />
+            connection-options
+          </div>
+          <div className="flex flex-wrap justify-center gap-8 p-8">
             {socialLinks.map((link, index) => {
               const isHovered = hoveredIcon === link.name;
               const IconComponent = link.icon;
@@ -272,8 +268,8 @@ const Contact: React.FC<ContactProps> = ({
                 >
                   <motion.div
                     className={cn(
-                      "flex items-center justify-center w-20 h-20 rounded-full",
-                      "bg-white/5 backdrop-blur-sm border border-white/10",
+                      "flex h-20 w-20 items-center justify-center border border-[var(--terminal-line)]",
+                      "bg-black/80 backdrop-blur-sm",
                       "transition-all duration-300"
                     )}
                     animate={{
@@ -291,11 +287,11 @@ const Contact: React.FC<ContactProps> = ({
                       animate={isHovered ? { rotate: [0, -5, 5, -5, 5, 0] } : {}}
                       transition={{ duration: 0.5 }}
                     >
-                      <IconComponent className="w-8 h-8 text-white" strokeWidth={1.5} />
+                      <IconComponent className="h-8 w-8 text-[var(--terminal-green)]" strokeWidth={1.5} />
                     </motion.div>
                   </motion.div>
                   <motion.span
-                    className="mt-3 text-white font-medium"
+                    className="mt-3 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--terminal-text)]"
                     animate={{
                       opacity: isHovered ? 1 : 0.7,
                       y: isHovered ? 5 : 0,
@@ -340,9 +336,9 @@ const Contact: React.FC<ContactProps> = ({
 
         {/* Glow effect underneath */}
         <div
-          className="absolute inset-0 -z-10 rounded-3xl blur-3xl opacity-30"
+          className="absolute inset-0 -z-10 blur-3xl opacity-30"
           style={{
-            background: "radial-gradient(ellipse at center, rgba(161, 161, 170, 0.3) 0%, transparent 70%)",
+            background: "radial-gradient(ellipse at center, rgba(70, 255, 123, 0.2) 0%, transparent 70%)",
             transform: "translateY(20px)",
           }}
         />
@@ -377,7 +373,7 @@ const Contact: React.FC<ContactProps> = ({
             }}
           >
             <div
-              className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/50 rounded-xl shadow-2xl overflow-hidden"
+              className="terminal-panel overflow-hidden backdrop-blur-xl"
               style={{
                 width: "280px",
                 boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",

@@ -2,15 +2,17 @@ import React from "react";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-40 py-7 bg-black/40 backdrop-blur-xl border-t border-white/15 shadow-[0_0_10px_rgba(255,255,255,0.3)]">
-      <div className="h-full flex items-center justify-center text-white/60 text-sm relative">
-        Use the glowing ball to navigate • Drag and release to launch • Or use
-        navbar
-        <div
-          className="absolute right-6 text-emerald-400 font-medium"
-          style={{ textShadow: "0 0 10px rgba(52, 211, 153, 0.5)" }}
-        >
-          Last updated: 12/31/2025
+    <footer className="fixed bottom-3 left-3 right-3 z-40 mx-auto max-w-[1240px] border border-[var(--terminal-line)] bg-black/90 px-4 py-2.5 shadow-[0_0_24px_rgba(70,255,123,0.08)] backdrop-blur-md">
+      <div className="flex items-center justify-between gap-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--terminal-muted)]">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="terminal-dot shrink-0" />
+          <span className="truncate">
+            drag orb → set vector → release to execute
+          </span>
+        </div>
+        <div className="hidden items-center gap-4 md:flex">
+          <span>physics: online</span>
+          <span className="text-[var(--terminal-green)]">status: ready</span>
         </div>
       </div>
     </footer>
@@ -18,4 +20,3 @@ const Footer: React.FC = () => {
 };
 
 export default Footer;
-

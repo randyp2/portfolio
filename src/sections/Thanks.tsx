@@ -24,7 +24,7 @@ const Thanks: React.FC<ThanksProps> = ({ centerX, ballX }) => {
 
   return (
     <motion.div
-      className="flex flex-row justify-center items-center w-screen h-screen absolute top-0"
+      className="absolute top-0 flex h-screen w-screen items-center justify-center"
       style={{
         left: `${centerX}px`,
         transform: "translateX(-50%)",
@@ -40,20 +40,25 @@ const Thanks: React.FC<ThanksProps> = ({ centerX, ballX }) => {
         mass: 0.5,
       }}
     >
-      <div
-        className="flex flex-col justify-center align-middle text-center font-alfa text-[100px]"
-      >
-        <span className="text-white [text-shadow:_0_0_4px_white]">
-          THANK YOU
-        </span>
-
-        <span className="-mt-6 text-border">
-          THANK YOU
-        </span>
-
-        <span className="-mt-5 text-white [text-shadow:_0_0_4px_white]">
-          THANK YOU
-        </span>
+      <div className="terminal-panel w-[min(760px,80vw)] overflow-hidden">
+        <div className="terminal-titlebar">
+          <span className="terminal-dot" />
+          session-complete
+        </div>
+        <div className="px-12 py-14 text-left">
+          <p className="terminal-command mb-6 text-sm text-[var(--terminal-muted)]">
+            exit --message
+          </p>
+          <h2 className="font-alfa text-[72px] leading-none text-[var(--terminal-green-bright)] [text-shadow:0_0_28px_rgba(70,255,123,0.2)]">
+            THANK YOU.
+          </h2>
+          <p className="mt-6 text-sm text-[var(--terminal-muted)]">
+            Connection remains open. Reach out when you are ready to build.
+          </p>
+          <p className="mt-8 text-[var(--terminal-green)]">
+            rjp@portfolio:~$ <span className="terminal-cursor" />
+          </p>
+        </div>
       </div>
     </motion.div>
   );

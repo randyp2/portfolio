@@ -6,7 +6,7 @@ interface GlowingEffectProps {
   inactiveZone?: number;
   proximity?: number;
   spread?: number;
-  variant?: "default" | "white";
+  variant?: "default" | "white" | "terminal";
   glow?: boolean;
   className?: string;
   disabled?: boolean;
@@ -23,7 +23,6 @@ const GlowingEffect = memo(
     variant = "default",
     glow = false,
     className,
-    movementDuration = 2,
     borderWidth = 1,
     disabled = true,
   }: GlowingEffectProps) => {
@@ -95,7 +94,7 @@ const GlowingEffect = memo(
           element.style.setProperty("--start", String(newAngle));
         });
       },
-      [inactiveZone, proximity, movementDuration]
+      [inactiveZone, proximity]
     );
 
     useEffect(() => {
@@ -125,6 +124,7 @@ const GlowingEffect = memo(
             "pointer-events-none absolute -inset-px hidden rounded-[inherit] border opacity-0 transition-opacity",
             glow && "opacity-100",
             variant === "white" && "border-white",
+            variant === "terminal" && "border-[#46ff7b]",
             disabled && "!block"
           )}
         />
@@ -140,7 +140,16 @@ const GlowingEffect = memo(
               "--repeating-conic-gradient-times": "5",
               transition: "var(--start) 0.3s ease-out",
               "--gradient":
-                variant === "white"
+                variant === "terminal"
+                  ? `radial-gradient(circle, rgba(70,255,123,0.9) 10%, rgba(70,255,123,0) 22%),
+                radial-gradient(circle at 40% 40%, rgba(0,120,35,0.8) 5%, rgba(0,120,35,0) 18%),
+                repeating-conic-gradient(
+                  from 236.84deg at 50% 50%,
+                  rgba(70,255,123,0.95) 0%,
+                  rgba(0,80,20,0.75) calc(50% / var(--repeating-conic-gradient-times)),
+                  rgba(70,255,123,0.95) calc(100% / var(--repeating-conic-gradient-times))
+                )`
+                  : variant === "white"
                   ? `radial-gradient(circle, rgba(255,255,255,0.8) 10%, rgba(255,255,255,0) 20%),
                 radial-gradient(circle at 40% 40%, rgba(200,200,200,0.6) 5%, rgba(200,200,200,0) 15%),
                 radial-gradient(circle at 60% 60%, rgba(255,255,255,0.7) 10%, rgba(255,255,255,0) 20%),

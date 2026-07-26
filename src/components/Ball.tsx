@@ -134,7 +134,7 @@ const Ball: React.FC<BallProps> = ({
     <>
       <div
         ref={ballRef}
-        className="absolute rounded-full bg-white cursor-grab active:cursor-grabbing select-none"
+        className="absolute cursor-grab select-none rounded-full border border-[#8cffad] bg-[#46ff7b] active:cursor-grabbing"
         style={{
           width: `${BALL_RADIUS * 2}px`,
           height: `${BALL_RADIUS * 2}px`,
@@ -143,8 +143,8 @@ const Ball: React.FC<BallProps> = ({
           willChange: "transform",
           // NO transform here - animation loop controls it exclusively to prevent ghost image on re-render
           boxShadow: isLaunching
-            ? "0 0 60px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.6)"
-            : "0 0 40px rgba(255,255,255,0.4)",
+            ? "0 0 70px rgba(70,255,123,0.8), 0 0 28px rgba(70,255,123,0.95), inset 0 0 10px rgba(255,255,255,0.5)"
+            : "0 0 32px rgba(70,255,123,0.65), 0 0 8px rgba(140,255,173,0.8), inset 0 0 8px rgba(255,255,255,0.35)",
           transition: "box-shadow 0.3s",
         }}
         onPointerDown={handlePointerDown}

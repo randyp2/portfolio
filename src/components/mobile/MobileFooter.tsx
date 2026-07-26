@@ -1,12 +1,13 @@
 const MobileFooter: React.FC = () => {
   return (
-    <footer className="py-8 px-4 border-t border-zinc-800">
-      <p
-        className="text-right text-sm font-medium text-emerald-400"
-        style={{ textShadow: "0 0 10px rgba(52, 211, 153, 0.5)" }}
-      >
-        Last updated: 12/31/2025
-      </p>
+    <footer className="border-t border-[var(--terminal-line)] px-4 py-8">
+      <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--terminal-muted)]">
+        <span>rjp@portfolio:~$</span>
+        <span className="flex items-center gap-2 text-[var(--terminal-green)]">
+          <span className="terminal-dot" />
+          online
+        </span>
+      </div>
     </footer>
   );
 };

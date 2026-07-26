@@ -77,7 +77,7 @@ const InfiniteIconCarousel: React.FC<InfiniteIconCarouselProps> = ({
               {[...row.icons, ...row.icons, ...row.icons].map((iconKey, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-center shrink-0 w-24 h-24 rounded-xl bg-zinc-800/50 border border-zinc-700/50"
+                  className="flex h-24 w-24 shrink-0 items-center justify-center border border-[var(--terminal-line)] bg-[#001d00]/65 shadow-[inset_0_0_20px_rgba(70,255,123,0.04)]"
                 >
                   {iconComponents[iconKey]}
                 </div>

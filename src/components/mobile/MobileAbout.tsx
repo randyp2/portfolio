@@ -12,7 +12,7 @@ interface MobileCardProps {
 const MobileCard = ({ children, className }: MobileCardProps) => (
   <motion.div
     className={cn(
-      "rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur-sm p-6 mb-4",
+      "terminal-panel mb-4 p-6",
       className
     )}
     initial={{ opacity: 0, y: 20 }}
@@ -31,8 +31,16 @@ const MobileAbout: React.FC = () => {
 
   return (
     <section id="about" className="py-12 px-4">
+      <div className="mb-6 flex items-center gap-3">
+        <span className="terminal-kicker">01 // about</span>
+        <span className="h-px flex-1 bg-[var(--terminal-line)]" />
+      </div>
+
       {/* Bio Card */}
       <MobileCard>
+        <p className="terminal-command mb-4 text-xs text-[var(--terminal-muted)]">
+          cat profile.txt
+        </p>
         <h1 className="text-2xl text-white font-bold mb-2 tracking-tight">
           Randy Pahang II
         </h1>
@@ -94,7 +102,7 @@ const MobileAbout: React.FC = () => {
         </div>
         <button
           onClick={() => scrollToSection("skills")}
-          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-zinc-800/60 border border-zinc-700 text-zinc-200 active:bg-zinc-700/60 transition-all duration-200 text-sm font-medium"
+          className="terminal-button mt-4 flex w-full items-center justify-center gap-2 px-4 py-3 text-sm font-medium"
         >
           See More
           <ArrowRight className="w-4 h-4" />

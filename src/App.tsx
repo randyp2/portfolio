@@ -9,7 +9,11 @@ const App: React.FC = () => {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   return (
-    <div className={`min-h-screen bg-[#101316] text-white antialiased font-sans ${isDesktop ? 'overflow-hidden' : ''}`}>
+    <div
+      className={`terminal-app min-h-screen antialiased ${
+        isDesktop ? "overflow-hidden" : ""
+      }`}
+    >
       <Navbar />
       {isDesktop ? (
         <>
