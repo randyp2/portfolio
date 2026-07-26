@@ -101,7 +101,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
         <div
           className="absolute inset-0 rounded-2xl transition-opacity duration-500"
           style={{
-            background: "radial-gradient(circle at 50% 70%, rgba(70,255,123,0.35) 0%, transparent 70%)",
+            background: "radial-gradient(circle at 50% 70%, rgba(46,212,101,0.35) 0%, transparent 70%)",
             opacity: isOpen || isHovered ? 0.12 : 0,
           }}
         />
@@ -220,7 +220,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
               viewBox="0 0 24 24"
               stroke="currentColor"
               style={{
-                filter: "drop-shadow(0 0 8px rgba(70, 255, 123, 0.75))",
+                filter: "drop-shadow(0 0 8px rgba(46, 212, 101, 0.75))",
               }}
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
@@ -229,13 +229,13 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
             <div
               className="h-4 w-4 animate-bounce rounded-full bg-[var(--terminal-green)]"
               style={{
-                boxShadow: "0 0 12px rgba(70, 255, 123, 0.9), 0 0 24px rgba(70, 255, 123, 0.45)",
+                boxShadow: "0 0 12px rgba(46, 212, 101, 0.9), 0 0 24px rgba(46, 212, 101, 0.45)",
               }}
             />
             <span
               className="mt-1 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.12em] text-[var(--terminal-green-bright)]"
               style={{
-                textShadow: "0 0 10px rgba(70, 255, 123, 0.7), 0 0 20px rgba(70, 255, 123, 0.35)",
+                textShadow: "0 0 10px rgba(46, 212, 101, 0.7), 0 0 20px rgba(46, 212, 101, 0.35)",
               }}
             >
               Hit to open
@@ -432,7 +432,7 @@ function ImageLightbox({
         }}
       >
         <div
-          className={cn("relative overflow-hidden", "bg-black", "ring-1 ring-[#46ff7b]/30", "shadow-2xl")}
+          className={cn("relative overflow-hidden", "bg-black", "ring-1 ring-[#2ed465]/30", "shadow-2xl")}
           style={{
             borderRadius: animationPhase === "initial" && !isClosing ? "8px" : "16px",
             transition: "border-radius 500ms cubic-bezier(0.16, 1, 0.3, 1)",
@@ -657,8 +657,8 @@ export const ProjectCard = forwardRef<HTMLDivElement, ProjectCardProps>(
         ref={ref}
         className={cn(
           "absolute w-20 h-28 rounded-lg overflow-hidden shadow-xl",
-          "bg-black border border-[#46ff7b]/25",
-          "cursor-pointer hover:ring-2 hover:ring-[#46ff7b]/50",
+          "bg-black border border-[#2ed465]/25",
+          "cursor-pointer hover:ring-2 hover:ring-[#2ed465]/50",
           isSelected && "opacity-0",
         )}
         style={{

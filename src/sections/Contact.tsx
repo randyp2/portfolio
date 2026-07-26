@@ -92,7 +92,7 @@ const Contact: React.FC<ContactProps> = ({
       icon: Github,
       href: "https://github.com/randyp2",
       hoverBg: "#001d00",
-      hoverShadow: "0 0 25px rgba(70, 255, 123, 0.28)",
+      hoverShadow: "0 0 25px rgba(46, 212, 101, 0.28)",
       iconColor: "#fff",
       previewUrl: "https://github.com/randyp2",
       previewImage: githubPreviewImage,
@@ -102,7 +102,7 @@ const Contact: React.FC<ContactProps> = ({
       icon: Linkedin,
       href: "https://linkedin.com/in/randypahangii",
       hoverBg: "#001d00",
-      hoverShadow: "0 0 25px rgba(70, 255, 123, 0.28)",
+      hoverShadow: "0 0 25px rgba(46, 212, 101, 0.28)",
       iconColor: "#fff",
       previewUrl: "https://linkedin.com/in/randypahangii",
       previewImage: linkedinPreviewImage,
@@ -112,7 +112,7 @@ const Contact: React.FC<ContactProps> = ({
       icon: FileDown,
       href: resumeUrl,
       hoverBg: "#001d00",
-      hoverShadow: "0 0 25px rgba(70, 255, 123, 0.28)",
+      hoverShadow: "0 0 25px rgba(46, 212, 101, 0.28)",
       iconColor: "#fff",
       previewUrl: resumeUrl,
       download: true,
@@ -124,7 +124,7 @@ const Contact: React.FC<ContactProps> = ({
       href: "#",
       onClick: handleCopyEmail,
       hoverBg: "#001d00",
-      hoverShadow: "0 0 25px rgba(70, 255, 123, 0.28)",
+      hoverShadow: "0 0 25px rgba(46, 212, 101, 0.28)",
       iconColor: "#fff",
       previewUrl: "mailto:rpahang2@gmail.com",
     },
@@ -159,71 +159,13 @@ const Contact: React.FC<ContactProps> = ({
       }}
       onMouseMove={handleMouseMove}
     >
-      {/* Animated background orbs - zinc tones */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute w-[500px] h-[500px] rounded-full opacity-20"
-          style={{
-            background: "radial-gradient(circle, rgba(0,59,10,0.38) 0%, transparent 70%)",
-            left: "10%",
-            top: "20%",
-          }}
-          animate={{
-            x: [0, 50, 0],
-            y: [0, -30, 0],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute w-[400px] h-[400px] rounded-full opacity-20"
-          style={{
-            background: "radial-gradient(circle, rgba(70,255,123,0.16) 0%, transparent 70%)",
-            right: "15%",
-            bottom: "25%",
-          }}
-          animate={{
-            x: [0, -40, 0],
-            y: [0, 40, 0],
-            scale: [1, 1.15, 1],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute w-[300px] h-[300px] rounded-full opacity-15"
-          style={{
-            background: "radial-gradient(circle, rgba(0,29,0,0.5) 0%, transparent 70%)",
-            left: "50%",
-            top: "10%",
-            transform: "translateX(-50%)",
-          }}
-          animate={{
-            y: [0, 20, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      </div>
-
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center text-center mb-12">
         <p className="terminal-command mb-4 text-sm text-[var(--terminal-muted)]">
           open ./contact
         </p>
         <motion.h1
-          className="mb-6 font-alfa text-6xl text-[var(--terminal-green-bright)] [text-shadow:0_0_28px_rgba(70,255,123,0.2)] md:text-7xl"
+          className="mb-6 font-alfa text-6xl text-[var(--terminal-green-bright)] [text-shadow:0_0_28px_rgba(46,212,101,0.2)] md:text-7xl"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.6 }}
@@ -333,15 +275,6 @@ const Contact: React.FC<ContactProps> = ({
             })}
           </div>
         </div>
-
-        {/* Glow effect underneath */}
-        <div
-          className="absolute inset-0 -z-10 blur-3xl opacity-30"
-          style={{
-            background: "radial-gradient(ellipse at center, rgba(70, 255, 123, 0.2) 0%, transparent 70%)",
-            transform: "translateY(20px)",
-          }}
-        />
       </motion.div>
 
       {/* Email display */}

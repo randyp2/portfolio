@@ -55,7 +55,7 @@ const MassBlock: React.FC<MassBlockProps> = ({ entity, blockRef }) => {
   return (
     <div
       ref={blockRef}
-      className="absolute flex items-center justify-center select-none border border-[#46ff7b]/35 bg-[#001d00]/90 shadow-[0_0_18px_rgba(70,255,123,0.1)]"
+      className="absolute flex items-center justify-center select-none border border-[#2ed465]/35 bg-[#001d00]/90 shadow-[0_0_18px_rgba(46,212,101,0.1)]"
       style={{
         width: `${entity.width}px`,
         height: `${entity.height}px`,

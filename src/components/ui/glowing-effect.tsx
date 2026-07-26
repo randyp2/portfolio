@@ -124,7 +124,7 @@ const GlowingEffect = memo(
             "pointer-events-none absolute -inset-px hidden rounded-[inherit] border opacity-0 transition-opacity",
             glow && "opacity-100",
             variant === "white" && "border-white",
-            variant === "terminal" && "border-[#46ff7b]",
+            variant === "terminal" && "border-[#2ed465]",
             disabled && "!block"
           )}
         />
@@ -141,13 +141,13 @@ const GlowingEffect = memo(
               transition: "var(--start) 0.3s ease-out",
               "--gradient":
                 variant === "terminal"
-                  ? `radial-gradient(circle, rgba(70,255,123,0.9) 10%, rgba(70,255,123,0) 22%),
+                  ? `radial-gradient(circle, rgba(46,212,101,0.9) 10%, rgba(46,212,101,0) 22%),
                 radial-gradient(circle at 40% 40%, rgba(0,120,35,0.8) 5%, rgba(0,120,35,0) 18%),
                 repeating-conic-gradient(
                   from 236.84deg at 50% 50%,
-                  rgba(70,255,123,0.95) 0%,
+                  rgba(46,212,101,0.95) 0%,
                   rgba(0,80,20,0.75) calc(50% / var(--repeating-conic-gradient-times)),
-                  rgba(70,255,123,0.95) calc(100% / var(--repeating-conic-gradient-times))
+                  rgba(46,212,101,0.95) calc(100% / var(--repeating-conic-gradient-times))
                 )`
                   : variant === "white"
                   ? `radial-gradient(circle, rgba(255,255,255,0.8) 10%, rgba(255,255,255,0) 20%),

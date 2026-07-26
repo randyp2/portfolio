@@ -253,7 +253,7 @@ const Projects: React.FC<ProjectsProps> = ({
           animate={{ x: [0, 10, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           style={{
-            filter: "drop-shadow(0 0 15px rgba(70, 255, 123, 0.55))",
+            filter: "drop-shadow(0 0 15px rgba(46, 212, 101, 0.55))",
           }}
         >
           <ChevronRight className="h-20 w-20 text-[var(--terminal-green)]" strokeWidth={1.5} />
@@ -261,7 +261,7 @@ const Projects: React.FC<ProjectsProps> = ({
         <span
           className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--terminal-muted)]"
           style={{
-            textShadow: "0 0 10px rgba(70, 255, 123, 0.35)",
+            textShadow: "0 0 10px rgba(46, 212, 101, 0.35)",
           }}
         >
           continue

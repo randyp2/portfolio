@@ -49,7 +49,7 @@ const Thanks: React.FC<ThanksProps> = ({ centerX, ballX }) => {
           <p className="terminal-command mb-6 text-sm text-[var(--terminal-muted)]">
             exit --message
           </p>
-          <h2 className="font-alfa text-[72px] leading-none text-[var(--terminal-green-bright)] [text-shadow:0_0_28px_rgba(70,255,123,0.2)]">
+          <h2 className="font-alfa text-[72px] leading-none text-[var(--terminal-green-bright)] [text-shadow:0_0_28px_rgba(46,212,101,0.2)]">
             THANK YOU.
           </h2>
           <p className="mt-6 text-sm text-[var(--terminal-muted)]">

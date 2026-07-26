@@ -113,32 +113,32 @@ const GitHubActivityChart: React.FC<{ username: string }> = memo(
           >
             <defs>
               <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="rgba(70, 255, 123, 0.35)" />
-                <stop offset="50%" stopColor="rgba(140, 255, 173, 1)" />
-                <stop offset="100%" stopColor="rgba(70, 255, 123, 0.35)" />
+                <stop offset="0%" stopColor="rgba(46, 212, 101, 0.35)" />
+                <stop offset="50%" stopColor="rgba(107, 226, 143, 1)" />
+                <stop offset="100%" stopColor="rgba(46, 212, 101, 0.35)" />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="date"
-              stroke="#174c25"
-              tick={{ fill: "#68a979", fontSize: 10 }}
+              stroke="#123d1d"
+              tick={{ fill: "#5a9569", fontSize: 10 }}
               tickLine={false}
             />
             <YAxis
-              stroke="#174c25"
-              tick={{ fill: "#68a979", fontSize: 10 }}
+              stroke="#123d1d"
+              tick={{ fill: "#5a9569", fontSize: 10 }}
               tickLine={false}
               axisLine={false}
             />
             <Tooltip
               contentStyle={{
                 backgroundColor: "#000900",
-                border: "1px solid rgba(70, 255, 123, 0.35)",
+                border: "1px solid rgba(46, 212, 101, 0.35)",
                 borderRadius: "2px",
-                color: "#c7ffd5",
+                color: "#b6e6c2",
                 fontFamily: "var(--font-terminal)",
               }}
-              labelStyle={{ color: "#68a979" }}
+              labelStyle={{ color: "#5a9569" }}
             />
             <Line
               type="monotone"
