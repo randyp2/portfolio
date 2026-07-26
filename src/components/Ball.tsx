@@ -72,6 +72,7 @@ const Ball: React.FC<BallProps> = ({
     const audio: HTMLAudioElement = new Audio(thudSound);
     let impactVolume: number = 1; // Base value
     const impactDamper: number = 0.7; // Reduce volume of subsequent impacts
+    const minimumAudibleImpactSpeed: number = 80;
 
     // Connect to physics launch event to reset volume
     physics.onLaunch = () => {
@@ -79,9 +80,15 @@ const Ball: React.FC<BallProps> = ({
     };
 
     // Connect to physics collision event
-    physics.onCollision = () => {
+    physics.onCollision = (impactSpeed: number) => {
       // Mute sound when user is scrolling via scrollbar
-      if (isScrolling) return;
+      if (
+        isScrolling ||
+        impactSpeed < minimumAudibleImpactSpeed ||
+        impactVolume <= 0
+      ) {
+        return;
+      }
 
       audio.volume = impactVolume;
       audio.currentTime = 0; // Rewind to start
@@ -156,4 +163,3 @@ const Ball: React.FC<BallProps> = ({
 };
 
 export default Ball;
-

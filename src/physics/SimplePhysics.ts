@@ -30,6 +30,12 @@ export interface ColliderRect {
 }
 
 export class SimplePhysics {
+  private static readonly FLOOR_FRICTION = 0.98;
+  private static readonly FLOOR_FRICTION_APPLICATIONS_PER_SECOND = 30;
+  private static readonly HORIZONTAL_SLEEP_SPEED = 5;
+  private static readonly VERTICAL_SLEEP_SPEED = 40;
+  private static readonly GRAVITY_STEP_SLEEP_MULTIPLIER = 1.25;
+
   /* ---------- Primary Ball (single projectile) ---------- */
   body: PhysicsEntity;
 
@@ -43,11 +49,13 @@ export class SimplePhysics {
   colliders: ColliderRect[] = []; // Array of rectangles the ball can collide with
 
   /* ---------- Event Callbacks ---------- */
-  onCollision?: () => void; // Optional collision callback function
+  onCollision?: (impactSpeed: number) => void;
   onLaunch?: () => void; // Optional launch callback function
 
   /* ---------- Internal Launch State ---------- */
   private hasLaunched: boolean = false; // track if ball has been launched
+  private isGrounded: boolean = false;
+  private isBallSleeping: boolean = false;
   private t: number = 0; // track time since last launched
   private launch = {
     x0: 0,
@@ -97,6 +105,8 @@ export class SimplePhysics {
     this.launch = { x0: this.body.x, y0: this.body.y, vx0: vx, vy0: vy };
     this.t = 0;
     this.hasLaunched = true;
+    this.isGrounded = false;
+    this.isBallSleeping = false;
     this.onLaunch?.(); // Trigger launch sound effect
   }
 
@@ -108,6 +118,15 @@ export class SimplePhysics {
     this.launch = { x0: x, y0: y, vx0: 0, vy0: 0 };
     this.t = 0;
     this.hasLaunched = false;
+    this.isGrounded = false;
+    this.isBallSleeping = false;
+  }
+
+  /**
+   * Reports whether the ball has stopped moving and can skip integration work.
+   */
+  get ballSleeping(): boolean {
+    return this.isBallSleeping;
   }
   /* ============================================================
      BLOCK MANAGEMENT
@@ -169,22 +188,29 @@ export class SimplePhysics {
      BALL LOGIC
      ============================================================ */
   updateBall(dt: number) {
-    this.t += dt; // advance time in seconds
-    const { x0, y0, vx0, vy0 } = this.launch;
-
-    // closed-form kinematic equations
-    this.body.x = x0 + vx0 * this.t;
-    this.body.y = y0 + vy0 * this.t + 0.5 * GRAVITY_Y * this.t * this.t;
-
-    // instantaneous velocity (for bounce handling)
-    this.body.vx = vx0;
-    this.body.vy = vy0 + GRAVITY_Y * this.t;
-
-    /* ====== COLLISION HANDLING ====== */
-    // --- World Bounds ---
     const radius: number | undefined = this.body.radius;
     if (radius === undefined) return;
 
+    if (this.isBallSleeping) return;
+
+    if (this.isGrounded) {
+      this.updateGroundedBall(dt, radius);
+    } else {
+      this.t += dt; // advance time in seconds
+      const { x0, y0, vx0, vy0 } = this.launch;
+
+      // closed-form kinematic equations
+      this.body.x = x0 + vx0 * this.t;
+      this.body.y =
+        y0 + vy0 * this.t + 0.5 * GRAVITY_Y * this.t * this.t;
+
+      // instantaneous velocity (for bounce handling)
+      this.body.vx = vx0;
+      this.body.vy = vy0 + GRAVITY_Y * this.t;
+    }
+
+    /* ====== COLLISION HANDLING ====== */
+    // --- World Bounds ---
     const rightBoundary = this.worldWidth + 400;
 
     // floor
@@ -192,25 +218,43 @@ export class SimplePhysics {
       this.body.y = this.worldHeight - radius;
 
       // compute new bounce velocities
-      const newVx = this.body.vx * 0.98; // friction
+      const impactSpeed = Math.abs(this.body.vy);
+      const newVx =
+        this.body.vx * SimplePhysics.FLOOR_FRICTION;
       const newVy = -this.body.vy * RESTITUTION;
 
-      // start a new parabola from this point
-      this.launch = {
-        x0: this.body.x,
-        y0: this.body.y,
-        vx0: newVx,
-        vy0: newVy,
-      };
-      this.t = 0;
+      this.body.vx = newVx;
+      this.body.vy = newVy;
+      this.emitCollision(impactSpeed);
 
-      if (this.hasLaunched) this.onCollision?.(); // Trigger sound effect
+      // A discrete timestep creates a minimum bounce velocity proportional
+      // to gravity. Use a timestep-scaled threshold to end that limit cycle.
+      const verticalSleepThreshold = Math.max(
+        SimplePhysics.VERTICAL_SLEEP_SPEED,
+        GRAVITY_Y * dt * SimplePhysics.GRAVITY_STEP_SLEEP_MULTIPLIER,
+      );
+
+      if (Math.abs(newVy) <= verticalSleepThreshold) {
+        this.setGrounded(radius, newVx);
+      } else {
+        // start a new parabola from this point
+        this.launch = {
+          x0: this.body.x,
+          y0: this.body.y,
+          vx0: newVx,
+          vy0: newVy,
+        };
+        this.t = 0;
+      }
     }
 
     // ceiling
     if (this.body.y - radius < 0) {
+      const impactSpeed = Math.abs(this.body.vy);
       this.body.y = radius;
       const newVy = -this.body.vy * RESTITUTION;
+      this.body.vy = newVy;
+      this.isGrounded = false;
       this.launch = {
         x0: this.body.x,
         y0: this.body.y,
@@ -219,12 +263,14 @@ export class SimplePhysics {
       };
       this.t = 0;
 
-      if (this.hasLaunched) this.onCollision?.(); // Trigger sound effect
+      this.emitCollision(impactSpeed);
     }
     // left wall
     if (this.body.x - radius < -this.viewportCenterX) {
+      const impactSpeed = Math.abs(this.body.vx);
       this.body.x = -this.viewportCenterX + radius;
       const newVx = -this.body.vx * RESTITUTION;
+      this.body.vx = newVx;
       this.launch = {
         x0: this.body.x,
         y0: this.body.y,
@@ -233,13 +279,15 @@ export class SimplePhysics {
       };
       this.t = 0;
 
-      if (this.hasLaunched) this.onCollision?.(); // Trigger sound effect
+      this.emitCollision(impactSpeed);
     }
 
     // right wall
     if (this.body.x + radius > rightBoundary) {
+      const impactSpeed = Math.abs(this.body.vx);
       this.body.x = rightBoundary - radius;
       const newVx = -this.body.vx * RESTITUTION;
+      this.body.vx = newVx;
       this.launch = {
         x0: this.body.x,
         y0: this.body.y,
@@ -248,17 +296,7 @@ export class SimplePhysics {
       };
       this.t = 0;
 
-      if (this.hasLaunched) this.onCollision?.(); // Trigger sound effect
-    }
-
-    // stop tiny jitter
-    if (
-      Math.abs(this.body.vy) < 1 &&
-      this.body.y + radius >= this.worldHeight - 1
-    ) {
-      this.body.vy = 0;
-      this.launch.vy0 = 0;
-      this.hasLaunched = false;
+      this.emitCollision(impactSpeed);
     }
 
     // --- Glass Cards ---
@@ -279,31 +317,43 @@ export class SimplePhysics {
       if (minOverlap < 0) continue;
       switch (minOverlap) {
         // Rectangle collied with right side of ball
-        case overlapRightOfBall:
+        case overlapRightOfBall: {
+          const impactSpeed = Math.abs(this.body.vx);
           this.body.x = rect.leftX - radius;
 
           // Ensure vx is negative and dampen with restitution
           this.body.vx = -Math.abs(this.body.vx) * (RESTITUTION / 2);
-          if (this.hasLaunched) this.onCollision?.(); // Trigger sound effect
+          this.emitCollision(impactSpeed);
           break;
+        }
 
-        case overlapLeftOfBall:
+        case overlapLeftOfBall: {
+          const impactSpeed = Math.abs(this.body.vx);
           this.body.x = rect.rightX + radius;
           this.body.vx = Math.abs(this.body.vx) * (RESTITUTION / 2);
-          if (this.hasLaunched) this.onCollision?.(); // Trigger sound effect
+          this.emitCollision(impactSpeed);
           break;
+        }
 
-        case overlapBelowBall:
+        case overlapBelowBall: {
+          const impactSpeed = Math.abs(this.body.vy);
           this.body.y = rect.topY - radius;
           this.body.vy = -Math.abs(this.body.vy) * (RESTITUTION / 2);
-          if (this.hasLaunched) this.onCollision?.(); // Trigger sound effect
+          this.isGrounded = false;
+          this.isBallSleeping = false;
+          this.emitCollision(impactSpeed);
           break;
+        }
 
-        case overlapAboveBall:
+        case overlapAboveBall: {
+          const impactSpeed = Math.abs(this.body.vy);
           this.body.y = rect.bottomY + radius;
           this.body.vy = Math.abs(this.body.vy) * (RESTITUTION / 2);
-          if (this.hasLaunched) this.onCollision?.(); // Trigger sound effect
+          this.isGrounded = false;
+          this.isBallSleeping = false;
+          this.emitCollision(impactSpeed);
           break;
+        }
 
         default:
           break;
@@ -317,6 +367,62 @@ export class SimplePhysics {
         vy0: this.body.vy,
       };
       this.t = 0;
+    }
+  }
+
+  private updateGroundedBall(dt: number, radius: number) {
+    const damping = Math.pow(
+      SimplePhysics.FLOOR_FRICTION,
+      dt * SimplePhysics.FLOOR_FRICTION_APPLICATIONS_PER_SECOND,
+    );
+
+    this.body.vx *= damping;
+    this.body.x += this.body.vx * dt;
+    this.body.y = this.worldHeight - radius;
+    this.body.vy = 0;
+
+    if (
+      Math.abs(this.body.vx) < SimplePhysics.HORIZONTAL_SLEEP_SPEED
+    ) {
+      this.body.vx = 0;
+      this.isBallSleeping = true;
+      this.hasLaunched = false;
+    }
+
+    this.launch = {
+      x0: this.body.x,
+      y0: this.body.y,
+      vx0: this.body.vx,
+      vy0: 0,
+    };
+    this.t = 0;
+  }
+
+  private setGrounded(radius: number, vx: number) {
+    this.body.y = this.worldHeight - radius;
+    this.body.vx = vx;
+    this.body.vy = 0;
+    this.isGrounded = true;
+    this.isBallSleeping =
+      Math.abs(vx) < SimplePhysics.HORIZONTAL_SLEEP_SPEED;
+
+    if (this.isBallSleeping) {
+      this.body.vx = 0;
+      this.hasLaunched = false;
+    }
+
+    this.launch = {
+      x0: this.body.x,
+      y0: this.body.y,
+      vx0: this.body.vx,
+      vy0: 0,
+    };
+    this.t = 0;
+  }
+
+  private emitCollision(impactSpeed: number) {
+    if (this.hasLaunched && impactSpeed > 0) {
+      this.onCollision?.(impactSpeed);
     }
   }
 
@@ -426,6 +532,8 @@ export class SimplePhysics {
     block: PhysicsEntity,
     restitution: number,
   ) {
+    this.isBallSleeping = false;
+
     /* ============================================================
        STEP 1: Calculate block boundaries
        ============================================================ */
@@ -466,6 +574,8 @@ export class SimplePhysics {
 
     // Ball hit top of block (ball coming from above)
     if (minOverlap === overlapBelowBall) {
+      this.isGrounded = false;
+
       // Position correction: move ball above the block
       ball.y = topY - ball.radius! - separationBuffer;
 
@@ -482,6 +592,8 @@ export class SimplePhysics {
 
     // Ball hit bottom of block (ball coming from below)
     if (minOverlap === overlapAboveBall) {
+      this.isGrounded = false;
+
       // Position correction: move ball below the block
       ball.y = bottomY + ball.radius! + separationBuffer;
 
