@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 const COMMAND_TEXT = "$ whoami";
 const HEADLINE_TEXT = "Coding is a love-hate relationship.";
-const PUNCHLINE_TEXT = "Naturally, I chose to do it for a living.";
+const PUNCHLINE_TEXT = "Ironically, I chose to do it for a living.";
 const NAME_TEXT = "Randy Pahang II";
 const ROLE_TEXT = "Software Engineer";
 const INITIAL_REVEAL_DELAY_MS = 100;
@@ -43,9 +43,7 @@ const RevealText: React.FC<RevealTextProps> = ({ text }) => {
   );
 };
 
-const shuffleCharacters = (
-  characters: HTMLElement[],
-): HTMLElement[] => {
+const shuffleCharacters = (characters: HTMLElement[]): HTMLElement[] => {
   const shuffledCharacters = [...characters];
 
   for (let index = shuffledCharacters.length - 1; index > 0; index -= 1) {
@@ -57,7 +55,7 @@ const shuffleCharacters = (
   }
 
   return shuffledCharacters;
-}
+};
 
 /**
  * Reveals the primary hero statement in a shuffled character sequence.
@@ -73,9 +71,7 @@ const HeroCopy: React.FC<HeroCopyProps> = ({
     if (!copyElement) return;
 
     const characters = Array.from(
-      copyElement.querySelectorAll<HTMLElement>(
-        "[data-hero-reveal-character]",
-      ),
+      copyElement.querySelectorAll<HTMLElement>("[data-hero-reveal-character]"),
     );
 
     characters.forEach((character) => {
@@ -84,25 +80,18 @@ const HeroCopy: React.FC<HeroCopyProps> = ({
 
     const shuffledCharacters = shuffleCharacters(characters);
     const revealSchedule = shuffledCharacters.map((character, index) => {
-      const previousRevealTime =
-        index === 0
-          ? INITIAL_REVEAL_DELAY_MS
-          : 0;
+      const previousRevealTime = index === 0 ? INITIAL_REVEAL_DELAY_MS : 0;
       const randomGap =
-        MIN_REVEAL_GAP_MS +
-        Math.random() * REVEAL_GAP_VARIANCE_MS;
+        MIN_REVEAL_GAP_MS + Math.random() * REVEAL_GAP_VARIANCE_MS;
 
       return {
         character,
-        revealAt:
-          previousRevealTime +
-          randomGap,
+        revealAt: previousRevealTime + randomGap,
       };
     });
 
     for (let index = 1; index < revealSchedule.length; index += 1) {
-      revealSchedule[index].revealAt +=
-        revealSchedule[index - 1].revealAt;
+      revealSchedule[index].revealAt += revealSchedule[index - 1].revealAt;
     }
 
     if (revealSchedule.length === 0) {
@@ -142,10 +131,7 @@ const HeroCopy: React.FC<HeroCopyProps> = ({
   }, [onRevealComplete]);
 
   return (
-    <div
-      ref={copyRef}
-      className={`hero-copy ${className}`.trim()}
-    >
+    <div ref={copyRef} className={`hero-copy ${className}`.trim()}>
       <p className="hero-command" aria-label={COMMAND_TEXT}>
         <RevealText text={COMMAND_TEXT} />
       </p>

@@ -1,5 +1,13 @@
-import { useEffect, useRef } from "react";
+import {
+  useEffect,
+  useRef,
+  type RefObject,
+} from "react";
 import asciiPortraitSource from "../assets/self-ascii-art.txt?raw";
+import {
+  BALL_RADIUS,
+  type BallCoordinates,
+} from "../typesConstants";
 
 const LINES_PER_WAVE = 10;
 const WAVE_INTERVAL_MS = 180;
@@ -7,6 +15,8 @@ const LINE_STAGGER_MS = 20;
 const MIN_CHARACTERS_PER_SECOND = 60;
 const SPEED_VARIATION = 30;
 const FRAME_INTERVAL_MS = 1000 / 30;
+const REACTION_PADDING_PX = 14;
+const POSITION_QUANTIZATION_PX = 2;
 
 const formatAsciiPortrait = (source: string): string => {
   const lines = source.replace(/\r/g, "").split("\n");
@@ -32,8 +42,16 @@ const emptyPortrait = portraitLines.map(() => "").join("\n");
 const portraitWidth =
   Math.max(...portraitLines.map((line) => line.length)) + 1;
 
+interface AsciiPortraitReaction {
+  ballPositionRef: RefObject<BallCoordinates>;
+  sectionCenterX: number;
+  sectionRef: RefObject<HTMLElement | null>;
+  viewportCenterX: number;
+}
+
 interface AsciiPortraitProps {
   onAnimationComplete?: () => void;
+  reaction?: AsciiPortraitReaction;
 }
 
 interface AnimatedLine {
@@ -90,13 +108,48 @@ const renderAnimationFrame = (
   return { complete, portrait: lines.join("\n") };
 };
 
+const quantizePosition = (position: number): number =>
+  Math.round(position / POSITION_QUANTIZATION_PX) *
+  POSITION_QUANTIZATION_PX;
+
+const carveLineAroundBall = (
+  line: string,
+  ballX: number,
+  characterWidth: number,
+  horizontalRadius: number,
+): string => {
+  const startIndex = Math.max(
+    0,
+    Math.floor((ballX - horizontalRadius) / characterWidth),
+  );
+  const endIndex = Math.min(
+    line.length,
+    Math.ceil((ballX + horizontalRadius) / characterWidth),
+  );
+
+  if (startIndex >= endIndex) return line;
+
+  return `${line.slice(0, startIndex)}${" ".repeat(
+    endIndex - startIndex,
+  )}${line.slice(endIndex)}`;
+};
+
 /**
- * Builds the portfolio owner's ASCII portrait with concurrent line typewriters.
+ * Builds the ASCII portrait once, then carves a temporary pocket around the ball.
  */
 const AsciiPortrait: React.FC<AsciiPortraitProps> = ({
   onAnimationComplete,
+  reaction,
 }) => {
   const portraitRef = useRef<HTMLPreElement>(null);
+  const onAnimationCompleteRef = useRef(onAnimationComplete);
+  const reactionRef = useRef(reaction);
+
+  reactionRef.current = reaction;
+
+  useEffect(() => {
+    onAnimationCompleteRef.current = onAnimationComplete;
+  }, [onAnimationComplete]);
 
   useEffect(() => {
     const portraitElement = portraitRef.current;
@@ -105,67 +158,137 @@ const AsciiPortrait: React.FC<AsciiPortraitProps> = ({
     portraitElement.textContent = emptyPortrait;
 
     let animationFrameId = 0;
-    let wasVisible = false;
+    let startTime: number | undefined;
+    let lastRenderTime = 0;
+    let basePortrait = emptyPortrait;
+    let animationComplete = false;
+    let completionReported = false;
+    let artOffsetX = 0;
+    let artTop = 0;
+    let characterWidth = 1;
+    let lineHeight = 1;
+    let lastBasePortrait = "";
+    let lastObstacleKey = "";
 
-    const playAnimation = () => {
-      cancelAnimationFrame(animationFrameId);
+    const updateMetrics = () => {
+      const activeReaction = reactionRef.current;
+      const section = activeReaction?.sectionRef.current;
+      if (!activeReaction || !section) return;
 
-      portraitElement.textContent = emptyPortrait;
+      const sectionRect = section.getBoundingClientRect();
+      const portraitRect = portraitElement.getBoundingClientRect();
+      const styles = window.getComputedStyle(portraitElement);
+      const measuredLineHeight = Number.parseFloat(styles.lineHeight);
 
-      let startTime: number | undefined;
-      let lastRenderTime = 0;
+      artOffsetX = portraitRect.left - sectionRect.left;
+      artTop = portraitRect.top;
+      characterWidth =
+        portraitWidth > 0
+          ? portraitRect.width / portraitWidth
+          : 1;
+      lineHeight = Number.isFinite(measuredLineHeight)
+        ? measuredLineHeight
+        : 1;
+      lastObstacleKey = "";
+    };
 
-      const animate = (timestamp: number) => {
-        startTime ??= timestamp;
+    const renderReactivePortrait = (): {
+      obstacleKey: string;
+      portrait: string;
+    } => {
+      const activeReaction = reactionRef.current;
+      const section = activeReaction?.sectionRef.current;
+      if (!activeReaction || !section) {
+        return { obstacleKey: "none", portrait: basePortrait };
+      }
 
-        if (timestamp - lastRenderTime >= FRAME_INTERVAL_MS) {
-          lastRenderTime = timestamp;
+      const ballPosition = activeReaction.ballPositionRef.current;
+      const ballX = quantizePosition(
+        ballPosition.x +
+          activeReaction.viewportCenterX -
+          activeReaction.sectionCenterX -
+          artOffsetX,
+      );
+      const ballY = quantizePosition(ballPosition.y - artTop);
+      const reactionRadius = BALL_RADIUS + REACTION_PADDING_PX;
+      const intersectsPortrait =
+        ballX >= -reactionRadius &&
+        ballX <= portraitElement.clientWidth + reactionRadius &&
+        ballY >= -reactionRadius &&
+        ballY <= portraitElement.clientHeight + reactionRadius;
+
+      if (!intersectsPortrait) {
+        return { obstacleKey: "none", portrait: basePortrait };
+      }
+
+      const carvedLines = basePortrait.split("\n").map((line, index) => {
+        const lineCenterY = index * lineHeight + lineHeight / 2;
+        const verticalDistance = Math.abs(ballY - lineCenterY);
+
+        if (verticalDistance >= reactionRadius) return line;
+
+        const horizontalRadius = Math.sqrt(
+          reactionRadius * reactionRadius -
+            verticalDistance * verticalDistance,
+        );
+        return carveLineAroundBall(
+          line,
+          ballX,
+          characterWidth,
+          horizontalRadius,
+        );
+      });
+
+      return {
+        obstacleKey: `${ballX}:${ballY}`,
+        portrait: carvedLines.join("\n"),
+      };
+    };
+
+    const animate = (timestamp: number) => {
+      startTime ??= timestamp;
+
+      if (timestamp - lastRenderTime >= FRAME_INTERVAL_MS) {
+        lastRenderTime = timestamp;
+
+        if (!animationComplete) {
           const frame = renderAnimationFrame(timestamp - startTime);
-          portraitElement.textContent = frame.complete
+          basePortrait = frame.complete
             ? asciiPortrait
             : frame.portrait;
-
-          if (frame.complete) {
-            onAnimationComplete?.();
-            return;
-          }
+          animationComplete = frame.complete;
         }
 
-        animationFrameId = requestAnimationFrame(animate);
-      };
+        const reactiveFrame = renderReactivePortrait();
+        if (
+          basePortrait !== lastBasePortrait ||
+          reactiveFrame.obstacleKey !== lastObstacleKey
+        ) {
+          portraitElement.textContent = reactiveFrame.portrait;
+          lastBasePortrait = basePortrait;
+          lastObstacleKey = reactiveFrame.obstacleKey;
+        }
 
+        if (animationComplete && !completionReported) {
+          completionReported = true;
+          onAnimationCompleteRef.current?.();
+        }
+      }
+
+      if (animationComplete && !reactionRef.current) return;
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    if (!("IntersectionObserver" in window)) {
-      playAnimation();
-      return () => cancelAnimationFrame(animationFrameId);
-    }
-
-    playAnimation();
-    wasVisible = true;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const isVisible =
-          entry.isIntersecting && entry.intersectionRatio >= 0.15;
-
-        if (isVisible && !wasVisible) {
-          playAnimation();
-        }
-
-        wasVisible = isVisible;
-      },
-      { threshold: [0, 0.15] },
-    );
-
-    observer.observe(portraitElement);
+    const resizeObserver = new ResizeObserver(updateMetrics);
+    resizeObserver.observe(portraitElement);
+    updateMetrics();
+    animationFrameId = requestAnimationFrame(animate);
 
     return () => {
-      observer.disconnect();
+      resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
     };
-  }, [onAnimationComplete]);
+  }, []);
 
   return (
     <pre

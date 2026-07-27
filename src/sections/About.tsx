@@ -1,108 +1,60 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
-import { FADE_RADIUS } from "../typesConstants";
+import { useRef, type RefObject } from "react";
 import { motion } from "framer-motion";
-import { GlowingEffect } from "../components/ui/glowing-effect";
-import { cn } from "@/lib/utils";
-import GitHubActivityChart from "../components/GitHubActivityChart";
-import { ArrowRight, ChevronRight } from "lucide-react";
-import InfiniteIconCarousel from "../components/InfiniteIconCarousel";
-import { useWorldStore } from "../state/useWorldStore";
+import AboutInfoSwitcher from "../components/AboutInfoSwitcher";
+import AboutPanelContent from "../components/AboutPanelContent";
+import DynamicAboutDetails from "../components/DynamicAboutDetails";
+import DynamicEducationAsciiArt from "../components/DynamicEducationAsciiArt";
+import DynamicEducationDetails from "../components/DynamicEducationDetails";
+import type { AboutPanelId } from "../content/about";
+import { useRandomizedPanelTransition } from "../hooks/useRandomizedPanelTransition";
+import { getAboutGravityScale } from "../physics/aboutGravityZone";
+import {
+  FADE_RADIUS,
+  type BallCoordinates,
+} from "../typesConstants";
 
 interface AboutProps {
   centerX: number;
   ballX: number;
-  cameraX?: number;
-  viewportCenterX?: number;
-
-  // Update bounds of glasscard
-  onBoundsChange?: (bounds: {
-    title: string;
-    x1: number;
-    x2: number;
-    y1: number;
-    y2: number;
-  }) => void;
+  ballPositionRef: RefObject<BallCoordinates>;
+  viewportCenterX: number;
 }
 
-interface GridItemProps {
-  area: string;
-  children: React.ReactNode;
-}
-
-const GridItem = ({ area, children }: GridItemProps) => {
-  return (
-    <motion.li
-      className={cn("list-none", area)}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-    >
-      <div className="relative h-full border border-[var(--terminal-line)] bg-black/70 p-2 md:p-3">
-        <GlowingEffect
-          spread={40}
-          glow={true}
-          disabled={false}
-          proximity={64}
-          inactiveZone={0.01}
-          borderWidth={3}
-          variant="terminal"
-        />
-        <div className="relative flex h-full flex-col overflow-hidden border border-[var(--terminal-line)] bg-black/90 backdrop-blur-sm shadow-[inset_0_0_30px_rgba(0,29,0,0.45)]">
-          {children}
-        </div>
-      </div>
-    </motion.li>
-  );
-};
-
+/**
+ * Positions the inline About Me content within the horizontal world.
+ */
 const About: React.FC<AboutProps> = ({
   centerX,
   ballX,
+  ballPositionRef,
+  viewportCenterX,
 }) => {
-  const jumpTo = useWorldStore((state) => state.jumpTo);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [sectionWidth, setSectionWidth] = useState<number>(0);
-
-  useLayoutEffect(() => {
-    const handleResize = () => {
-      if (sectionRef.current) {
-        const rect = sectionRef.current.getBoundingClientRect();
-        setSectionWidth(rect.width);
-      }
-    };
-
-    handleResize(); // initial call
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const leftEdge = centerX;
-  const rightEdge = centerX + sectionWidth - 1200;
-
-  let opacity = 1;
-  if (ballX < leftEdge) {
-    const diff = leftEdge - ballX;
-    opacity = Math.max(0, 1 - diff / FADE_RADIUS);
-  } else if (ballX > rightEdge) {
-    const diff = ballX - rightEdge;
-    opacity = Math.max(0, 1 - diff / FADE_RADIUS);
-  }
-  const scale: number = 0.96 + 0.04 * opacity;
+  const sectionRef = useRef<HTMLElement>(null);
+  const {
+    activeValue: activePanelId,
+    isTransitioning,
+    panelRef,
+    requestValue: setActivePanelId,
+    selectedValue: selectedPanelId,
+  } = useRandomizedPanelTransition<AboutPanelId>("now");
+  const distanceFromSection = Math.abs(ballX - centerX);
+  const opacity = Math.max(0, 1 - distanceFromSection / FADE_RADIUS);
+  const gravityScale = getAboutGravityScale(
+    ballX,
+    centerX,
+    viewportCenterX * 2,
+  );
+  const isLowGravityActive = gravityScale < 0.95;
 
   return (
-    <motion.div
+    <motion.section
       ref={sectionRef}
-      className="absolute top-1/2 -translate-y-1/2 p-4 md:p-6 lg:p-10"
+      className="absolute top-1/2 -translate-y-1/2 px-10"
       style={{
         left: `${centerX}px`,
-        width: "min(1400px, calc(100vw - 80px))",
+        width: "min(1180px, calc(100vw - 120px))",
       }}
-      animate={{
-        opacity,
-        scale,
-      }}
+      animate={{ opacity }}
       transition={{
         type: "spring",
         stiffness: 100,
@@ -110,146 +62,92 @@ const About: React.FC<AboutProps> = ({
         mass: 0.5,
       }}
     >
-      <ul className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5 lg:gap-6 auto-rows-[minmax(200px,1fr)] md:auto-rows-[minmax(240px,1fr)] lg:auto-rows-[200px]">
-        {/* About Me - Tall (2x2) */}
-        <GridItem area="md:col-span-2 md:row-span-3 lg:row-span-2">
-          <div className="flex flex-col h-full gap-3 px-5 py-6 sm:px-6 sm:py-7 md:px-7 md:py-8 lg:px-8 lg:py-9 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/70 md:max-h-[70vh]">
-            <h1 className="text-2xl md:text-3xl text-white font-bold tracking-tight">
-              Randy Pahang II
-            </h1>
-            <p className="text-base md:text-lg text-zinc-300 mb-1">
-              Computer Science Student @ UNLV
-            </p>
-            <p className="text-sm md:text-base text-zinc-400 mb-6">
-              SWE Full-Stack Developer
-            </p>
+      <div
+        className={`gravity-chamber ${
+          isLowGravityActive ? "is-active" : ""
+        }`}
+      >
+        <div className="gravity-chamber-label">
+          <span className="gravity-chamber-symbol" aria-hidden="true">
+            ↑
+          </span>
+          <span>Low gravity</span>
+        </div>
 
-            <div className="space-y-4 text-sm md:text-base text-zinc-300 leading-relaxed">
-              <p>
-                I love building polished products that connect thoughtful design
-                with reliable engineering. My recent work spans full stack
-                projects, interactive visuals, and tooling that makes teams move
-                faster.
-              </p>
-              <p>
-                Outside of classes you can find me tutoring CS peers,
-                experimenting with new frameworks, and contributing to
-                collaborative projects that solve real problems for students and
-                small businesses.
-              </p>
-            </div>
-          </div>
-        </GridItem>
-
-        {/* Tech Stack - Tall (2x2) with Languages carousel */}
-        <GridItem area="md:col-span-2 md:row-span-2">
-          <div className="flex flex-col h-full p-6">
-            <h3 className="text-2xl text-white font-medium mb-2">Languages</h3>
-            <div className="flex-1 flex items-center">
-              <InfiniteIconCarousel
-                rows={[
-                  {
-                    label: "Languages",
-                    icons: [
-                      "java",
-                      "typescript",
-                      "cpp",
-                      "c",
-                      "csharp",
-                      "python",
-                      "sql",
-                      "swift",
-                    ],
-                  },
-                ]}
-              />
-            </div>
-            <button
-              onClick={() => jumpTo("languages")}
-              className="terminal-button group mt-4 flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium"
-            >
-              See More
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-        </GridItem>
-
-        {/* Skills - GitHub Activity Chart (2x2) */}
-        <GridItem area="md:col-span-2 md:row-span-2">
-          <div className="flex flex-col h-full p-4">
-            <h3 className="text-xl text-white font-medium mb-2">
-              GitHub Activity
-            </h3>
-            <div className="flex-1 min-h-0">
-              <GitHubActivityChart username="randyp2" />
-            </div>
-          </div>
-        </GridItem>
-
-        {/* Experience - Wide (3x1) */}
-        <GridItem area="md:col-span-2 lg:col-span-3">
-          <div className="flex flex-col h-full p-6">
-            <h3 className="text-2xl text-white font-medium mb-4">
-              Experience
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
-              <div className="space-y-1">
-                <p className="text-white font-semibold">Tutor for UNLV CS</p>
-                <p className="text-sm text-zinc-400">2024 - Present</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-white font-semibold">STARS</p>
-                <p className="text-sm text-zinc-400">Nov 2025 - Present</p>
-                <p className="text-xs text-zinc-500 mt-1">
-                  ML recommendation system
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-white font-semibold">CRJ Services</p>
-                <p className="text-sm text-zinc-400">Sept - Dec 2025</p>
-                <p className="text-xs text-zinc-500 mt-1">Admin dashboard</p>
-              </div>
-            </div>
-          </div>
-        </GridItem>
-
-        {/* Education - Wide (3x1) */}
-        <GridItem area="md:col-span-2 lg:col-span-3">
-          <div className="flex items-center justify-between h-full px-6 py-4">
-            <div>
-              <h3 className="text-xl text-white font-medium">Education</h3>
-              <p className="text-zinc-300">BS Computer Science @ UNLV</p>
-              <p className="text-sm text-zinc-400">Minor in Accounting</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xl text-white font-bold">4.0 GPA</p>
-              <p className="text-zinc-400 text-sm">Class of 2027</p>
-            </div>
-          </div>
-        </GridItem>
-      </ul>
-
-      {/* Navigation arrow - keep going indicator */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-32 flex flex-col items-center gap-2">
-        <motion.div
-          animate={{ x: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          style={{
-            filter: "drop-shadow(0 0 15px rgba(46, 212, 101, 0.55))",
-          }}
-        >
-          <ChevronRight className="h-16 w-16 text-[var(--terminal-green)]" strokeWidth={1.5} />
-        </motion.div>
         <span
-          className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--terminal-muted)]"
-          style={{
-            textShadow: "0 0 10px rgba(46, 212, 101, 0.35)",
-          }}
-        >
-          next process
-        </span>
+          className="gravity-chamber-corner gravity-chamber-corner-top-left"
+          aria-hidden="true"
+        />
+        <span
+          className="gravity-chamber-corner gravity-chamber-corner-top-right"
+          aria-hidden="true"
+        />
+        <span
+          className="gravity-chamber-corner gravity-chamber-corner-bottom-left"
+          aria-hidden="true"
+        />
+        <span
+          className="gravity-chamber-corner gravity-chamber-corner-bottom-right"
+          aria-hidden="true"
+        />
+
+        <span
+          className="gravity-chamber-drift gravity-chamber-drift-left"
+          aria-hidden="true"
+        />
+        <span
+          className="gravity-chamber-drift gravity-chamber-drift-right"
+          aria-hidden="true"
+        />
+
+        <AboutInfoSwitcher
+          disabled={isTransitioning}
+          value={selectedPanelId}
+          onChange={setActivePanelId}
+        />
+
+        <div className="about-panel-transition-host">
+          <div
+            ref={panelRef}
+            className="about-panel-view"
+            aria-live="polite"
+            aria-busy={isTransitioning}
+          >
+            <AboutPanelContent
+              panelId={activePanelId}
+              educationArtwork={
+                <DynamicEducationAsciiArt
+                  ballPositionRef={ballPositionRef}
+                  sectionCenterX={centerX}
+                  sectionRef={sectionRef}
+                  viewportCenterX={viewportCenterX}
+                />
+              }
+              educationDetails={
+                <DynamicEducationDetails
+                  ballPositionRef={ballPositionRef}
+                  sectionCenterX={centerX}
+                  sectionRef={sectionRef}
+                  viewportCenterX={viewportCenterX}
+                />
+              }
+              nowDetails={
+                <DynamicAboutDetails
+                  ballPositionRef={ballPositionRef}
+                  sectionCenterX={centerX}
+                  sectionRef={sectionRef}
+                  viewportCenterX={viewportCenterX}
+                />
+              }
+            />
+          </div>
+        </div>
+
+        <p className="gravity-chamber-tagline">
+          Built to orbit, not to stall.
+        </p>
       </div>
-    </motion.div>
+    </motion.section>
   );
 };
 

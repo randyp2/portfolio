@@ -1,13 +1,30 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import AsciiPortrait from "../components/AsciiPortrait";
 import HeroCopy from "../components/HeroCopy";
 import PixelArrow from "../components/PixelArrow";
+import type { BallCoordinates } from "../typesConstants";
 
 const SEQUENCE_STALL_MS = 750;
 
-const Intro: React.FC = () => {
+interface IntroProps {
+  ballPositionRef: RefObject<BallCoordinates>;
+  centerX: number;
+  viewportCenterX: number;
+}
+
+const Intro: React.FC<IntroProps> = ({
+  ballPositionRef,
+  centerX,
+  viewportCenterX,
+}) => {
+  const sectionRef = useRef<HTMLElement>(null);
   const [isCopyComplete, setIsCopyComplete] = useState(false);
-  const [isPortraitVisible, setIsPortraitVisible] = useState(false);
   const [isPortraitComplete, setIsPortraitComplete] = useState(false);
   const [isArrowVisible, setIsArrowVisible] = useState(false);
   const completeCopy = useCallback(() => setIsCopyComplete(true), []);
@@ -17,18 +34,7 @@ const Intro: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!isCopyComplete) return;
-
-    const stallId = window.setTimeout(
-      () => setIsPortraitVisible(true),
-      SEQUENCE_STALL_MS,
-    );
-
-    return () => window.clearTimeout(stallId);
-  }, [isCopyComplete]);
-
-  useEffect(() => {
-    if (!isPortraitComplete) return;
+    if (!isCopyComplete || !isPortraitComplete) return;
 
     const stallId = window.setTimeout(
       () => setIsArrowVisible(true),
@@ -36,14 +42,20 @@ const Intro: React.FC = () => {
     );
 
     return () => window.clearTimeout(stallId);
-  }, [isPortraitComplete]);
+  }, [isCopyComplete, isPortraitComplete]);
 
   return (
-    <section className="hero-intro">
+    <section ref={sectionRef} className="hero-intro">
       <div className="hero-portrait-slot">
-        {isPortraitVisible ? (
-          <AsciiPortrait onAnimationComplete={completePortrait} />
-        ) : null}
+        <AsciiPortrait
+          onAnimationComplete={completePortrait}
+          reaction={{
+            ballPositionRef,
+            sectionCenterX: centerX,
+            sectionRef,
+            viewportCenterX,
+          }}
+        />
       </div>
       <HeroCopy
         className="hero-copy-slot"

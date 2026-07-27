@@ -56,6 +56,7 @@ export class SimplePhysics {
   private hasLaunched: boolean = false; // track if ball has been launched
   private isGrounded: boolean = false;
   private isBallSleeping: boolean = false;
+  private ballGravityScale: number = 1;
   private t: number = 0; // track time since last launched
   private launch = {
     x0: 0,
@@ -120,6 +121,30 @@ export class SimplePhysics {
     this.hasLaunched = false;
     this.isGrounded = false;
     this.isBallSleeping = false;
+  }
+
+  /**
+   * Changes gravity for the primary ball without discontinuing its trajectory.
+   */
+  setBallGravityScale(scale: number): void {
+    if (!Number.isFinite(scale) || scale < 0) {
+      throw new RangeError(
+        "Ball gravity scale must be a finite, non-negative number.",
+      );
+    }
+    if (Math.abs(scale - this.ballGravityScale) < 0.001) return;
+
+    if (!this.isGrounded && !this.isBallSleeping) {
+      this.launch = {
+        x0: this.body.x,
+        y0: this.body.y,
+        vx0: this.body.vx,
+        vy0: this.body.vy,
+      };
+      this.t = 0;
+    }
+
+    this.ballGravityScale = scale;
   }
 
   /**
@@ -196,17 +221,18 @@ export class SimplePhysics {
     if (this.isGrounded) {
       this.updateGroundedBall(dt, radius);
     } else {
+      const gravityY = GRAVITY_Y * this.ballGravityScale;
       this.t += dt; // advance time in seconds
       const { x0, y0, vx0, vy0 } = this.launch;
 
       // closed-form kinematic equations
       this.body.x = x0 + vx0 * this.t;
       this.body.y =
-        y0 + vy0 * this.t + 0.5 * GRAVITY_Y * this.t * this.t;
+        y0 + vy0 * this.t + 0.5 * gravityY * this.t * this.t;
 
       // instantaneous velocity (for bounce handling)
       this.body.vx = vx0;
-      this.body.vy = vy0 + GRAVITY_Y * this.t;
+      this.body.vy = vy0 + gravityY * this.t;
     }
 
     /* ====== COLLISION HANDLING ====== */
@@ -231,7 +257,10 @@ export class SimplePhysics {
       // to gravity. Use a timestep-scaled threshold to end that limit cycle.
       const verticalSleepThreshold = Math.max(
         SimplePhysics.VERTICAL_SLEEP_SPEED,
-        GRAVITY_Y * dt * SimplePhysics.GRAVITY_STEP_SLEEP_MULTIPLIER,
+        GRAVITY_Y *
+          this.ballGravityScale *
+          dt *
+          SimplePhysics.GRAVITY_STEP_SLEEP_MULTIPLIER,
       );
 
       if (Math.abs(newVy) <= verticalSleepThreshold) {

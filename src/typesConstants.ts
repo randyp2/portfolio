@@ -33,6 +33,11 @@ export const FADE_RADIUS = 1500; // How far sections shoudl fade in/out based on
 export const BALL_RADIUS = 18;
 export const CAMERA_LERP = 0.18; // Move 18% of distance towards ball for each frame
 
+export interface BallCoordinates {
+  x: number;
+  y: number;
+}
+
 // export type SectionId = keyof typeof SECTION_X;
 
 export type COLLIDERES_RECT = {
@@ -42,4 +47,3 @@ export type COLLIDERES_RECT = {
   y1: number;
   y2: number;
 };
-

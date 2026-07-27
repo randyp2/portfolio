@@ -10,9 +10,11 @@ import {
   type ColliderRect,
   type PhysicsEntity,
 } from "../physics/SimplePhysics";
+import { getAboutGravityScale } from "../physics/aboutGravityZone";
 import { useWorldStore } from "../state/useWorldStore";
 import {
   BALL_RADIUS,
+  type BallCoordinates,
   CAMERA_LERP,
   type COLLIDERES_RECT,
   SECTION_SPACING_MULTIPLIER,
@@ -43,6 +45,10 @@ const WorldCanvas: React.FC = () => {
   // Ref for direct DOM manipulation of camera and ball (avoids re-renders)
   const worldContainerRef = useRef<HTMLDivElement>(null);
   const ballRef = useRef<HTMLDivElement>(null);
+  const liveBallPositionRef = useRef<BallCoordinates>({
+    x: 0,
+    y: window.innerHeight - 80,
+  });
   const cameraXRef = useRef<number>(0);
   const lastStoreUpdateRef = useRef<number>(0);
 
@@ -92,7 +98,7 @@ const WorldCanvas: React.FC = () => {
     }
 
     return map;
-  }, [viewportWidth]);
+  }, [SECTION_SPACING, SKILL_SECTION_SPACING]);
 
   /**
    * @brief Initialize physics engine and run animation loop
@@ -133,9 +139,18 @@ const WorldCanvas: React.FC = () => {
       lastTimeRef.current = now;
 
       if (physicsRef.current) {
+        physicsRef.current.setBallGravityScale(
+          getAboutGravityScale(
+            physicsRef.current.body.x,
+            dynamicSections.about.x,
+            viewportWidth,
+          ),
+        );
         physicsRef.current.update(dt); // Update position/physics of ball
 
         const pos: PhysicsEntity = physicsRef.current.body; // Get new position of ball
+        liveBallPositionRef.current.x = pos.x;
+        liveBallPositionRef.current.y = pos.y;
 
         // target camera x is x position of the ball
         const targetCameraX: number = pos.x;
@@ -196,7 +211,14 @@ const WorldCanvas: React.FC = () => {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [viewportHeight, setCameraX, dynamicSections]);
+  }, [
+    dynamicSections,
+    setBallPosition,
+    setCameraX,
+    viewportCenterX,
+    viewportHeight,
+    viewportWidth,
+  ]);
 
   /**
    * @brief Update sections in zustand store when dynamicSections change
@@ -333,14 +355,17 @@ const WorldCanvas: React.FC = () => {
           viewportHeight={viewportHeight}
         />
 
-        <Intro />
+        <Intro
+          ballPositionRef={liveBallPositionRef}
+          centerX={dynamicSections.intro.x}
+          viewportCenterX={viewportCenterX}
+        />
 
         <About
           centerX={dynamicSections.about.x}
           ballX={ballX}
-          cameraX={cameraX}
+          ballPositionRef={liveBallPositionRef}
           viewportCenterX={viewportCenterX}
-          onBoundsChange={handleCardBounds}
         />
 
         <Projects
