@@ -4,7 +4,7 @@
 export const ABOUT_IDENTITY = {
   name: "Randy Pahang II",
   education: "Computer Science Student @ UNLV",
-  role: "SWE Full-Stack Developer",
+  role: "SWE Full-Stack Developer • Retired Minecraft Veteran",
 } as const;
 
 /**
@@ -49,16 +49,16 @@ export const ABOUT_EDUCATION = {
 
 export const ABOUT_LINKS = [
   {
-    label: "GitHub",
-    href: "https://github.com/randyp2",
-    detail: "@randyp2",
+    label: "LinkedIn",
+    href: "https://linkedin.com/in/randypahangii",
+    detail: "/in/randypahangii",
     newTab: true,
     usesBasePath: false,
   },
   {
-    label: "LinkedIn",
-    href: "https://linkedin.com/in/randypahangii",
-    detail: "/in/randypahangii",
+    label: "GitHub",
+    href: "https://github.com/randyp2",
+    detail: "@randyp2",
     newTab: true,
     usesBasePath: false,
   },
@@ -70,10 +70,10 @@ export const ABOUT_LINKS = [
     usesBasePath: true,
   },
   {
-    label: "Email",
-    href: "mailto:rpahang2@gmail.com",
-    detail: "rpahang2@gmail.com",
-    newTab: false,
+    label: "YouTube",
+    href: "https://www.youtube.com/@randypahang6873",
+    detail: "@randypahang6873",
+    newTab: true,
     usesBasePath: false,
   },
 ] as const;

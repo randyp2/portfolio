@@ -1,158 +1,152 @@
-import React, { useEffect, useState, memo, useRef } from "react";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+  useEffect,
+  useState,
+  type CSSProperties,
+} from "react";
+import {
+  loadGitHubProfile,
+  type GitHubProfile,
+} from "../services/githubProfile";
 
-interface GitHubEvent {
-  created_at: string;
-  type: string;
+interface GitHubActivityChartProps {
+  username: string;
 }
 
-interface ChartData {
-  date: string;
-  count: number;
+interface ActivityWaveStyle extends CSSProperties {
+  "--github-activity-wave-delay": string;
 }
 
-const GitHubActivityChart: React.FC<{ username: string }> = memo(
-  ({ username }) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [data, setData] = useState<ChartData[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+const getActivityWaveStyle = (index: number): ActivityWaveStyle => {
+  const column = Math.floor(index / 7);
+  const row = index % 7;
+  const waveCrest = Math.round(
+    3 + Math.sin(column * 0.55) * 3,
+  );
+  const delay = 200 + column * 28 + Math.abs(row - waveCrest) * 12;
 
-    useEffect(() => {
-      const fetchGitHubActivity = async () => {
-        try {
-          const response = await fetch(
-            `https://api.github.com/users/${username}/events?per_page=100`,
-          );
+  return {
+    "--github-activity-wave-delay": `${delay}ms`,
+  };
+};
 
-          if (!response.ok) {
-            throw new Error("Failed to fetch GitHub data");
-          }
+const formatActivityDate = (date: string): string =>
+  new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T00:00:00Z`));
 
-          const events: GitHubEvent[] = await response.json();
+/**
+ * Renders a lazy-loaded, pixel-style GitHub activity calendar.
+ */
+const GitHubActivityChart: React.FC<GitHubActivityChartProps> = ({
+  username,
+}) => {
+  const [activity, setActivity] = useState<GitHubProfile | null>(
+    null,
+  );
+  const [error, setError] = useState(false);
 
-          // Group events by date
-          const activityByDate: Record<string, number> = {};
+  useEffect(() => {
+    let disposed = false;
 
-          events.forEach((event) => {
-            const date = new Date(event.created_at).toLocaleDateString(
-              "en-US",
-              {
-                month: "short",
-                day: "numeric",
-              },
-            );
-            activityByDate[date] = (activityByDate[date] || 0) + 1;
-          });
+    void loadGitHubProfile(username)
+      .then((nextActivity) => {
+        if (!disposed) setActivity(nextActivity);
+      })
+      .catch(() => {
+        if (!disposed) setError(true);
+      });
 
-          // Convert to chart data format (last 30 data points)
-          const chartData: ChartData[] = Object.entries(activityByDate)
-            .map(([date, count]) => ({ date, count }))
-            .reverse()
-            .slice(0, 30);
+    return () => {
+      disposed = true;
+    };
+  }, [username]);
 
-          // console.log("[GitHubActivityChart] fetched events", {
-          //   username,
-          //   eventsCount: events.length,
-          //   chartPoints: chartData.length,
-          // });
-          setData(chartData);
-          setLoading(false);
-        } catch (err) {
-          setError(err instanceof Error ? err.message : "Unknown error");
-          setLoading(false);
-        }
-      };
-
-      fetchGitHubActivity();
-    }, [username]);
-
-    if (loading) {
-      return (
-        <div className="flex items-center justify-center h-full text-zinc-400">
-          Loading activity...
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="flex items-center justify-center h-full text-zinc-400">
-          Unable to load GitHub activity
-        </div>
-      );
-    }
-
-    // Guard against zero-size containers which Recharts treats as -1 width/height
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    const hasSize =
-      containerRect && containerRect.width > 0 && containerRect.height > 0;
-    if (!hasSize) {
-      console.warn(
-        "[GitHubActivityChart] no measurable size, skipping render",
-        {
-          width: containerRect?.width,
-          height: containerRect?.height,
-        },
-      );
-    }
-
+  if (error) {
     return (
-      <div ref={containerRef} className="w-full h-full min-h-40">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={data}
-            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-          >
-            <defs>
-              <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="rgba(46, 212, 101, 0.35)" />
-                <stop offset="50%" stopColor="rgba(107, 226, 143, 1)" />
-                <stop offset="100%" stopColor="rgba(46, 212, 101, 0.35)" />
-              </linearGradient>
-            </defs>
-            <XAxis
-              dataKey="date"
-              stroke="#123d1d"
-              tick={{ fill: "#5a9569", fontSize: 10 }}
-              tickLine={false}
-            />
-            <YAxis
-              stroke="#123d1d"
-              tick={{ fill: "#5a9569", fontSize: 10 }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#000900",
-                border: "1px solid rgba(46, 212, 101, 0.35)",
-                borderRadius: "2px",
-                color: "#b6e6c2",
-                fontFamily: "var(--font-terminal)",
-              }}
-              labelStyle={{ color: "#5a9569" }}
-            />
-            <Line
-              type="monotone"
-              dataKey="count"
-              stroke="url(#lineGradient)"
-              strokeWidth={2}
-              dot={false}
-              animationDuration={1500}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+      <div className="github-activity-status" role="status">
+        Activity unavailable. GitHub profile is still online.
       </div>
     );
-  },
-);
+  }
+
+  if (!activity) {
+    return (
+      <div className="github-activity-status" role="status">
+        Loading GitHub activity<span className="terminal-cursor" />
+      </div>
+    );
+  }
+
+  const isContributionCalendar =
+    activity.source === "contributions";
+  const activityLabel = isContributionCalendar
+    ? "contributions"
+    : "public events";
+  const rangeLabel = isContributionCalendar
+    ? "Last 12 months"
+    : "Last 5 weeks";
+  const latestLabel = isContributionCalendar
+    ? "Latest contribution"
+    : "Latest public activity";
+
+  return (
+    <section className="github-activity-card" aria-live="polite">
+      <header className="github-activity-header">
+        <div>
+          <p>GitHub activity</p>
+          <small>{rangeLabel}</small>
+        </div>
+        <p className="github-activity-total">
+          <strong>{activity.total.toLocaleString()}</strong>
+          <span>{activityLabel}</span>
+        </p>
+      </header>
+
+      <div className="github-activity-scroll">
+        <div
+          className="github-activity-grid"
+          data-source={activity.source}
+          role="img"
+          aria-label={`${activity.total.toLocaleString()} ${activityLabel} in the ${rangeLabel.toLowerCase()}`}
+        >
+          {activity.days.map((day, index) => (
+            <span
+              key={day.date}
+              className="github-activity-day"
+              data-level={day.level}
+              style={getActivityWaveStyle(index)}
+              title={`${formatActivityDate(day.date)}: ${day.count} ${
+                day.count === 1
+                  ? activityLabel.replace(/s$/, "")
+                  : activityLabel
+              }`}
+              aria-hidden="true"
+            />
+          ))}
+        </div>
+      </div>
+
+      <footer className="github-activity-footer">
+        <span>
+          {activity.latestActivityDate
+            ? `${latestLabel}: ${formatActivityDate(
+                activity.latestActivityDate,
+              )}`
+            : "No recent public activity"}
+        </span>
+        <a
+          href={`https://github.com/${encodeURIComponent(username)}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          View profile <span aria-hidden="true">&gt;</span>
+        </a>
+      </footer>
+    </section>
+  );
+};
 
 export default GitHubActivityChart;

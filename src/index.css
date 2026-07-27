@@ -166,6 +166,135 @@
   }
 }
 
+.navbar-shell {
+  pointer-events: none;
+}
+
+.navbar-wordmark,
+.navbar-nav-link,
+.navbar-icon-link {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.navbar-wordmark {
+  color: var(--terminal-green-bright);
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  transition: color 140ms ease;
+}
+
+.navbar-wordmark:hover,
+.navbar-wordmark:focus-visible {
+  color: var(--terminal-text);
+}
+
+.navbar-nav-link {
+  position: relative;
+  padding: 0.65rem 0.75rem;
+  color: var(--terminal-muted);
+  font-family: var(--font-pixel);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 140ms ease;
+}
+
+.navbar-nav-link::after {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.35rem;
+  left: 0.75rem;
+  height: 1px;
+  content: "";
+  background: var(--terminal-green);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 140ms ease;
+}
+
+.navbar-nav-link:hover,
+.navbar-nav-link:focus-visible {
+  color: var(--terminal-green-bright);
+}
+
+.navbar-nav-link:hover::after,
+.navbar-nav-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.navbar-icon-link {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  color: var(--terminal-muted);
+  transition:
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+.navbar-icon-link svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  stroke-width: 1.7;
+}
+
+.navbar-icon-link:hover,
+.navbar-icon-link:focus-visible {
+  color: var(--terminal-green-bright);
+  transform: translateY(-1px);
+}
+
+.navbar-dropdown,
+.navbar-mobile-menu {
+  border-top: 1px solid var(--terminal-line-strong);
+  background: rgba(0, 9, 0, 0.96);
+}
+
+.navbar-dropdown-link {
+  border: 0;
+  background: transparent;
+  color: var(--terminal-muted);
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 140ms ease;
+}
+
+.navbar-dropdown-link:hover,
+.navbar-dropdown-link:focus-visible {
+  color: var(--terminal-green-bright);
+}
+
+.navbar-mobile-menu {
+  font-family: var(--font-pixel);
+  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.5);
+}
+
+.navbar-mobile-link {
+  border: 0;
+  background: transparent;
+  color: var(--terminal-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 140ms ease;
+}
+
+.navbar-mobile-link:hover,
+.navbar-mobile-link:focus-visible {
+  color: var(--terminal-green-bright);
+}
+
 body {
   margin: 0;
   font-family: var(--font-terminal);
@@ -571,10 +700,12 @@ a:focus-visible {
 
 .about-panel-transition-host {
   position: relative;
+  height: clamp(24rem, 45vh, 27rem);
   width: 100%;
 }
 
 .about-panel-view {
+  height: 100%;
   width: 100%;
 }
 
@@ -605,7 +736,15 @@ a:focus-visible {
 }
 
 .about-panel-static-details {
-  min-height: clamp(24rem, 45vh, 27rem);
+  height: 100%;
+}
+
+.about-social-panel {
+  height: 100%;
+}
+
+.about-section-title {
+  font-family: var(--font-pixel);
 }
 
 .about-details-name,
@@ -625,16 +764,16 @@ a:focus-visible {
 
 .about-education-panel {
   display: flex;
-  min-height: clamp(24rem, 45vh, 27rem);
+  height: 100%;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .about-education-artwork {
   display: grid;
-  height: clamp(12rem, 27vh, 15rem);
+  height: clamp(10rem, 20vh, 12rem);
   margin: 0;
-  padding: 0.75rem 0 1.5rem;
+  padding: 0.75rem 0 3rem;
   overflow: hidden;
   align-items: start;
   justify-items: center;
@@ -648,9 +787,9 @@ a:focus-visible {
   font-size: clamp(3.4px, 0.65vw, 7px);
   font-weight: 700;
   font-variant-ligatures: none;
-  line-height: 0.88;
+  line-height: 0.68;
   letter-spacing: 0;
-  transform: translateY(-0.75rem);
+  transform: translateY(-0.25rem);
   white-space: pre;
   user-select: none;
 }
@@ -745,10 +884,32 @@ a:focus-visible {
   gap: 1rem 2rem;
 }
 
+.about-social-panel > .grid {
+  height: 100%;
+}
+
+.about-social-panel > .grid > header {
+  min-height: 0;
+}
+
+.about-social-panel > .grid > div {
+  height: 100%;
+  padding-top: 0.5rem;
+}
+
+.about-social-panel .about-section-title {
+  font-size: clamp(3.5rem, 6vw, 5.5rem);
+}
+
+.about-social-panel .about-panel-eyebrow {
+  margin-bottom: 1rem;
+}
+
 .about-social-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   min-height: 5.5rem;
   padding: 1rem 0;
   border-bottom: 1px solid var(--terminal-line);
@@ -756,7 +917,39 @@ a:focus-visible {
   transition:
     color 150ms ease,
     border-color 150ms ease,
-    transform 150ms ease;
+  transform 150ms ease;
+}
+
+.about-social-panel .about-social-link {
+  min-height: 4.75rem;
+  padding-block: 0.75rem;
+}
+
+.about-social-link-content {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.about-social-link-icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--terminal-line-strong);
+  color: var(--terminal-green);
+  transition:
+    border-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.about-social-link-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  stroke-width: 1.7;
 }
 
 .about-social-link strong,
@@ -784,10 +977,1039 @@ a:focus-visible {
 }
 
 .about-social-link:hover,
-.about-social-link:focus-visible {
+.about-social-link:focus-visible,
+.about-social-link.is-selected {
   border-color: var(--terminal-green);
   color: var(--terminal-green);
   transform: translateX(2px);
+}
+
+.about-social-link:hover .about-social-link-icon,
+.about-social-link:focus-visible .about-social-link-icon,
+.about-social-link.is-selected .about-social-link-icon {
+  border-color: var(--terminal-green-bright);
+  color: var(--terminal-green-bright);
+  box-shadow: 0 0 12px rgba(88, 255, 88, 0.14);
+}
+
+.about-social-link-region {
+  min-width: 0;
+}
+
+.about-social-link-region > .about-social-link {
+  width: 100%;
+}
+
+.about-social-hover-prompt {
+  display: flex;
+  min-height: 10rem;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 1.25rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--terminal-line-strong);
+  color: var(--terminal-muted);
+  font-family: var(--font-pixel);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.about-social-hover-prompt .terminal-cursor {
+  width: 0.5em;
+  height: 0.9em;
+}
+
+.about-social-selection-preview {
+  display: grid;
+  min-height: 10rem;
+  margin-top: 1.25rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--terminal-line-strong);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 1rem;
+  color: var(--terminal-text);
+  animation: github-activity-enter 180ms steps(3, end) both;
+  transition: color 150ms ease;
+}
+
+.about-social-selection-preview:hover,
+.about-social-selection-preview:focus-visible {
+  color: var(--terminal-green-bright);
+}
+
+.about-social-selection-icon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border: 1px solid var(--terminal-line-strong);
+  color: var(--terminal-green);
+}
+
+.about-social-selection-icon svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  stroke-width: 1.7;
+}
+
+.about-social-selection-copy {
+  min-width: 0;
+}
+
+.about-social-selection-copy small,
+.about-social-selection-copy strong,
+.about-social-selection-copy > span {
+  display: block;
+}
+
+.about-social-selection-copy small {
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.about-social-selection-copy strong {
+  margin-top: 0.55rem;
+  font-family: var(--font-pixel);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.about-social-selection-copy > span {
+  max-width: 25rem;
+  margin-top: 0.55rem;
+  color: var(--terminal-muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.about-social-selection-action {
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-align: right;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.youtube-heading-channel {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 1.1rem;
+  border: 1px solid var(--terminal-line-strong);
+  color: var(--terminal-text);
+  background: rgba(0, 29, 0, 0.16);
+  animation: github-activity-enter 180ms steps(3, end) both;
+  transition:
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.youtube-heading-channel:hover,
+.youtube-heading-channel:focus-visible {
+  border-color: var(--terminal-green);
+  color: var(--terminal-green-bright);
+  transform: translateY(-2px);
+}
+
+.youtube-heading-channel > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.youtube-heading-channel-icon {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid var(--terminal-line-strong);
+  color: var(--terminal-green);
+}
+
+.youtube-heading-channel-icon > svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  stroke-width: 1.7;
+}
+
+.youtube-heading-channel > header small,
+.youtube-heading-channel > header strong {
+  display: block;
+}
+
+.youtube-heading-channel > header small {
+  color: var(--terminal-muted);
+  font-family: var(--font-pixel);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.youtube-heading-channel > header strong {
+  margin-top: 0.35rem;
+  color: var(--terminal-text);
+  font-family: var(--font-pixel);
+  font-size: 0.8rem;
+}
+
+.youtube-heading-channel > header > svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--terminal-green);
+}
+
+.youtube-heading-channel > p {
+  margin: 1rem 0 0;
+  color: var(--terminal-muted);
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+
+.youtube-heading-channel-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--terminal-line);
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.youtube-channel-preview {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--terminal-line-strong);
+  animation: github-activity-enter 180ms steps(3, end) both;
+}
+
+.youtube-embedded-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.youtube-video-card > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.youtube-video-card > a:hover,
+.youtube-video-card > a:focus-visible {
+  color: var(--terminal-green-bright);
+}
+
+.youtube-video-card > a > svg {
+  width: 0.7rem;
+  height: 0.7rem;
+}
+
+.youtube-video-card {
+  min-width: 0;
+  padding: 0.45rem;
+  border: 1px solid var(--terminal-line);
+  background: rgba(0, 29, 0, 0.12);
+  transition:
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+
+.youtube-video-card:hover,
+.youtube-video-card:focus-within {
+  border-color: var(--terminal-green);
+  transform: translateY(-2px);
+}
+
+.youtube-video-card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.15rem 0.1rem 0.5rem;
+  color: var(--terminal-muted);
+  font-size: 0.46rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.youtube-video-card > header > span:last-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--terminal-green);
+}
+
+.youtube-video-card > header i {
+  width: 0.3rem;
+  height: 0.3rem;
+  background: currentColor;
+}
+
+.youtube-video-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--terminal-line-strong);
+  background: var(--terminal-black);
+}
+
+.youtube-video-frame::after {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(88, 255, 88, 0.06);
+  content: "";
+  pointer-events: none;
+}
+
+.youtube-video-frame > iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  filter: saturate(0.74) contrast(1.04);
+}
+
+.youtube-video-card > a {
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  padding: 0.1rem;
+}
+
+.youtube-channel-preview .youtube-video-card {
+  padding: 0.3rem;
+}
+
+.youtube-channel-preview .youtube-video-card > header {
+  padding-bottom: 0.35rem;
+  font-size: 0.42rem;
+}
+
+.youtube-channel-preview .youtube-video-card > a {
+  margin-top: 0.3rem;
+  font-size: 0.46rem;
+}
+
+.linkedin-post-preview {
+  width: min(100%, 22rem);
+  margin-top: 1.25rem;
+  animation: github-activity-enter 180ms steps(3, end) both;
+}
+
+.linkedin-post-card {
+  padding: 0.75rem;
+  border: 1px solid var(--terminal-line-strong);
+  color: var(--terminal-text);
+  background: rgba(0, 29, 0, 0.12);
+}
+
+.linkedin-post-author {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.7rem;
+}
+
+.linkedin-post-author > img {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--terminal-line-strong);
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 22%;
+  filter: grayscale(0.25);
+}
+
+.linkedin-post-author > span {
+  min-width: 0;
+}
+
+.linkedin-post-author strong,
+.linkedin-post-author small {
+  display: block;
+}
+
+.linkedin-post-author strong {
+  font-family: var(--font-pixel);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.linkedin-post-author small {
+  margin-top: 0.18rem;
+  overflow: hidden;
+  color: var(--terminal-muted);
+  font-size: 0.52rem;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linkedin-post-author > span:last-child {
+  color: var(--terminal-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+.linkedin-post-body {
+  margin-top: 0.7rem;
+  font-size: 0.68rem;
+  line-height: 1.55;
+}
+
+.linkedin-post-body > p {
+  margin: 0;
+}
+
+.linkedin-post-body > p:first-child {
+  color: var(--terminal-text);
+  font-weight: 700;
+}
+
+.linkedin-post-body > p + p {
+  display: -webkit-box;
+  margin-top: 0.4rem;
+  overflow: hidden;
+  color: var(--terminal-muted);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.linkedin-post-award {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.7rem;
+  padding: 0.55rem;
+  border: 1px solid var(--terminal-line);
+  background: rgba(0, 29, 0, 0.3);
+}
+
+.linkedin-post-award > svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: none;
+  color: var(--terminal-green);
+  stroke-width: 1.6;
+}
+
+.linkedin-post-award small,
+.linkedin-post-award strong {
+  display: block;
+}
+
+.linkedin-post-award small {
+  color: var(--terminal-muted);
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.linkedin-post-award strong {
+  margin-top: 0.2rem;
+  font-family: var(--font-pixel);
+  font-size: 0.78rem;
+}
+
+.linkedin-post-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--terminal-line);
+}
+
+.linkedin-post-footer > span {
+  color: var(--terminal-muted);
+  font-size: 0.5rem;
+}
+
+.linkedin-post-footer > button,
+.linkedin-experience-panel > header > button {
+  border: 0;
+  color: var(--terminal-green);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: 0.54rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.linkedin-post-footer > button:hover,
+.linkedin-post-footer > button:focus-visible,
+.linkedin-experience-panel > header > button:hover,
+.linkedin-experience-panel > header > button:focus-visible {
+  color: var(--terminal-green-bright);
+}
+
+.linkedin-experience-panel {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--terminal-line-strong);
+  animation: github-activity-enter 180ms steps(3, end) both;
+}
+
+.linkedin-experience-panel > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.linkedin-preview-icon {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 1px solid var(--terminal-line-strong);
+  color: var(--terminal-green);
+}
+
+.linkedin-preview-icon > svg {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 1.7;
+}
+
+.linkedin-experience-panel > header small,
+.linkedin-experience-panel > header strong {
+  display: block;
+}
+
+.linkedin-experience-panel > header small {
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+  font-size: 0.54rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.linkedin-experience-panel > header strong {
+  margin-top: 0.3rem;
+  color: var(--terminal-text);
+  font-family: var(--font-pixel);
+  font-size: 0.76rem;
+}
+
+.linkedin-experience-panel > ol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linkedin-experience-panel > ol > li {
+  display: flex;
+  min-width: 0;
+  min-height: 7.75rem;
+  padding: 0.65rem;
+  border: 1px solid var(--terminal-line);
+  flex-direction: column;
+}
+
+.linkedin-experience-panel > ol span,
+.linkedin-experience-panel > ol strong,
+.linkedin-experience-panel > ol small,
+.linkedin-experience-panel > ol p {
+  display: block;
+}
+
+.linkedin-experience-panel > ol span {
+  color: var(--terminal-green);
+  font-size: 0.52rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.linkedin-experience-panel > ol strong {
+  margin-top: 0.4rem;
+  color: var(--terminal-text);
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.linkedin-experience-panel > ol small {
+  margin-top: 0.35rem;
+  overflow: hidden;
+  color: var(--terminal-muted);
+  font-size: 0.56rem;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+}
+
+.linkedin-experience-panel > ol p {
+  display: -webkit-box;
+  margin: auto 0 0;
+  padding-top: 0.45rem;
+  overflow: hidden;
+  color: var(--terminal-muted);
+  font-size: 0.58rem;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.github-repository-preview {
+  width: min(100%, 22rem);
+  margin-top: 1.25rem;
+  animation: github-activity-enter 180ms steps(3, end) both;
+}
+
+.github-repository-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.github-repository-card {
+  display: flex;
+  min-height: 12rem;
+  padding: 1rem;
+  border: 1px solid var(--terminal-line-strong);
+  flex-direction: column;
+  color: var(--terminal-text);
+  background: rgba(0, 29, 0, 0.14);
+  transition:
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.github-repository-list .github-repository-card:not(.is-status) {
+  min-height: 6.2rem;
+  padding: 0.6rem;
+}
+
+.github-repository-card:hover,
+.github-repository-card:focus-visible {
+  border-color: var(--terminal-green);
+  color: var(--terminal-green-bright);
+  transform: translateY(-2px);
+}
+
+.github-repository-card.is-status {
+  min-height: 8rem;
+  align-items: center;
+  flex-direction: row;
+  gap: 0.45rem;
+  color: var(--terminal-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.github-repository-kicker {
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.github-repository-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.35rem;
+}
+
+.github-repository-heading strong {
+  overflow-wrap: anywhere;
+  font-family: var(--font-pixel);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.github-repository-heading svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  color: var(--terminal-green);
+  stroke-width: 1.7;
+}
+
+.github-repository-description {
+  display: -webkit-box;
+  margin-top: 0.35rem;
+  overflow: hidden;
+  color: var(--terminal-muted);
+  font-size: 0.58rem;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.github-repository-topics {
+  display: none;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.8rem;
+}
+
+.github-repository-topics > span {
+  padding: 0.2rem 0.35rem;
+  border: 1px solid var(--terminal-line);
+  color: var(--terminal-green);
+  font-size: 0.55rem;
+  letter-spacing: 0.05em;
+}
+
+.github-repository-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.4rem;
+  color: var(--terminal-muted);
+  font-size: 0.52rem;
+}
+
+.github-repository-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.github-repository-meta svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--terminal-green);
+  stroke-width: 1.8;
+}
+
+.github-repository-meta i {
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 1px solid var(--terminal-green);
+  background: var(--terminal-green-dark);
+}
+
+.github-repository-date {
+  margin-top: 0.35rem;
+  color: var(--terminal-muted);
+  font-size: 0.48rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.github-activity-preview {
+  min-width: 0;
+  min-height: 10rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--terminal-line-strong);
+  animation: github-activity-enter 180ms steps(3, end) both;
+}
+
+.github-activity-card {
+  min-width: 0;
+}
+
+.github-activity-status {
+  display: flex;
+  min-height: 9rem;
+  align-items: center;
+  color: var(--terminal-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.github-activity-status .terminal-cursor {
+  width: 0.5em;
+  height: 0.9em;
+}
+
+.github-activity-header,
+.github-activity-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.github-activity-header p,
+.github-activity-header small,
+.github-activity-footer {
+  margin: 0;
+}
+
+.github-activity-header > div > p {
+  color: var(--terminal-green-bright);
+  font-family: var(--font-pixel);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.github-activity-header small {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--terminal-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.github-activity-total {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  text-align: right;
+}
+
+.github-activity-total strong {
+  color: var(--terminal-text);
+  font-family: var(--font-pixel);
+  font-size: 1.1rem;
+}
+
+.github-activity-total span {
+  color: var(--terminal-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.github-activity-scroll {
+  max-width: 100%;
+  margin: 1rem 0;
+  padding-bottom: 0.3rem;
+  overflow-x: auto;
+}
+
+.github-activity-grid {
+  --github-activity-cell: clamp(6px, 0.58vw, 8px);
+  display: grid;
+  grid-template-rows: repeat(7, var(--github-activity-cell));
+  grid-auto-columns: var(--github-activity-cell);
+  grid-auto-flow: column;
+  gap: 3px;
+  width: max-content;
+}
+
+.github-activity-grid[data-source="public-events"] {
+  --github-activity-cell: 0.75rem;
+}
+
+.github-activity-day {
+  --github-activity-fill: #001000;
+  width: var(--github-activity-cell);
+  height: var(--github-activity-cell);
+  border: 1px solid rgba(46, 212, 101, 0.1);
+  background: var(--github-activity-fill);
+}
+
+.github-activity-day[data-level="1"] {
+  --github-activity-fill: #002d0b;
+}
+
+.github-activity-day[data-level="2"] {
+  --github-activity-fill: #07551e;
+}
+
+.github-activity-day[data-level="3"] {
+  --github-activity-fill: #14843a;
+}
+
+.github-activity-day[data-level="4"] {
+  --github-activity-fill: var(--terminal-green);
+}
+
+.github-activity-day:not([data-level="0"]) {
+  animation: github-activity-wave-fill 260ms steps(4, end) both;
+  animation-delay: var(--github-activity-wave-delay);
+}
+
+.github-activity-footer {
+  color: var(--terminal-muted);
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+}
+
+.github-activity-footer a {
+  flex: none;
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.github-activity-footer a:hover,
+.github-activity-footer a:focus-visible {
+  color: var(--terminal-green-bright);
+}
+
+.experience-section {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  padding: 2rem 2.5rem 7.5rem;
+  grid-template-columns: minmax(15rem, 0.65fr) minmax(0, 1.35fr);
+  align-items: start;
+  gap: clamp(3rem, 6vw, 6rem);
+  transform: translateY(-50%);
+}
+
+.mobile-experience-section {
+  padding: 6rem 1.25rem;
+}
+
+.experience-section-header > p {
+  margin: 0 0 1rem;
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.experience-section-header > h2 {
+  margin: 0;
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+  font-size: clamp(3.2rem, 5.8vw, 5.8rem);
+  font-weight: 700;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+}
+
+.experience-section-header > span {
+  display: block;
+  max-width: 24rem;
+  margin-top: 1.5rem;
+  color: var(--terminal-muted);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.experience-timeline {
+  position: relative;
+  display: grid;
+  gap: 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.experience-timeline::before {
+  position: absolute;
+  top: 1rem;
+  bottom: 1rem;
+  left: 9.65rem;
+  width: 1px;
+  content: "";
+  background: var(--terminal-line-strong);
+}
+
+.experience-timeline > li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 8.4rem 2.5rem minmax(0, 1fr);
+  align-items: start;
+}
+
+.experience-timeline-period {
+  padding-top: 0.45rem;
+  color: var(--terminal-muted);
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.experience-timeline-marker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-inline: auto;
+  place-items: center;
+  border: 1px solid var(--terminal-green);
+  color: var(--terminal-green);
+  background: var(--terminal-black);
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+}
+
+.experience-timeline-entry {
+  padding: 0 0 1rem 0.5rem;
+  border-bottom: 1px solid var(--terminal-line);
+}
+
+.experience-timeline-entry > p,
+.experience-timeline-entry > h3,
+.experience-timeline-entry > span {
+  margin: 0;
+}
+
+.experience-timeline-entry > p {
+  color: var(--terminal-green);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.experience-timeline-entry > h3 {
+  margin-top: 0.35rem;
+  color: var(--terminal-text);
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.experience-timeline-entry > span {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--terminal-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.experience-timeline-entry > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.65rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.experience-timeline-entry > ul > li {
+  padding: 0.18rem 0.35rem;
+  border: 1px solid var(--terminal-line);
+  color: var(--terminal-green);
+  font-size: 0.52rem;
+  letter-spacing: 0.05em;
 }
 
 .terminal-app [class*="text-zinc-"],
@@ -849,9 +2071,49 @@ a:focus-visible {
   }
 }
 
+@keyframes github-activity-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.4rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes github-activity-wave-fill {
+  0% {
+    border-color: rgba(46, 212, 101, 0.1);
+    background: #001000;
+    transform: translateY(3px) scale(0.7);
+  }
+
+  65% {
+    border-color: rgba(88, 255, 88, 0.48);
+    background: var(--github-activity-fill);
+    transform: translateY(-1px) scale(1.12);
+  }
+
+  100% {
+    border-color: rgba(46, 212, 101, 0.1);
+    background: var(--github-activity-fill);
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .terminal-cursor,
-  .gravity-chamber-drift {
+  .gravity-chamber-drift,
+  .about-social-selection-preview,
+  .linkedin-post-preview,
+  .linkedin-experience-panel,
+  .youtube-heading-channel,
+  .youtube-channel-preview,
+  .github-repository-preview,
+  .github-activity-preview,
+  .github-activity-day {
     animation: none;
   }
 }
@@ -863,6 +2125,14 @@ a:focus-visible {
 
   .about-panel-static-details {
     min-height: 22rem;
+  }
+
+  .youtube-heading-channel {
+    margin-top: 1rem;
+  }
+
+  .youtube-channel-preview .youtube-video-card {
+    padding: 0.25rem;
   }
 
   .about-education-panel {
@@ -883,6 +2153,26 @@ a:focus-visible {
   }
 }
 
+@media (max-width: 1023px) {
+  .about-panel-transition-host,
+  .about-panel-view,
+  .about-panel-static-details,
+  .about-social-panel,
+  .about-social-panel > .grid,
+  .about-social-panel > .grid > div,
+  .about-education-panel {
+    height: auto;
+  }
+
+  .about-social-panel {
+    min-height: 0;
+  }
+
+  .about-social-panel > .grid > div {
+    padding-top: 2rem;
+  }
+}
+
 @media (max-width: 767px) {
   .about-panel-static-details {
     min-height: 0;
@@ -894,7 +2184,7 @@ a:focus-visible {
 
   .about-education-artwork {
     height: 9rem;
-    padding-bottom: 1rem;
+    padding-bottom: 2rem;
   }
 
   .about-education-list {
@@ -903,5 +2193,77 @@ a:focus-visible {
 
   .about-links-list {
     grid-template-columns: 1fr;
+  }
+
+  .about-social-selection-preview {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .about-social-selection-action {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .youtube-embedded-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .linkedin-experience-panel > header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .linkedin-experience-panel > header > button {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .linkedin-experience-panel > ol {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-section-header > h2 {
+    font-size: clamp(3rem, 16vw, 5rem);
+  }
+
+  .experience-section-header > span {
+    margin-top: 1rem;
+  }
+
+  .mobile-experience-section .experience-timeline {
+    margin-top: 3rem;
+  }
+
+  .experience-timeline::before {
+    left: 0.85rem;
+  }
+
+  .experience-timeline > li {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+  }
+
+  .experience-timeline-period {
+    grid-column: 2;
+    padding-top: 0;
+    text-align: left;
+  }
+
+  .experience-timeline-marker {
+    grid-row: 1 / span 2;
+    grid-column: 1;
+  }
+
+  .experience-timeline-entry {
+    grid-column: 2;
+    padding-left: 0;
+  }
+
+  .github-activity-header,
+  .github-activity-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .github-activity-total {
+    text-align: left;
   }
 }

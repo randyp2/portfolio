@@ -26,6 +26,7 @@ import Ball from "./Ball";
 import StarField from "./StarField";
 import Intro from "../sections/Intro";
 import About from "../sections/About";
+import Experience from "../sections/Experience";
 import Projects from "../sections/Projects";
 import Contact from "../sections/Contact";
 import Thanks from "../sections/Thanks";
@@ -366,6 +367,11 @@ const WorldCanvas: React.FC = () => {
           ballX={ballX}
           ballPositionRef={liveBallPositionRef}
           viewportCenterX={viewportCenterX}
+        />
+
+        <Experience
+          centerX={dynamicSections.experience.x}
+          ballX={ballX}
         />
 
         <Projects

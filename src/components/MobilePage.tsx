@@ -1,5 +1,6 @@
 import MobileIntro from "./mobile/MobileIntro";
 import MobileAbout from "./mobile/MobileAbout";
+import MobileExperience from "./mobile/MobileExperience";
 import MobileProjects from "./mobile/MobileProjects";
 import MobileSkills from "./mobile/MobileSkills";
 import MobileContact from "./mobile/MobileContact";
@@ -10,6 +11,7 @@ const MobilePage: React.FC = () => {
     <div className="relative">
       <MobileIntro />
       <MobileAbout />
+      <MobileExperience />
       <MobileProjects />
       <MobileSkills />
       <MobileContact />

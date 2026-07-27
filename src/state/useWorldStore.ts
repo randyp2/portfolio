@@ -27,6 +27,7 @@ export const useWorldStore = create<WorldState>((set, get) => ({
     sections: {
         intro: { x: 0 },
         about: { x: 0 },
+        experience: { x: 0 },
         projects: { x: 0 },
         languages: { x: 0 },
         tools: { x: 0 },

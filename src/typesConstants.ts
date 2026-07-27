@@ -20,6 +20,7 @@ export const SKILL_SECTION_SPACING_MULTIPLIER = 0.5; // Smaller spacing for skil
 export const SECTION_ORDER = [
   "intro",
   "about",
+  "experience",
   "projects",
   "languages",
   "tools",

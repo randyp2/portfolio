@@ -1,12 +1,36 @@
-import type { ReactNode } from "react";
+import {
+  useState,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
+import {
+  FileText,
+  Github,
+  Linkedin,
+  Youtube,
+  type LucideIcon,
+} from "lucide-react";
 import {
   ABOUT_EDUCATION,
   ABOUT_LINKS,
   type AboutPanelId,
 } from "../content/about";
 import { UNLV_ASCII_ART } from "../content/educationAsciiArt";
+import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useWorldStore } from "../state/useWorldStore";
 import AboutMeContent from "./AboutMeContent";
 import EducationPixelIcon from "./EducationPixelIcon";
+import GitHubActivityChart from "./GitHubActivityChart";
+import GitHubRecentRepositories from "./GitHubRecentRepositories";
+import {
+  LinkedInExperiencePreview,
+  LinkedInRecentWinPost,
+  type LinkedInPreviewDestination,
+} from "./LinkedInPreview";
+import {
+  YouTubeChannelPreview,
+  YouTubeHeadingPreview,
+} from "./YouTubePreview";
 
 interface AboutPanelContentProps {
   educationArtwork?: ReactNode;
@@ -20,6 +44,37 @@ const getLinkHref = (
   usesBasePath: boolean,
 ): string =>
   usesBasePath ? `${import.meta.env.BASE_URL}${href}` : href;
+
+const LINK_ICONS: Record<
+  (typeof ABOUT_LINKS)[number]["label"],
+  LucideIcon
+> = {
+  GitHub: Github,
+  LinkedIn: Linkedin,
+  Resume: FileText,
+  YouTube: Youtube,
+};
+
+type AboutLink = (typeof ABOUT_LINKS)[number];
+type AboutLinkLabel = AboutLink["label"];
+
+const SOCIAL_PREVIEW_COPY: Record<
+  Extract<AboutLinkLabel, "Resume">,
+  {
+    action: string;
+    description: string;
+    eyebrow: string;
+    title: string;
+  }
+> = {
+  Resume: {
+    action: "View resume",
+    description:
+      "A quick look at my engineering work, leadership, and education.",
+    eyebrow: "Current resume",
+    title: "Experience, in one file.",
+  },
+};
 
 interface EducationDetailsProps {
   artwork?: ReactNode;
@@ -117,30 +172,223 @@ const EducationDetails: React.FC<EducationDetailsProps> = ({
   </div>
 );
 
-const LinksDetails: React.FC = () => (
+interface LinksDetailsProps {
+  activeLink: AboutLink | null;
+  handleLinkClick: (
+    event: MouseEvent<HTMLAnchorElement>,
+    label: AboutLinkLabel,
+  ) => void;
+  navigateFromLinkedIn: (
+    destination: LinkedInPreviewDestination,
+  ) => void;
+  selectLink: (label: AboutLinkLabel) => void;
+}
+
+interface SocialLinkPreviewProps {
+  link: Extract<AboutLink, { label: "Resume" }>;
+}
+
+const SocialLinkPreview: React.FC<SocialLinkPreviewProps> = ({
+  link,
+}) => {
+  const LinkIcon = LINK_ICONS[link.label];
+  const copy = SOCIAL_PREVIEW_COPY[link.label];
+
+  return (
+    <a
+      id="social-link-preview"
+      className="about-social-selection-preview"
+      href={getLinkHref(link.href, link.usesBasePath)}
+      target={link.newTab ? "_blank" : undefined}
+      rel={link.newTab ? "noreferrer" : undefined}
+    >
+      <span className="about-social-selection-icon" aria-hidden="true">
+        <LinkIcon />
+      </span>
+      <span className="about-social-selection-copy">
+        <small>{copy.eyebrow}</small>
+        <strong>{copy.title}</strong>
+        <span>{copy.description}</span>
+      </span>
+      <span className="about-social-selection-action">
+        {copy.action} <span aria-hidden="true">&gt;</span>
+      </span>
+    </a>
+  );
+};
+
+const LinksDetails: React.FC<LinksDetailsProps> = ({
+  activeLink,
+  handleLinkClick,
+  navigateFromLinkedIn,
+  selectLink,
+}) => (
   <div className="about-panel-static-details">
     <p className="about-panel-eyebrow">Elsewhere on the internet</p>
     <div className="about-links-list">
-      {ABOUT_LINKS.map((link) => (
-        <a
-          key={link.label}
-          className="about-social-link"
-          href={getLinkHref(link.href, link.usesBasePath)}
-          target={link.newTab ? "_blank" : undefined}
-          rel={link.newTab ? "noreferrer" : undefined}
-        >
-          <span>
-            <strong>{link.label}</strong>
-            <small>{link.detail}</small>
-          </span>
-          <span className="about-social-link-arrow" aria-hidden="true">
-            &gt;
-          </span>
-        </a>
-      ))}
+      {ABOUT_LINKS.map((link) => {
+        const LinkIcon = LINK_ICONS[link.label];
+        const isGitHubLink = link.label === "GitHub";
+        const isLinkedInLink = link.label === "LinkedIn";
+        const isSelected = activeLink?.label === link.label;
+
+        return (
+          <div
+            key={link.label}
+            className="about-social-link-region"
+            onMouseEnter={() => selectLink(link.label)}
+          >
+            <a
+              className={`about-social-link ${
+                isSelected ? "is-selected" : ""
+              }`}
+              href={getLinkHref(link.href, link.usesBasePath)}
+              target={link.newTab ? "_blank" : undefined}
+              rel={link.newTab ? "noreferrer" : undefined}
+              aria-controls={
+                isGitHubLink
+                  ? "github-repository-preview github-activity-preview"
+                  : isLinkedInLink
+                    ? "linkedin-post-preview social-link-preview"
+                    : link.label === "YouTube"
+                      ? "youtube-channel-card youtube-channel-preview"
+                      : "social-link-preview"
+              }
+              aria-expanded={isSelected}
+              onClick={(event) =>
+                handleLinkClick(event, link.label)
+              }
+              onFocus={() => selectLink(link.label)}
+            >
+              <span className="about-social-link-content">
+                <span
+                  className="about-social-link-icon"
+                  aria-hidden="true"
+                >
+                  <LinkIcon />
+                </span>
+                <span>
+                  <strong>{link.label}</strong>
+                  <small>
+                    {isGitHubLink
+                      ? "Preview repository + activity"
+                      : link.detail}
+                  </small>
+                </span>
+              </span>
+              <span
+                className="about-social-link-arrow"
+                aria-hidden="true"
+              >
+                &gt;
+              </span>
+            </a>
+          </div>
+        );
+      })}
     </div>
+
+    {activeLink?.label === "GitHub" ? (
+      <div
+        id="github-activity-preview"
+        className="github-activity-preview"
+      >
+        <GitHubActivityChart username="randyp2" />
+      </div>
+    ) : activeLink?.label === "LinkedIn" ? (
+      <LinkedInExperiencePreview
+        onNavigate={navigateFromLinkedIn}
+      />
+    ) : activeLink?.label === "YouTube" ? (
+      <YouTubeChannelPreview />
+    ) : activeLink ? (
+      <SocialLinkPreview link={activeLink} />
+    ) : (
+      <p className="about-social-hover-prompt">
+        Hover over a link:<span className="terminal-cursor" />
+      </p>
+    )}
   </div>
 );
+
+const LinksPanel: React.FC = () => {
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const jumpTo = useWorldStore((state) => state.jumpTo);
+  const [activeLinkLabel, setActiveLinkLabel] =
+    useState<AboutLinkLabel | null>(null);
+  const activeLink =
+    ABOUT_LINKS.find((link) => link.label === activeLinkLabel) ??
+    null;
+
+  const handleLinkClick = (
+    event: MouseEvent<HTMLAnchorElement>,
+    label: AboutLinkLabel,
+  ) => {
+    if (
+      window.matchMedia("(hover: none), (pointer: coarse)").matches &&
+      activeLinkLabel !== label
+    ) {
+      event.preventDefault();
+      setActiveLinkLabel(label);
+    }
+  };
+
+  const handleLinkedInNavigation = (
+    destination: LinkedInPreviewDestination,
+  ) => {
+    if (isDesktop) {
+      jumpTo(destination);
+      return;
+    }
+
+    const section = document.getElementById(destination);
+    if (!section) return;
+
+    const navbarOffset = 72;
+    const offsetPosition =
+      section.getBoundingClientRect().top +
+      window.scrollY -
+      navbarOffset;
+    window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+  };
+
+  return (
+    <div className="about-social-panel">
+      <AboutMeContent
+        heading={["FIND", "ME"]}
+        headingDetails={
+          activeLinkLabel === "GitHub" ? (
+            <div
+              id="github-repository-preview"
+              className="github-repository-preview"
+            >
+              <GitHubRecentRepositories username="randyp2" />
+            </div>
+          ) : activeLinkLabel === "LinkedIn" ? (
+            <div
+              id="linkedin-post-preview"
+              className="linkedin-post-preview"
+            >
+              <LinkedInRecentWinPost
+                onNavigate={handleLinkedInNavigation}
+              />
+            </div>
+          ) : activeLinkLabel === "YouTube" ? (
+            <YouTubeHeadingPreview />
+          ) : null
+        }
+        details={
+          <LinksDetails
+            activeLink={activeLink}
+            handleLinkClick={handleLinkClick}
+            navigateFromLinkedIn={handleLinkedInNavigation}
+            selectLink={setActiveLinkLabel}
+          />
+        }
+      />
+    </div>
+  );
+};
 
 /**
  * Renders the complete chamber content for the selected About view.
@@ -161,12 +409,7 @@ const AboutPanelContent: React.FC<AboutPanelContentProps> = ({
   }
 
   if (panelId === "links") {
-    return (
-      <AboutMeContent
-        heading={["FIND", "ME"]}
-        details={<LinksDetails />}
-      />
-    );
+    return <LinksPanel />;
   }
 
   return <AboutMeContent details={nowDetails} />;

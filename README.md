@@ -34,6 +34,16 @@ Interactive portfolio built with React and Vite. On desktop it renders a physics
    ```
 4) Open localhost
 
+## GitHub activity
+
+The Socials panel loads the public contribution calendar through
+`/api/github-activity`. Add `GITHUB_TOKEN` to the Vercel project's
+environment variables to enable the full 12-month calendar. The token is
+only read by the server function and must never use the `VITE_` prefix.
+
+Local Vite development falls back to GitHub's public events endpoint when
+the server function is unavailable.
+
 ## Scripts
 - `pnpm dev` — start the dev server.
 - `pnpm build` — type-check (`tsc -b`) and build for production.
