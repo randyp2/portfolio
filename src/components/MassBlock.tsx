@@ -18,6 +18,8 @@ import {
   SiNodedotjs,
   SiDjango,
   SiPostgresql,
+  SiFastapi,
+  SiGo,
 } from "react-icons/si";
 import { FaJava, FaDatabase } from "react-icons/fa";
 
@@ -31,6 +33,7 @@ const skillIcons: Record<string, React.ReactNode> = {
   python: <SiPython size={40} color="#3776AB" />,
   sql: <FaDatabase size={40} color="#F29111" />,
   swift: <SiSwift size={40} color="#F05138" />,
+  go: <SiGo size={40} color="#00ADD8" />,
   git: <SiGit size={40} color="#F05032" />,
   docker: <SiDocker size={40} color="#2496ED" />,
   aws: <SiAmazonwebservices size={40} color="#FF9900" />,
@@ -42,6 +45,7 @@ const skillIcons: Record<string, React.ReactNode> = {
   nodejs: <SiNodedotjs size={40} color="#339933" />,
   django: <SiDjango size={40} color="#092E20" />,
   postgresql: <SiPostgresql size={40} color="#4169E1" />,
+  fastapi: <SiFastapi size={40} color="#009688" />,
 };
 
 interface MassBlockProps {

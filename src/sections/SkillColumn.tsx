@@ -14,6 +14,30 @@ interface SkillColumnProps {
   showArrow?: boolean;
 }
 
+const SKILL_DISPLAY_NAMES: Readonly<Record<string, string>> = {
+  java: "Java",
+  typescript: "TypeScript",
+  cpp: "C++",
+  c: "C",
+  csharp: "C#",
+  python: "Python",
+  sql: "SQL",
+  swift: "Swift",
+  go: "Go",
+  git: "Git",
+  docker: "Docker",
+  aws: "AWS",
+  supabase: "Supabase",
+  postman: "Postman",
+  springboot: "Spring Boot",
+  react: "React",
+  nextjs: "Next.js",
+  nodejs: "Node.js",
+  django: "Django",
+  postgresql: "PostgreSQL",
+  fastapi: "FastAPI",
+};
+
 const SkillColumn: React.FC<SkillColumnProps> = ({
   centerX,
   ballX,
@@ -103,13 +127,24 @@ const SkillColumn: React.FC<SkillColumnProps> = ({
     >
       {/* Title */}
       <motion.span
-        className="absolute top-24 border border-[var(--terminal-line)] bg-black/80 px-6 py-3 text-center font-alfa text-[48px] text-[var(--terminal-green-bright)] [text-shadow:0_0_18px_rgba(46,212,101,0.2)]"
+        className="skill-column-title"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.5 }}
       >
         {title}
       </motion.span>
+
+      <ul
+        className="skill-column-list"
+        aria-label={`${title} skills`}
+      >
+        {skills.map((skill) => (
+          <li key={skill}>
+            {SKILL_DISPLAY_NAMES[skill] ?? skill}
+          </li>
+        ))}
+      </ul>
 
       {/* Navigation arrow - keep going indicator */}
       {showArrow && (

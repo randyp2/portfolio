@@ -2121,6 +2121,52 @@ a:focus-visible {
   white-space: nowrap;
 }
 
+.skill-column-title {
+  position: absolute;
+  top: 6rem;
+  margin: 0;
+  color: var(--terminal-green-bright);
+  font-family: var(--font-pixel);
+  font-size: clamp(3.75rem, 5vw, 6rem);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.skill-column-list {
+  position: absolute;
+  top: clamp(12rem, 23vh, 14rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  color: var(--terminal-text);
+  font-family: var(--font-pixel);
+  font-size: clamp(0.9rem, 1.15vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: 0.045em;
+  line-height: 1.4;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.skill-column-list > li {
+  display: inline-flex;
+  align-items: center;
+}
+
+.skill-column-list > li:not(:last-child)::after {
+  margin-inline: clamp(0.55rem, 0.85vw, 0.95rem);
+  color: var(--terminal-muted);
+  content: "//";
+  font-family: var(--font-terminal);
+  font-size: 0.72em;
+  letter-spacing: 0;
+}
+
 .experience-section {
   position: absolute;
   top: 50%;

@@ -18,6 +18,8 @@ import {
   SiNodedotjs,
   SiDjango,
   SiPostgresql,
+  SiFastapi,
+  SiGo,
 } from "react-icons/si";
 import { FaJava, FaDatabase } from "react-icons/fa";
 import { cn } from "@/lib/utils";
@@ -31,6 +33,7 @@ type SkillKey =
   | "python"
   | "sql"
   | "swift"
+  | "go"
   | "git"
   | "docker"
   | "aws"
@@ -41,7 +44,8 @@ type SkillKey =
   | "nextjs"
   | "nodejs"
   | "django"
-  | "postgresql";
+  | "postgresql"
+  | "fastapi";
 
 interface SkillInfo {
   icon: React.ReactNode;
@@ -60,6 +64,7 @@ const skillData: Record<SkillKey, SkillInfo> = {
   python: { icon: <SiPython size={32} color="#3776AB" />, label: "Python" },
   sql: { icon: <FaDatabase size={32} color="#F29111" />, label: "SQL" },
   swift: { icon: <SiSwift size={32} color="#F05138" />, label: "Swift" },
+  go: { icon: <SiGo size={32} color="#00ADD8" />, label: "Go" },
   git: { icon: <SiGit size={32} color="#F05032" />, label: "Git" },
   docker: { icon: <SiDocker size={32} color="#2496ED" />, label: "Docker" },
   aws: { icon: <SiAmazonwebservices size={32} color="#FF9900" />, label: "AWS" },
@@ -80,6 +85,10 @@ const skillData: Record<SkillKey, SkillInfo> = {
     icon: <SiPostgresql size={32} color="#4169E1" />,
     label: "PostgreSQL",
   },
+  fastapi: {
+    icon: <SiFastapi size={32} color="#009688" />,
+    label: "FastAPI",
+  },
 };
 
 const languageSkills: SkillKey[] = [
@@ -91,6 +100,7 @@ const languageSkills: SkillKey[] = [
   "python",
   "sql",
   "swift",
+  "go",
 ];
 const toolSkills: SkillKey[] = ["git", "docker", "aws", "supabase", "postman"];
 const frameworkSkills: SkillKey[] = [
@@ -100,6 +110,7 @@ const frameworkSkills: SkillKey[] = [
   "nodejs",
   "django",
   "postgresql",
+  "fastapi",
 ];
 
 type TabType = "languages" | "tools" | "frameworks";

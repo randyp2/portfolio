@@ -346,6 +346,7 @@ const WorldCanvas: React.FC = () => {
     "python",
     "sql",
     "swift",
+    "go",
   ];
 
   const toolSkills = ["git", "docker", "aws", "supabase", "postman"];
@@ -357,6 +358,7 @@ const WorldCanvas: React.FC = () => {
     "nodejs",
     "django",
     "postgresql",
+    "fastapi",
   ];
 
   // Callback to force re-render when blocks spawn
