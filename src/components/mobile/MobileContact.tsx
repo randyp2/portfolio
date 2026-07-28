@@ -1,123 +1,100 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, Check, FileDown } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, Mail } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
-interface SocialButtonProps {
-  icon: React.ElementType;
-  label: string;
-  href?: string;
-  onClick?: () => void;
-  download?: boolean;
-  copied?: boolean;
-}
-
-const SocialButton = ({
-  icon: Icon,
-  label,
-  href,
-  onClick,
-  download,
-  copied,
-}: SocialButtonProps) => {
-  const content = (
-    <div className="terminal-button flex items-center gap-3 p-4">
-      <Icon className="h-5 w-5 text-[var(--terminal-green)]" />
-      <span className="text-sm font-medium text-[var(--terminal-text)]">
-        {label === "Email" && copied ? "Copied!" : label}
-      </span>
-    </div>
-  );
-
-  if (onClick) {
-    return (
-      <motion.button
-        onClick={onClick}
-        className="w-full text-left"
-        whileTap={{ scale: 0.98 }}
-      >
-        {content}
-      </motion.button>
-    );
-  }
-
-  return (
-    <motion.a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      download={download}
-      className="block"
-      whileTap={{ scale: 0.98 }}
-    >
-      {content}
-    </motion.a>
-  );
-};
+const CONTACT_EMAIL = "rpahang2@gmail.com";
 
 const MobileContact: React.FC = () => {
   const [copied, setCopied] = useState(false);
+  const copyResetTimerRef = useRef<number | null>(null);
+  const resumeUrl = `${import.meta.env.BASE_URL}files/resume.pdf`;
+  const resumePreviewImage = `${import.meta.env.BASE_URL}images/resume-photo.png`;
+
+  useEffect(
+    () => () => {
+      if (copyResetTimerRef.current !== null) {
+        window.clearTimeout(copyResetTimerRef.current);
+      }
+    },
+    [],
+  );
 
   const handleCopyEmail = async () => {
     try {
-      await navigator.clipboard.writeText("rpahang2@gmail.com");
+      await navigator.clipboard.writeText(CONTACT_EMAIL);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+
+      if (copyResetTimerRef.current !== null) {
+        window.clearTimeout(copyResetTimerRef.current);
+      }
+      copyResetTimerRef.current = window.setTimeout(() => {
+        setCopied(false);
+        copyResetTimerRef.current = null;
+      }, 2000);
     } catch {
-      window.location.href = "mailto:rpahang2@gmail.com";
+      window.location.href = `mailto:${CONTACT_EMAIL}`;
     }
   };
 
-  const resumeUrl = `${import.meta.env.BASE_URL}files/resume.pdf`;
-
   return (
-    <section id="contact" className="py-12 px-4">
+    <section id="contact" className="mobile-contact-section">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        <div className="mb-6 flex items-center gap-3">
-          <span className="terminal-kicker">04 // contact</span>
-          <span className="h-px flex-1 bg-[var(--terminal-line)]" />
-        </div>
-        <h2 className="terminal-command mb-2 text-xl font-bold">
-          open connection
+        <p className="mobile-contact-kicker">05 // contact</p>
+        <h2 className="mobile-contact-heading">
+          LET&apos;S
+          <br />
+          TALK.
         </h2>
-        <p className="text-zinc-400 text-sm mb-6">
-          Open to opportunities, collaborations, and new connections.
+        <p className="mobile-contact-description">
+          Have an opportunity, a project worth building, or a basketball score
+          to settle? My inbox is open.
         </p>
 
-        {/* Social links grid */}
-        <div className="grid grid-cols-2 gap-3">
-          <SocialButton
-            icon={Github}
-            label="GitHub"
-            href="https://github.com/randyp2"
-          />
-          <SocialButton
-            icon={Linkedin}
-            label="LinkedIn"
-            href="https://linkedin.com/in/randypahangii"
-          />
-          <SocialButton
-            icon={FileDown}
-            label="Resume"
-            href={resumeUrl}
-            download
-          />
-          <SocialButton
-            icon={copied ? Check : Mail}
-            label="Email"
+        <div className="mobile-contact-email">
+          <Mail aria-hidden="true" />
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          <button
+            type="button"
             onClick={handleCopyEmail}
-            copied={copied}
-          />
+            aria-label={copied ? "Email copied" : "Copy email address"}
+          >
+            {copied ? (
+              <Check aria-hidden="true" />
+            ) : (
+              <Copy aria-hidden="true" />
+            )}
+          </button>
         </div>
 
-        {/* Email display */}
-        <p className="text-zinc-500 text-sm text-center mt-6">
-          rpahang2@gmail.com
-        </p>
+        <div className="mobile-contact-resume">
+          <div className="mobile-contact-resume-toolbar">
+            <span>~/files/resume.pdf</span>
+            <div>
+              <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink aria-hidden="true" />
+                OPEN
+              </a>
+              <a href={resumeUrl} download>
+                <Download aria-hidden="true" />
+                SAVE
+              </a>
+            </div>
+          </div>
+          <a
+            className="mobile-contact-resume-preview"
+            href={resumeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open Randy Pahang II resume PDF"
+          >
+            <img src={resumePreviewImage} alt="Preview of Randy Pahang II resume" />
+          </a>
+        </div>
       </motion.div>
     </section>
   );

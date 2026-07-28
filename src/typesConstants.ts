@@ -4,7 +4,7 @@ export const RESTITUTION = 0.6;
 // e = 1.0 = perfectly elastic (no energy loss)
 // e = 0.0 = perfectly inelastic (maximum energy loss)
 // Higher values create a "Newton's cradle" effect where momentum propagates through stacked blocks
-export const BLOCK_RESTITUTION = 0.5;
+export const BLOCK_RESTITUTION = 0.72;
 export const MAX_LAUNCH_SPEED = 3600; // pixels/sec (was 60 pixels/frame * 60 fps)
 export const COEFFICIENT_OF_FRICTION = 0.0005; // Friction coefficient for seconds-based physics (tuned for smooth deceleration)
 // export const SECTION_X = {

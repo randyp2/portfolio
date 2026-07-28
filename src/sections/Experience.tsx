@@ -27,11 +27,15 @@ interface ExperienceProps {
 const CHECKPOINT_Y_PERCENT = [44, 63, 35, 61, 43] as const;
 const JOURNEY_BENDS = [17, -22, 20, -18] as const;
 const CHECKPOINT_X_PERCENT = 15;
-const BALL_MOVEMENT_THRESHOLD_PX_PER_SECOND = 8;
+const BALL_RUN_START_SPEED_PX_PER_SECOND = 90;
+const BALL_RUN_STOP_SPEED_PX_PER_SECOND = 45;
+const BALL_FULL_SPRINT_SPEED_PX_PER_SECOND = 900;
 const CHARACTER_CATCH_RADIUS_PX = 10;
 const CHARACTER_ROUTE_SAMPLE_COUNT = 256;
 const CHARACTER_START_X_PX = 32;
 const CHARACTER_VIEWBOX_HEIGHT = 100;
+const CHARACTER_FAST_RUN_CYCLE_MS = 220;
+const CHARACTER_SLOW_RUN_CYCLE_MS = 420;
 
 const getCheckpointY = (index: number): number =>
   CHECKPOINT_Y_PERCENT[index % CHECKPOINT_Y_PERCENT.length];
@@ -161,9 +165,31 @@ const getRouteY = (
   );
 };
 
+const getRunCycleDuration = (horizontalSpeed: number): number => {
+  const speedRange =
+    BALL_FULL_SPRINT_SPEED_PX_PER_SECOND -
+    BALL_RUN_STOP_SPEED_PX_PER_SECOND;
+  const normalizedSpeed = Math.min(
+    Math.max(
+      (horizontalSpeed - BALL_RUN_STOP_SPEED_PX_PER_SECOND) /
+        speedRange,
+      0,
+    ),
+    1,
+  );
+
+  return (
+    CHARACTER_SLOW_RUN_CYCLE_MS -
+    normalizedSpeed *
+      (CHARACTER_SLOW_RUN_CYCLE_MS -
+        CHARACTER_FAST_RUN_CYCLE_MS)
+  );
+};
+
 /**
- * Chases the ball along the dotted route and keeps sprinting while the ball
- * has measurable velocity, even after entering the catch radius.
+ * Chases the ball along the dotted route and matches its run cycle to the
+ * ball's horizontal speed. Separate start and stop thresholds prevent the
+ * character from flickering between running and idle near rest.
  */
 const ExperienceJourneyCharacter: React.FC<
   ExperienceJourneyCharacterProps
@@ -180,10 +206,10 @@ const ExperienceJourneyCharacter: React.FC<
   const runningRef = useRef(false);
   const directionRef = useRef<CharacterDirection>("right");
   const previousFrameTimeRef = useRef<number | null>(null);
-  const previousBallPositionRef = useRef<BallCoordinates>({
-    x: ballPositionRef.current.x,
-    y: ballPositionRef.current.y,
-  });
+  const previousBallXRef = useRef(ballPositionRef.current.x);
+  const runCycleDurationRef = useRef(
+    CHARACTER_FAST_RUN_CYCLE_MS,
+  );
   const [isRunning, setIsRunning] = useState(false);
   const [direction, setDirection] =
     useState<CharacterDirection>("right");
@@ -199,10 +225,7 @@ const ExperienceJourneyCharacter: React.FC<
     const runSpeed = Math.max(960, viewportWidth * 1.25);
     const routePath = routePathRef.current;
     const routeSamples = routePath ? sampleRoute(routePath) : [];
-    previousBallPositionRef.current.x =
-      ballPositionRef.current.x;
-    previousBallPositionRef.current.y =
-      ballPositionRef.current.y;
+    previousBallXRef.current = ballPositionRef.current.x;
 
     const updateMotionState = (
       nextRunning: boolean,
@@ -228,17 +251,18 @@ const ExperienceJourneyCharacter: React.FC<
       previousFrameTimeRef.current = now;
 
       const ballPosition = ballPositionRef.current;
-      const previousBallPosition = previousBallPositionRef.current;
-      const ballDeltaX = ballPosition.x - previousBallPosition.x;
-      const ballDeltaY = ballPosition.y - previousBallPosition.y;
-      const ballSpeed =
+      const ballDeltaX =
+        ballPosition.x - previousBallXRef.current;
+      const horizontalBallSpeed =
         deltaTime > 0
-          ? Math.hypot(ballDeltaX, ballDeltaY) / deltaTime
+          ? Math.abs(ballDeltaX) / deltaTime
           : 0;
       const isBallMoving =
-        ballSpeed > BALL_MOVEMENT_THRESHOLD_PX_PER_SECOND;
-      previousBallPosition.x = ballPosition.x;
-      previousBallPosition.y = ballPosition.y;
+        horizontalBallSpeed >
+        (runningRef.current
+          ? BALL_RUN_STOP_SPEED_PX_PER_SECOND
+          : BALL_RUN_START_SPEED_PX_PER_SECOND);
+      previousBallXRef.current = ballPosition.x;
 
       const targetX = Math.min(
         Math.max(
@@ -275,6 +299,24 @@ const ExperienceJourneyCharacter: React.FC<
       }
 
       const runner = runnerRef.current;
+      const animationSpeed = isOutsideCatchRadius
+        ? runSpeed
+        : horizontalBallSpeed;
+      const nextRunCycleDuration = Math.round(
+        getRunCycleDuration(animationSpeed) / 20,
+      ) * 20;
+
+      if (
+        runner &&
+        runCycleDurationRef.current !== nextRunCycleDuration
+      ) {
+        runCycleDurationRef.current = nextRunCycleDuration;
+        runner.style.setProperty(
+          "--experience-run-cycle-duration",
+          `${nextRunCycleDuration}ms`,
+        );
+      }
+
       const journeyHeight =
         runner?.parentElement?.clientHeight ?? window.innerHeight;
       const routeY = routeSamples.length > 1

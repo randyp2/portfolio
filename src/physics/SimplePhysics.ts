@@ -37,6 +37,16 @@ export class SimplePhysics {
   private static readonly HORIZONTAL_SLEEP_SPEED = 5;
   private static readonly VERTICAL_SLEEP_SPEED = 40;
   private static readonly GRAVITY_STEP_SLEEP_MULTIPLIER = 1.25;
+  private static readonly MAX_PHYSICS_STEP_SECONDS = 1 / 120;
+  private static readonly BLOCK_BLAST_RADIUS = 260;
+  private static readonly MIN_BLOCK_BLAST_SPEED = 220;
+  private static readonly MAX_BLOCK_BLAST_INPUT_SPEED = 3600;
+  private static readonly MAX_BLOCK_SPEED = 3200;
+  private static readonly DIRECT_BLAST_HORIZONTAL_SCALE = 0.3;
+  private static readonly DIRECT_BLAST_LIFT_SCALE = 0.75;
+  private static readonly RADIAL_BLAST_SCALE = 0.9;
+  private static readonly RADIAL_BLAST_VERTICAL_SCALE = 0.35;
+  private static readonly RADIAL_BLAST_LIFT_SCALE = 0.65;
 
   /* ---------- Primary Ball (single projectile) ---------- */
   body: PhysicsEntity;
@@ -189,7 +199,22 @@ export class SimplePhysics {
      UPDATE LOOP
      ============================================================ */
 
+  /**
+   * Advances the simulation with fixed-size substeps for stable fast impacts.
+   */
   update(dt: number) {
+    const substepCount = Math.max(
+      1,
+      Math.ceil(dt / SimplePhysics.MAX_PHYSICS_STEP_SECONDS),
+    );
+    const substepDuration = dt / substepCount;
+
+    for (let index = 0; index < substepCount; index += 1) {
+      this.updateStep(substepDuration);
+    }
+  }
+
+  private updateStep(dt: number) {
     this.updateBall(dt); // Update ball position
     this.updateBlocks(dt); // Update block positions
 
@@ -200,12 +225,9 @@ export class SimplePhysics {
     }
 
     for (let i = 0; i < this.blocks.length; ++i) {
-      for (let j = 0; j < this.blocks.length; ++j) {
+      for (let j = i + 1; j < this.blocks.length; ++j) {
         const block1 = this.blocks[i];
         const block2 = this.blocks[j];
-
-        // No self collision
-        if (i == j) continue;
 
         if (this.blockCollision(block1, block2))
           this.resolveBlockBlockCollision(block1, block2, BLOCK_RESTITUTION);
@@ -589,6 +611,12 @@ export class SimplePhysics {
     restitution: number,
   ) {
     this.isBallSleeping = false;
+    const relativeVelocityX = ball.vx - block.vx;
+    const relativeVelocityY = ball.vy - block.vy;
+    const impactSpeed = Math.hypot(
+      relativeVelocityX,
+      relativeVelocityY,
+    );
 
     /* ============================================================
        STEP 1: Calculate block boundaries
@@ -642,6 +670,8 @@ export class SimplePhysics {
       // Reset parabolic motion from new position/velocity
       this.launch = { x0: ball.x, y0: ball.y, vx0: ball.vx, vy0: ball.vy };
       this.t = 0;
+      this.applyBlockBlast(block, impactSpeed);
+      this.emitCollision(impactSpeed);
       block.justCollided = true;
       return;
     }
@@ -685,6 +715,8 @@ export class SimplePhysics {
 
       this.launch = { x0: ball.x, y0: ball.y, vx0: ball.vx, vy0: ball.vy };
       this.t = 0;
+      this.applyBlockBlast(block, impactSpeed);
+      this.emitCollision(impactSpeed);
       block.justCollided = true;
       return;
     }
@@ -762,7 +794,91 @@ export class SimplePhysics {
     this.launch = { x0: ball.x, y0: ball.y, vx0: ball.vx, vy0: ball.vy };
     this.t = 0;
 
+    this.applyBlockBlast(block, impactSpeed);
+    this.emitCollision(impactSpeed);
     block.justCollided = true;
+  }
+
+  /**
+   * Adds an arcade-style radial impulse around the directly hit block.
+   *
+   * The collision resolver still supplies the primary momentum transfer.
+   * This secondary impulse creates a readable blast through nearby blocks.
+   */
+  private applyBlockBlast(
+    impactedBlock: PhysicsEntity,
+    rawImpactSpeed: number,
+  ) {
+    if (rawImpactSpeed < SimplePhysics.MIN_BLOCK_BLAST_SPEED) {
+      return;
+    }
+
+    const impactSpeed = Math.min(
+      rawImpactSpeed,
+      SimplePhysics.MAX_BLOCK_BLAST_INPUT_SPEED,
+    );
+    const horizontalDirection =
+      Math.sign(impactedBlock.x - this.body.x) ||
+      Math.sign(this.body.vx) ||
+      1;
+
+    impactedBlock.vx +=
+      horizontalDirection *
+      impactSpeed *
+      SimplePhysics.DIRECT_BLAST_HORIZONTAL_SCALE;
+    impactedBlock.vy -=
+      impactSpeed * SimplePhysics.DIRECT_BLAST_LIFT_SCALE;
+    impactedBlock.justCollided = true;
+    this.limitBlockSpeed(impactedBlock);
+
+    for (const block of this.blocks) {
+      if (block === impactedBlock) {
+        continue;
+      }
+
+      const distanceX = block.x - impactedBlock.x;
+      const distanceY = block.y - impactedBlock.y;
+      const distance = Math.hypot(distanceX, distanceY);
+
+      if (
+        distance <= 0 ||
+        distance >= SimplePhysics.BLOCK_BLAST_RADIUS
+      ) {
+        continue;
+      }
+
+      const falloff =
+        1 - distance / SimplePhysics.BLOCK_BLAST_RADIUS;
+      const radialSpeed =
+        impactSpeed *
+        SimplePhysics.RADIAL_BLAST_SCALE *
+        falloff;
+      const directionX = distanceX / distance;
+      const directionY = distanceY / distance;
+
+      block.vx += directionX * radialSpeed;
+      block.vy +=
+        directionY *
+          radialSpeed *
+          SimplePhysics.RADIAL_BLAST_VERTICAL_SCALE -
+        impactSpeed *
+          SimplePhysics.RADIAL_BLAST_LIFT_SCALE *
+          falloff;
+      block.justCollided = true;
+      this.limitBlockSpeed(block);
+    }
+  }
+
+  private limitBlockSpeed(block: PhysicsEntity) {
+    const speed = Math.hypot(block.vx, block.vy);
+
+    if (speed <= SimplePhysics.MAX_BLOCK_SPEED) {
+      return;
+    }
+
+    const scale = SimplePhysics.MAX_BLOCK_SPEED / speed;
+    block.vx *= scale;
+    block.vy *= scale;
   }
 
   /**
@@ -918,8 +1034,8 @@ export class SimplePhysics {
       const newVy2: number = ((m2 - m1) * vy2 + 2 * m1 * vy1) / (m1 + m2);
 
       // Apply with restitution to control bounciness
-      // 0.5 reduces bouncing while still allowing some vertical response
-      const verticalRestitution = 0.5;
+      // Preserve enough energy for visible upward chain reactions.
+      const verticalRestitution = restitution;
       block1.vy = newVy1 * verticalRestitution;
       block2.vy = newVy2 * verticalRestitution;
     } else {

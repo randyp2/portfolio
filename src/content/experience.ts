@@ -1,10 +1,22 @@
+/**
+ * A focused outcome worth surfacing within an experience story.
+ */
+export interface ExperienceHighlight {
+  detail: string;
+  title: string;
+}
+
+/**
+ * Narrative content for one checkpoint on the experience journey.
+ */
 export interface ExperiencePathItem {
+  highlights: readonly ExperienceHighlight[];
   organization: string;
   period: string;
   role: string;
-  summary: string;
-  details: readonly string[];
+  story: string;
   tags: readonly string[];
+  thoughts: string;
 }
 
 /**
@@ -15,12 +27,22 @@ export const EXPERIENCE_PATH: readonly ExperiencePathItem[] = [
     organization: "Nevada Help Desk",
     period: "Summer 2022",
     role: "Frontend Intern",
-    summary:
-      "Learned mobile and web development while creating websites for local churches.",
-    details: [
-      "Developed an early foundation in Apple Swift and mobile application development.",
-      "Built websites for local churches using HTML, CSS, JavaScript, and WordPress.",
+    story:
+      "This was the first place where programming stopped feeling like a school exercise. I was learning Swift and web development at the same time, then using both to make practical things for people in the community.",
+    highlights: [
+      {
+        title: "Built for real users",
+        detail:
+          "Created and updated church websites with HTML, CSS, JavaScript, and WordPress.",
+      },
+      {
+        title: "Tried more than one lane",
+        detail:
+          "Explored Swift and mobile development while building my web foundation.",
+      },
     ],
+    thoughts:
+      "Seeing someone actually use what I built was the hook. Software started to feel less like syntax and more like a way to turn an idea into something useful.",
     tags: [
       "Swift",
       "Mobile development",
@@ -32,12 +54,22 @@ export const EXPERIENCE_PATH: readonly ExperiencePathItem[] = [
     organization: "UNLV Academic Success Center",
     period: "2024 - 2025",
     role: "Computer Science Tutor",
-    summary:
-      "Helped UNLV students work through challenging computer science concepts while strengthening my communication skills.",
-    details: [
-      "Adapted explanations to different learning styles and made technical concepts easier to approach.",
-      "Tutored students in C++, automata, data structures, algorithms, and related coursework.",
+    story:
+      "Tutoring put me on the other side of the classroom. I worked with students on C++, automata, data structures, and algorithms, but the real challenge was finding an explanation that made sense to the person sitting across from me.",
+    highlights: [
+      {
+        title: "Made hard ideas approachable",
+        detail:
+          "Adjusted examples and explanations to match how each student learned instead of repeating the textbook.",
+      },
+      {
+        title: "Strengthened my own foundation",
+        detail:
+          "Teaching core computer science topics exposed weak spots in my understanding and pushed me to close them.",
+      },
     ],
+    thoughts:
+      "This role taught me that knowing something and communicating it are different skills. The best explanation is usually the clearest one, not the most technical one.",
     tags: [
       "C++",
       "Data structures",
@@ -50,12 +82,22 @@ export const EXPERIENCE_PATH: readonly ExperiencePathItem[] = [
     organization: "CRJ Services LLC",
     period: "2024 - 2025",
     role: "Lead Full-Stack Developer",
-    summary:
-      "Led a team of more than five developers building an online booking website for a local accounting firm.",
-    details: [
-      "Coordinated development across a five-plus-person team and kept implementation moving toward a shared release.",
-      "Directed development of the firm’s customer-facing website and online appointment-booking workflow.",
+    story:
+      "At CRJ, I helped turn a local accountant's needs into an online booking experience and coordinated the developers building it. It was my first time balancing implementation, team decisions, and a real client's expectations at once.",
+    highlights: [
+      {
+        title: "Led a team of 5+ developers",
+        detail:
+          "Kept responsibilities clear and moved the group toward one consistent release.",
+      },
+      {
+        title: "Turned a request into a workflow",
+        detail:
+          "Helped shape the customer-facing site and appointment flow around how the business actually operated.",
+      },
     ],
+    thoughts:
+      "I learned that leadership is mostly clarity and follow-through. A good technical decision only helps when the team understands it and the client can see why it matters.",
     tags: [
       "Team leadership",
       "Full-stack development",
@@ -67,14 +109,22 @@ export const EXPERIENCE_PATH: readonly ExperiencePathItem[] = [
     organization: "STARS Solution LLC",
     period: "Nov 2025 - Present",
     role: "Software Engineer Intern",
-    summary:
-      "Led development of ZenithAI, a career-guidance system helping Las Vegas-area National Guard members transition into civilian life.",
-    details: [
-      "Developed Spring Boot and FastAPI services deployed through AWS ECS and Fargate for a planned 3.5K+ user pilot.",
-      "Redesigned ZenithAI plan generation as an asynchronous RabbitMQ workflow that streams progress through Server-Sent Events.",
-      "Reduced institution-search latency from 110ms to 37ms with a version-aware Redis cache and database fallback.",
-      "Improved generated recommendations by separating structured and semantic memory, then reranking context before generation.",
+    story:
+      "STARS was my first real experience inside a startup, so I had to get comfortable moving quickly, working through ambiguity, and adapting as the product changed. I led development of ZenithAI, the platform's core agentic feature, and had a lot of fun learning directly from the National Guard members it was built to support.",
+    highlights: [
+      {
+        title: "3x faster institution search",
+        detail:
+          "A Redis cache-aside layer brought lookup time from 110 ms to 37 ms while keeping a safe database fallback.",
+      },
+      {
+        title: "Generation without the frozen screen",
+        detail:
+          "Moved plan generation into RabbitMQ workers and streamed progress with Server-Sent Events instead of holding one blocking request open.",
+      },
     ],
+    thoughts:
+      "Working this closely with end users changed how I approach product engineering. Their feedback often revealed more than an architecture diagram could, and I learned to treat ambiguity as something to explore rather than something to wait out. It also showed me how much I enjoy building AI systems around real human needs.",
     tags: [
       "Spring Boot",
       "FastAPI",
@@ -89,15 +139,23 @@ export const EXPERIENCE_PATH: readonly ExperiencePathItem[] = [
   {
     organization: "JT4, LLC • Las Vegas, NV",
     period: "May 2026 - Present",
-    role: "Software / Systems Engineering Intern — Telemetry Team",
-    summary:
-      "Built real-time telemetry simulation and monitoring tools that let engineers validate flight-test pipelines in the office.",
-    details: [
-      "Created a C++ IRIG-106 Chapter 10 simulator that replaced an estimated $30K of hardware-dependent testing.",
-      "Streamed generated packets at live flight-test rates so ingestion tools could be checked before consuming range time.",
-      "Delivered a PySide6 and Qt dashboard monitoring more than 100 simulated telemetry channels in real time.",
-      "Compared simulator output with recorded range data to establish confidence and support adoption by telemetry teams.",
+    role: "Software / Systems Engineering Intern | Telemetry Team",
+    story:
+      "At JT4, I work much closer to the hardware side of software. I built tools that simulate real flight-test telemetry and make the stream visible, so engineers can validate their pipelines in the office before spending time at a live range.",
+    highlights: [
+      {
+        title: "An estimated $30K in hardware avoided",
+        detail:
+          "Built a C++ IRIG-106 Chapter 10 simulator that replaced hardware-dependent testing for common validation work.",
+      },
+      {
+        title: "100+ channels made visible",
+        detail:
+          "Created a PySide6 and Qt dashboard for watching simulated channel health in real time.",
+      },
     ],
+    thoughts:
+      "Telemetry reinforced that correctness needs evidence. Comparing generated output with recorded range data mattered just as much as writing the simulator because trust is what turns a tool into part of a team's workflow.",
     tags: [
       "C++",
       "PySide6",

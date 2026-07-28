@@ -2,7 +2,11 @@ import {
   motion,
   useReducedMotion,
 } from "framer-motion";
-import React, { useState } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   EXPERIENCE_PATH,
   type ExperiencePathItem,
@@ -47,6 +51,8 @@ export const ExperienceCheckpoint: React.FC<
   onToggle,
   total,
 }) => {
+  const checkpointRef = useRef<HTMLDivElement>(null);
+  const onToggleRef = useRef(onToggle);
   const checkpointNumber = String(index + 1).padStart(2, "0");
   const shouldReduceMotion = useReducedMotion();
   const markerTransition = shouldReduceMotion
@@ -59,8 +65,53 @@ export const ExperienceCheckpoint: React.FC<
         },
       };
 
+  useEffect(() => {
+    onToggleRef.current = onToggle;
+  }, [onToggle]);
+
+  useEffect(() => {
+    if (!expanded) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      event.preventDefault();
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      onToggleRef.current();
+    };
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        checkpointRef.current?.contains(event.target)
+      ) {
+        return;
+      }
+
+      onToggleRef.current();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener(
+        "pointerdown",
+        handlePointerDown,
+      );
+    };
+  }, [expanded]);
+
   return (
     <div
+      ref={checkpointRef}
       className="experience-stop-layout"
       data-expanded={expanded}
     >
@@ -123,14 +174,32 @@ export const ExperienceCheckpoint: React.FC<
             {item.organization}
           </p>
           <h3 className="experience-stop-role">{item.role}</h3>
-          <p className="experience-stop-summary">{item.summary}</p>
 
           <div className="experience-stop-expanded">
-            <ul className="experience-stop-details">
-              {item.details.map((detail) => (
-                <li key={detail}>{detail}</li>
-              ))}
-            </ul>
+            <section className="experience-stop-narrative">
+              <h4>What I worked on</h4>
+              <p>{item.story}</p>
+            </section>
+
+            <section className="experience-stop-highlights">
+              <h4>Worth highlighting</h4>
+              <div>
+                {item.highlights.map((highlight) => (
+                  <article key={highlight.title}>
+                    <strong>{highlight.title}</strong>
+                    <p>{highlight.detail}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="experience-stop-thoughts">
+              <div className="experience-stop-thought-bubble">
+                <h4>My thoughts</h4>
+                <p>{item.thoughts}</p>
+              </div>
+            </section>
+
             <ul
               className="experience-stop-tags"
               aria-label={`${item.role} technologies and outcomes`}

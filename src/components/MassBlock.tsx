@@ -59,14 +59,14 @@ const MassBlock: React.FC<MassBlockProps> = ({ entity, blockRef }) => {
   return (
     <div
       ref={blockRef}
-      className="absolute flex items-center justify-center select-none border border-[#2ed465]/35 bg-[#001d00]/90 shadow-[0_0_18px_rgba(46,212,101,0.1)]"
+      className="skill-physics-block absolute flex items-center justify-center select-none"
       style={{
         width: `${entity.width}px`,
         height: `${entity.height}px`,
         willChange: "transform",
       }}
     >
-      {icon}
+      <span className="skill-physics-block-icon">{icon}</span>
     </div>
   );
 };
