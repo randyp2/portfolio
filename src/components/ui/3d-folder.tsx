@@ -26,25 +26,24 @@ interface AnimatedFolderProps {
   title: string
   projects: Project[]
   className?: string
-  isColliding?: boolean  // External collision trigger from physics
+  collisionTrigger?: number  // Changes for each new physics impact
   isDisabled?: boolean   // Disable folder interaction (shows "0 projects")
 }
 
 export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
-  function AnimatedFolder({ title, projects, className, isColliding, isDisabled }, ref) {
+  function AnimatedFolder({ title, projects, className, collisionTrigger, isDisabled }, ref) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [sourceRect, setSourceRect] = useState<DOMRect | null>(null)
   const [hiddenCardId, setHiddenCardId] = useState<string | null>(null)
-  const [isHovered, setIsHovered] = useState(false)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
 
-  // Handle collision trigger - one-time folder opening (only if not disabled)
+  // A collision opens the folder. Later user toggles do not retrigger this effect.
   useEffect(() => {
-    if (isColliding && !isOpen && !isDisabled) {
-      setIsOpen(true)  // Once open, stays open
+    if (collisionTrigger !== undefined && !isDisabled) {
+      setIsOpen(true)
     }
-  }, [isColliding, isOpen, isDisabled])
+  }, [collisionTrigger, isDisabled])
 
   const setLightboxOpen = useWorldStore((state) => state.setLightboxOpen)
 
@@ -78,55 +77,42 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
   return (
     <>
       <div
-        ref={ref}
         className={cn(
-          "relative flex flex-col items-center justify-center",
-          "terminal-panel p-8",
-          "transition-all duration-500 ease-out",
-          "group cursor-pointer",
+          "project-folder-shell group",
+          isOpen && "is-open",
+          isDisabled && "is-disabled",
           className,
         )}
-        onMouseEnter={() => !isDisabled && setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         onClick={() => {
-          if (!isDisabled) setIsOpen(true)
+          if (!isDisabled) setIsOpen((currentIsOpen) => !currentIsOpen)
         }}
         style={{
-          minWidth: "280px",
-          minHeight: "320px",
-          perspective: "1000px",
+          perspective: "700px",
         }}
       >
-        {/* Subtle background glow on collision */}
-        <div
-          className="absolute inset-0 rounded-2xl transition-opacity duration-500"
-          style={{
-            background: "radial-gradient(circle at 50% 70%, rgba(46,212,101,0.35) 0%, transparent 70%)",
-            opacity: isOpen || isHovered ? 0.12 : 0,
-          }}
-        />
-
-        <div className="relative flex items-center justify-center mb-4" style={{ height: "160px", width: "200px" }}>
+        <div className="project-folder-stage">
           {/* Folder back layer - z-index 10 */}
           <div
-            className="absolute w-32 h-24 bg-folder-back rounded-lg shadow-md"
+            className="project-folder-layer project-folder-back"
             style={{
               transformOrigin: "bottom center",
-              transform: isOpen ? "rotateX(-15deg)" : "rotateX(0deg)",
-              transition: "transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+              transform: isOpen
+                ? "translate(-50%, -50%) translateY(-4px) rotateX(-18deg)"
+                : "translate(-50%, -50%) rotateX(0deg)",
+              transition: "transform 240ms cubic-bezier(0.16, 1, 0.3, 1)",
               zIndex: 10,
             }}
           />
 
           {/* Folder tab - z-index 10 */}
           <div
-            className="absolute w-12 h-4 bg-folder-tab rounded-t-md"
+            className="project-folder-tab"
             style={{
-              top: "calc(50% - 48px - 12px)",
-              left: "calc(50% - 64px + 16px)",
               transformOrigin: "bottom center",
-              transform: isOpen ? "rotateX(-25deg) translateY(-2px)" : "rotateX(0deg)",
-              transition: "transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+              transform: isOpen
+                ? "translateY(-3px) rotateX(-24deg)"
+                : "rotateX(0deg)",
+              transition: "transform 240ms cubic-bezier(0.16, 1, 0.3, 1)",
               zIndex: 10,
             }}
           />
@@ -149,7 +135,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
                 }}
                 image={project.image}
                 title={project.title}
-                delay={index * 80}
+                delay={index * 40}
                 isVisible={isOpen}
                 index={index}
                 onClick={() => handleProjectClick(project, index)}
@@ -160,33 +146,22 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
 
           {/* Folder front layer - z-index 30 */}
           <div
-            className="absolute w-32 h-24 bg-folder-front rounded-lg shadow-lg"
+            ref={ref}
+            className="project-folder-layer project-folder-front"
             style={{
-              top: "calc(50% - 48px + 4px)",
               transformOrigin: "bottom center",
-              transform: isOpen ? "rotateX(25deg) translateY(8px)" : "rotateX(0deg)",
-              transition: "transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+              transform: isOpen
+                ? "translate(-50%, -50%) translateY(14px) rotateX(28deg)"
+                : "translate(-50%, -50%) translateY(5px) rotateX(0deg)",
+              transition: "transform 240ms cubic-bezier(0.16, 1, 0.3, 1)",
               zIndex: 30,
-            }}
-          />
-
-          {/* Folder shine effect - z-index 31 */}
-          <div
-            className="absolute w-32 h-24 rounded-lg overflow-hidden pointer-events-none"
-            style={{
-              top: "calc(50% - 48px + 4px)",
-              background: "linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%)",
-              transformOrigin: "bottom center",
-              transform: isOpen ? "rotateX(25deg) translateY(8px)" : "rotateX(0deg)",
-              transition: "transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1)",
-              zIndex: 31,
             }}
           />
         </div>
 
         {/* Folder title */}
         <h3
-          className="mt-4 font-alfa text-3xl font-bold text-[var(--terminal-green-bright)] transition-all duration-300"
+          className="project-folder-title"
           style={{
             transform: isOpen ? "translateY(4px)" : "translateY(0)",
           }}
@@ -196,7 +171,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
 
         {/* Project count */}
         <p
-          className="text-sm text-muted-foreground transition-all duration-300"
+          className="project-folder-count"
           style={{
             opacity: isOpen ? 0.7 : 1,
           }}
@@ -207,38 +182,23 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
         {/* Collision hint - visual indicator (hidden when disabled) */}
         {!isDisabled && (
           <div
-            className="absolute -bottom-16 left-1/2 flex flex-col items-center gap-2 transition-all duration-300 pointer-events-none"
+            className="project-folder-collision-hint"
             style={{
-              opacity: isOpen ? 0 : 1,
-              transform: isOpen ? "translateX(-50%) translateY(10px)" : "translateX(-50%) translateY(0)",
+              opacity: 1,
+              transform: isOpen ? "translateX(-50%) translateY(6px)" : "translateX(-50%) translateY(0)",
             }}
           >
-            {/* Arrow pointing up */}
-            <svg
-              className="h-6 w-6 animate-bounce text-[var(--terminal-green)]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              style={{
-                filter: "drop-shadow(0 0 8px rgba(46, 212, 101, 0.75))",
-              }}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
-            </svg>
-            {/* Bouncing ball indicator */}
-            <div
-              className="h-4 w-4 animate-bounce rounded-full bg-[var(--terminal-green)]"
-              style={{
-                boxShadow: "0 0 12px rgba(46, 212, 101, 0.9), 0 0 24px rgba(46, 212, 101, 0.45)",
-              }}
-            />
             <span
-              className="mt-1 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.12em] text-[var(--terminal-green-bright)]"
-              style={{
-                textShadow: "0 0 10px rgba(46, 212, 101, 0.7), 0 0 20px rgba(46, 212, 101, 0.35)",
-              }}
+              className={cn(
+                "project-folder-hint-arrow",
+                isOpen && "is-close",
+              )}
             >
-              Hit to open
+              {isOpen ? "×" : "↑"}
+            </span>
+            <span className="project-folder-hint-pixel" />
+            <span className="project-folder-hint-copy">
+              {isOpen ? "Click to close" : "Hit to open"}
             </span>
           </div>
         )}
@@ -651,14 +611,13 @@ export const ProjectCard = forwardRef<HTMLDivElement, ProjectCardProps>(
   ({ image, title, delay, isVisible, index, onClick, isSelected }, ref) => {
     const rotations = [-12, 0, 12]
     const translations = [-55, 0, 55]
+    const transitionDelay = isVisible ? delay : 0
 
     return (
       <div
         ref={ref}
         className={cn(
-          "absolute w-20 h-28 rounded-lg overflow-hidden shadow-xl",
-          "bg-black border border-[#2ed465]/25",
-          "cursor-pointer hover:ring-2 hover:ring-[#2ed465]/50",
+          "project-folder-card",
           isSelected && "opacity-0",
         )}
         style={{
@@ -666,7 +625,7 @@ export const ProjectCard = forwardRef<HTMLDivElement, ProjectCardProps>(
             ? `translateY(-90px) translateX(${translations[index]}px) rotate(${rotations[index]}deg) scale(1)`
             : "translateY(0px) translateX(0px) rotate(0deg) scale(0.5)",
           opacity: isSelected ? 0 : isVisible ? 1 : 0,
-          transition: `all 600ms cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}ms`,
+          transition: `transform 280ms cubic-bezier(0.16, 1, 0.3, 1) ${transitionDelay}ms, opacity 100ms ease-out ${transitionDelay}ms`,
           zIndex: 10 - index,
           left: "-40px",
           top: "-56px",
@@ -676,18 +635,13 @@ export const ProjectCard = forwardRef<HTMLDivElement, ProjectCardProps>(
           onClick()
         }}
       >
-{isVideoFile(image) ? (
+        {isVideoFile(image) ? (
           <video src={image} className="w-full h-full object-cover" autoPlay loop muted playsInline />
         ) : (
           <img src={image || "/placeholder.svg"} alt={title} className="w-full h-full object-cover" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-        <p
-          className="absolute bottom-1.5 left-1.5 right-1.5 text-[10px] font-semibold text-white truncate"
-          style={{ textShadow: "0 1px 2px rgba(0, 0, 0, 0.8)" }}
-        >
-          {title}
-        </p>
+        <div className="project-folder-card-overlay" />
+        <p className="project-folder-card-title">{title}</p>
       </div>
     )
   },

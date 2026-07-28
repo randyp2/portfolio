@@ -54,6 +54,7 @@ const WorldCanvas: React.FC = () => {
   });
   const cameraXRef = useRef<number>(0);
   const lastStoreUpdateRef = useRef<number>(0);
+  const colliderHitSequenceRef = useRef<number>(0);
 
   // Ref map for block DOM elements (for direct DOM manipulation)
   const blockRefsMap = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -75,6 +76,10 @@ const WorldCanvas: React.FC = () => {
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
   const viewportCenterX = viewportWidth / 2;
   const [colliders, setColliders] = useState<COLLIDERES_RECT[]>([]); // Store bounds of glass cards for collision detection
+  const [lastColliderHit, setLastColliderHit] = useState<{
+    title: string;
+    sequence: number;
+  } | null>(null);
 
   /**
    * @brief Set up dynamic sections based on viewport width
@@ -133,6 +138,13 @@ const WorldCanvas: React.FC = () => {
       viewportHeight - 80, // world height
       viewportCenterX, // center of viewpointX
     );
+    physicsRef.current.onColliderCollision = (title: string) => {
+      colliderHitSequenceRef.current += 1;
+      setLastColliderHit({
+        title,
+        sequence: colliderHitSequenceRef.current,
+      });
+    };
 
     // Camera initial position x
     let currentCameraX: number = viewportCenterX;
@@ -287,7 +299,8 @@ const WorldCanvas: React.FC = () => {
     // Update colliders in physics engine to handle collisions
     if (physicsRef.current) {
       const simplifiedColliders: ColliderRect[] = colliders.map(
-        ({ x1: leftX, x2: rightX, y1: topY, y2: bottomY }) => ({
+        ({ title: id, x1: leftX, x2: rightX, y1: topY, y2: bottomY }) => ({
+          id,
           leftX,
           rightX,
           topY,
@@ -390,9 +403,9 @@ const WorldCanvas: React.FC = () => {
         <Projects
           centerX={dynamicSections.projects.x}
           ballX={ballX}
-          ballY={ballY}
           cameraX={cameraX}
           viewportCenterX={viewportCenterX}
+          lastColliderHit={lastColliderHit}
           onBoundsChange={handleCardBounds}
         />
 

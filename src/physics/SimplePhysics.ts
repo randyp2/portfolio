@@ -4,6 +4,7 @@ import {
   GRAVITY_Y,
   RESTITUTION,
 } from "../typesConstants";
+import { circleIntersectsRect } from "./circleRectCollision";
 
 export interface PhysicsEntity {
   id: string;
@@ -23,6 +24,7 @@ export interface PhysicsEntity {
 }
 
 export interface ColliderRect {
+  id: string;
   leftX: number; // Left x coordinate
   rightX: number; // Right x coordinate
   topY: number; // Top y coordinate
@@ -47,9 +49,11 @@ export class SimplePhysics {
   worldHeight: number;
   viewportCenterX: number;
   colliders: ColliderRect[] = []; // Array of rectangles the ball can collide with
+  private activeColliderIds = new Set<string>();
 
   /* ---------- Event Callbacks ---------- */
   onCollision?: (impactSpeed: number) => void;
+  onColliderCollision?: (colliderId: string) => void;
   onLaunch?: () => void; // Optional launch callback function
 
   /* ---------- Internal Launch State ---------- */
@@ -328,8 +332,29 @@ export class SimplePhysics {
       this.emitCollision(impactSpeed);
     }
 
+    const collidersTouchingThisFrame = new Set<string>();
+
     // --- Glass Cards ---
     for (const rect of this.colliders) {
+      if (
+        !circleIntersectsRect(
+          this.body.x,
+          this.body.y,
+          radius,
+          rect.leftX,
+          rect.rightX,
+          rect.topY,
+          rect.bottomY,
+        )
+      ) {
+        continue;
+      }
+
+      collidersTouchingThisFrame.add(rect.id);
+      if (!this.activeColliderIds.has(rect.id)) {
+        this.onColliderCollision?.(rect.id);
+      }
+
       // Calculate how much the ball is overlapping onto the rectangle on all sides
       const overlapRightOfBall: number = this.body.x + radius - rect.leftX;
       const overlapLeftOfBall: number = rect.rightX - (this.body.x - radius);
@@ -397,6 +422,8 @@ export class SimplePhysics {
       };
       this.t = 0;
     }
+
+    this.activeColliderIds = collidersTouchingThisFrame;
   }
 
   private updateGroundedBall(dt: number, radius: number) {

@@ -1881,6 +1881,246 @@ a:focus-visible {
   color: var(--terminal-green-bright);
 }
 
+.project-folder-shell {
+  position: relative;
+  display: flex;
+  min-width: 17.5rem;
+  min-height: 20rem;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  cursor: pointer;
+  flex-direction: column;
+  transform-style: preserve-3d;
+}
+
+.project-folder-shell.is-disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.project-folder-stage {
+  position: relative;
+  width: 13rem;
+  height: 10.5rem;
+  margin-bottom: 0.75rem;
+  transform-style: preserve-3d;
+}
+
+.project-folder-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10rem;
+  height: 7rem;
+  border: 2px solid var(--terminal-line-strong);
+  clip-path: polygon(
+    0 0.55rem,
+    0.55rem 0,
+    calc(100% - 0.55rem) 0,
+    100% 0.55rem,
+    100% 100%,
+    0 100%
+  );
+  image-rendering: pixelated;
+}
+
+.project-folder-back {
+  background:
+    linear-gradient(
+      to bottom,
+      var(--terminal-surface-raised) 0 12%,
+      var(--folder-back) 12% 100%
+    );
+  box-shadow:
+    6px 6px 0 var(--terminal-black),
+    inset 0 0 0 3px var(--terminal-black);
+}
+
+.project-folder-tab {
+  position: absolute;
+  top: 1.15rem;
+  left: 2.5rem;
+  width: 4.75rem;
+  height: 1.5rem;
+  border: 2px solid var(--terminal-line-strong);
+  border-bottom: 0;
+  background: var(--folder-tab);
+  clip-path: polygon(
+    0 0.4rem,
+    0.4rem 0,
+    calc(100% - 0.4rem) 0,
+    100% 0.4rem,
+    100% 100%,
+    0 100%
+  );
+}
+
+.project-folder-front {
+  border-color: var(--terminal-green);
+  background:
+    linear-gradient(
+      to bottom,
+      var(--folder-tab) 0 8%,
+      var(--folder-front) 8% 82%,
+      var(--terminal-surface) 82% 100%
+    );
+  box-shadow:
+    7px 7px 0 var(--terminal-black),
+    inset 0 0 0 3px var(--terminal-black);
+}
+
+.project-folder-front::before,
+.project-folder-front::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.project-folder-front::before {
+  top: 1rem;
+  right: 1rem;
+  left: 1rem;
+  height: 3px;
+  background: var(--terminal-green-bright);
+  opacity: 0.38;
+}
+
+.project-folder-front::after {
+  right: 0.8rem;
+  bottom: 0.8rem;
+  width: 0.65rem;
+  height: 0.65rem;
+  background: var(--terminal-green);
+  box-shadow:
+    -0.9rem 0 0 var(--terminal-surface),
+    0 -0.9rem 0 var(--terminal-surface);
+}
+
+.project-folder-shell:hover .project-folder-front,
+.project-folder-shell:focus-within .project-folder-front {
+  border-color: var(--terminal-green-bright);
+}
+
+.project-folder-title {
+  margin: 0;
+  color: var(--terminal-green-bright);
+  font-family: var(--font-pixel);
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition: transform 140ms ease-out;
+}
+
+.project-folder-count {
+  margin: 0.6rem 0 0;
+  color: var(--terminal-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: opacity 120ms ease-out;
+}
+
+.project-folder-collision-hint {
+  position: absolute;
+  bottom: -4rem;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--terminal-green);
+  pointer-events: none;
+  transition:
+    opacity 120ms ease-out,
+    transform 140ms ease-out;
+}
+
+.project-folder-hint-arrow {
+  font-family: var(--font-pixel);
+  font-size: 1.5rem;
+  line-height: 1;
+  animation: project-folder-hint-step 800ms steps(2, end)
+    infinite;
+}
+
+.project-folder-hint-arrow.is-close {
+  animation: none;
+}
+
+.project-folder-hint-pixel {
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid var(--terminal-green);
+  background: var(--terminal-black);
+  transform: rotate(45deg);
+}
+
+.project-folder-hint-copy {
+  margin-top: 0.25rem;
+  font-family: var(--font-pixel);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.project-folder-card {
+  position: absolute;
+  width: 5rem;
+  height: 7rem;
+  overflow: hidden;
+  border: 2px solid var(--terminal-line-strong);
+  background: var(--terminal-black);
+  clip-path: polygon(
+    0 0.4rem,
+    0.4rem 0,
+    100% 0,
+    100% calc(100% - 0.4rem),
+    calc(100% - 0.4rem) 100%,
+    0 100%
+  );
+  cursor: pointer;
+}
+
+.project-folder-card:hover,
+.project-folder-card:focus-visible {
+  border-color: var(--terminal-green-bright);
+  outline: 2px solid var(--terminal-green);
+  outline-offset: 3px;
+}
+
+.project-folder-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.96) 0 32%,
+    transparent 32% 100%
+  );
+  pointer-events: none;
+}
+
+.project-folder-card-title {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.35rem;
+  left: 0.35rem;
+  overflow: hidden;
+  margin: 0;
+  color: var(--terminal-text);
+  font-family: var(--font-pixel);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .experience-section {
   position: absolute;
   top: 50%;
@@ -2309,6 +2549,11 @@ a:focus-visible {
   left: 0;
   animation: experience-character-idle 1.4s steps(2, end)
     infinite;
+}
+
+.experience-journey-character-runner[data-active="false"]
+  .experience-journey-character-cycle {
+  animation-play-state: paused;
 }
 
 .experience-journey-character {
@@ -2939,6 +3184,17 @@ a:focus-visible {
   }
 }
 
+@keyframes project-folder-hint-step {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -0.35rem;
+  }
+}
+
 @keyframes gravity-chamber-drift {
   0% {
     opacity: 0;
@@ -3066,6 +3322,7 @@ a:focus-visible {
   .github-repository-preview,
   .github-activity-preview,
   .github-activity-day,
+  .project-folder-hint-arrow,
   .experience-journey-edge,
   .experience-journey-route > path,
   .experience-journey-character-cycle,

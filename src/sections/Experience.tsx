@@ -95,6 +95,7 @@ const getCheckpointOpacity = (
 interface ExperienceJourneyCharacterProps {
   ballPositionRef: React.RefObject<BallCoordinates>;
   centerX: number;
+  isActive: boolean;
   journeyWidth: number;
   routePathRef: React.RefObject<SVGPathElement | null>;
   viewportWidth: number;
@@ -169,6 +170,7 @@ const ExperienceJourneyCharacter: React.FC<
 > = ({
   ballPositionRef,
   centerX,
+  isActive,
   journeyWidth,
   routePathRef,
   viewportWidth,
@@ -188,6 +190,11 @@ const ExperienceJourneyCharacter: React.FC<
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
+    if (!isActive) {
+      previousFrameTimeRef.current = null;
+      return;
+    }
+
     let animationFrame = 0;
     const runSpeed = Math.max(960, viewportWidth * 1.25);
     const routePath = routePathRef.current;
@@ -295,6 +302,7 @@ const ExperienceJourneyCharacter: React.FC<
   }, [
     ballPositionRef,
     centerX,
+    isActive,
     journeyWidth,
     routePathRef,
     shouldReduceMotion,
@@ -305,8 +313,9 @@ const ExperienceJourneyCharacter: React.FC<
     <div
       ref={runnerRef}
       className="experience-journey-character-runner"
+      data-active={isActive}
       data-direction={direction}
-      data-running={isRunning}
+      data-running={isActive && isRunning}
       aria-hidden="true"
     >
       <span className="experience-journey-character-cycle">
@@ -353,6 +362,11 @@ const Experience: React.FC<ExperienceProps> = ({
   );
   const routePathRef = useRef<SVGPathElement>(null);
   const journeyWidth = EXPERIENCE_PATH.length * viewportWidth;
+  const journeyStartX = centerX - viewportWidth / 2;
+  const journeyEndX =
+    centerX + journeyWidth - viewportWidth / 2;
+  const isJourneyActive =
+    ballX >= journeyStartX && ballX <= journeyEndX;
   const firstCheckpointOpacity = getCheckpointOpacity(
     ballX,
     centerX,
@@ -400,6 +414,7 @@ const Experience: React.FC<ExperienceProps> = ({
       <ExperienceJourneyCharacter
         ballPositionRef={ballPositionRef}
         centerX={centerX}
+        isActive={isJourneyActive}
         journeyWidth={journeyWidth}
         routePathRef={routePathRef}
         viewportWidth={viewportWidth}
