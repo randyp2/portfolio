@@ -87,10 +87,14 @@ export const ExperienceCheckpoint: React.FC<
     };
 
     const handlePointerDown = (event: PointerEvent) => {
-      if (
-        event.target instanceof Node &&
-        checkpointRef.current?.contains(event.target)
-      ) {
+      const target =
+        event.target instanceof Element
+          ? event.target
+          : event.target instanceof Node
+            ? event.target.parentElement
+            : null;
+
+      if (target?.closest(".experience-stop-layout")) {
         return;
       }
 
@@ -230,9 +234,25 @@ export const ExperienceCheckpoint: React.FC<
 const ExperiencePath: React.FC<ExperiencePathProps> = ({
   items = EXPERIENCE_PATH,
 }) => {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(
-    null,
+  const [expandedIndexes, setExpandedIndexes] = useState<
+    ReadonlySet<number>
+  >(
+    () => new Set(),
   );
+
+  const toggleCheckpoint = (index: number) => {
+    setExpandedIndexes((currentIndexes) => {
+      const nextIndexes = new Set(currentIndexes);
+
+      if (nextIndexes.has(index)) {
+        nextIndexes.delete(index);
+      } else {
+        nextIndexes.add(index);
+      }
+
+      return nextIndexes;
+    });
+  };
 
   return (
     <ol className="experience-mobile-route">
@@ -246,19 +266,11 @@ const ExperiencePath: React.FC<ExperiencePathProps> = ({
           }
         >
           <ExperienceCheckpoint
-            expanded={expandedIndex === index}
+            expanded={expandedIndexes.has(index)}
             index={index}
             item={item}
-            onSelect={() => {
-              setExpandedIndex((currentIndex) =>
-                currentIndex === index ? null : index,
-              );
-            }}
-            onToggle={() => {
-              setExpandedIndex((currentIndex) =>
-                currentIndex === index ? null : index,
-              );
-            }}
+            onSelect={() => toggleCheckpoint(index)}
+            onToggle={() => toggleCheckpoint(index)}
             total={items.length}
           />
         </li>

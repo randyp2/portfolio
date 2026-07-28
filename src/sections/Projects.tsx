@@ -135,7 +135,7 @@ const Projects: React.FC<ProjectsProps> = ({
         projects={[
           {
             id: "p1",
-            image: "/media/portfolio-gen-prev.mp4",
+            image: "/media/portrn.mp4",
             title: "Portfolio Generator",
             description:
               "Generates a portfolio based on user form and user resume",
@@ -193,7 +193,7 @@ const Projects: React.FC<ProjectsProps> = ({
           },
           {
             id: "w2",
-            image: "/media/portfolio-gen-prev.mp4",
+            image: "/media/portrn.mp4",
             title: "Portfolio Generator",
             description:
               "Startup venture: AI-powered portfolio generator that creates personalized portfolios from user forms and resumes",

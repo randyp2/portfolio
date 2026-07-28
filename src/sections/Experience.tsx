@@ -395,8 +395,10 @@ const Experience: React.FC<ExperienceProps> = ({
 }) => {
   const jumpTo = useWorldStore((state) => state.jumpTo);
   const expansionFrameRef = useRef<number>(0);
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(
-    null,
+  const [expandedIndexes, setExpandedIndexes] = useState<
+    ReadonlySet<number>
+  >(
+    () => new Set(),
   );
   const journeyPath = useMemo(
     () => buildJourneyPath(EXPERIENCE_PATH.length),
@@ -423,18 +425,35 @@ const Experience: React.FC<ExperienceProps> = ({
 
   const openCheckpoint = (index: number) => {
     window.cancelAnimationFrame(expansionFrameRef.current);
-    setExpandedIndex(null);
     jumpTo(EXPERIENCE_SECTION_IDS[index]);
 
     expansionFrameRef.current = window.requestAnimationFrame(() => {
-      setExpandedIndex(index);
+      setExpandedIndexes((currentIndexes) => {
+        const nextIndexes = new Set(currentIndexes);
+        nextIndexes.add(index);
+        return nextIndexes;
+      });
+    });
+  };
+
+  const toggleCheckpoint = (index: number) => {
+    setExpandedIndexes((currentIndexes) => {
+      const nextIndexes = new Set(currentIndexes);
+
+      if (nextIndexes.has(index)) {
+        nextIndexes.delete(index);
+      } else {
+        nextIndexes.add(index);
+      }
+
+      return nextIndexes;
     });
   };
 
   return (
     <section
       className="experience-journey"
-      data-checkpoint-open={expandedIndex !== null}
+      data-checkpoint-open={expandedIndexes.size > 0}
       style={{
         left: `${centerX}px`,
         width: `${journeyWidth}px`,
@@ -445,7 +464,9 @@ const Experience: React.FC<ExperienceProps> = ({
         className="experience-journey-header"
         animate={{
           opacity:
-            expandedIndex === null ? firstCheckpointOpacity : 0,
+            expandedIndexes.size === 0
+              ? firstCheckpointOpacity
+              : 0,
         }}
         transition={{ duration: 0.2 }}
       >
@@ -502,15 +523,11 @@ const Experience: React.FC<ExperienceProps> = ({
               }}
             >
               <ExperienceCheckpoint
-                expanded={expandedIndex === index}
+                expanded={expandedIndexes.has(index)}
                 index={index}
                 item={item}
                 onSelect={() => openCheckpoint(index)}
-                onToggle={() => {
-                  setExpandedIndex((currentIndex) =>
-                    currentIndex === index ? null : index,
-                  );
-                }}
+                onToggle={() => toggleCheckpoint(index)}
                 total={EXPERIENCE_PATH.length}
               />
             </motion.li>

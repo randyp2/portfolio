@@ -54,7 +54,6 @@ const mobileSkillIds: SectionId[] = ["languages", "tools", "frameworks"];
 const Navbar: React.FC = () => {
   const jumpTo = useWorldStore((state) => state.jumpTo);
   const resetTo = useWorldStore((state) => state.reset);
-  const [showResumePreview, setShowResumePreview] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isExperienceExpanded, setIsExperienceExpanded] =
     useState(false);
@@ -62,7 +61,6 @@ const Navbar: React.FC = () => {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const resumeUrl = `${import.meta.env.BASE_URL}files/resume.pdf`;
-  const resumePreview = `${import.meta.env.BASE_URL}images/resume-photo.png`;
 
   const handleHomeClick = () => {
     if (isDesktop) {
@@ -226,10 +224,6 @@ const Navbar: React.FC = () => {
             rel="noopener noreferrer"
             className="navbar-icon-link"
             whileTap={{ scale: 0.96 }}
-            onMouseEnter={() => setShowResumePreview(true)}
-            onMouseLeave={() => setShowResumePreview(false)}
-            onFocus={() => setShowResumePreview(true)}
-            onBlur={() => setShowResumePreview(false)}
             aria-label="Download resume"
             title="Resume"
           >
@@ -302,27 +296,6 @@ const Navbar: React.FC = () => {
           )}
         </div>
 
-        <AnimatePresence>
-          {showResumePreview && isDesktop && (
-            <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.98 }}
-              transition={{ duration: 0.16 }}
-              className="terminal-panel pointer-events-none fixed right-6 top-[78px] z-50 w-80 overflow-hidden"
-            >
-              <div className="terminal-titlebar">
-                <span className="terminal-dot" />
-                ~/files/resume.pdf
-              </div>
-              <img
-                src={resumePreview}
-                alt="Resume preview"
-                className="h-48 w-full object-cover opacity-80 grayscale"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.nav>
 
       <AnimatePresence>

@@ -21,7 +21,7 @@ const isVideoFile = (url: string): boolean => {
 const personalProjects: Project[] = [
   {
     id: "p1",
-    image: "/media/portfolio-gen-prev.mp4",
+    image: "/media/portrn.mp4",
     title: "Portfolio Generator",
     description: "Generates a portfolio based on user form and user resume",
     tags: ["Next.js", "TailwindCSS", "Java", "Spring Boot", "Docker", "AWS"],
@@ -62,7 +62,7 @@ const workProjects: Project[] = [
   },
   {
     id: "w2",
-    image: "/media/portfolio-gen-prev.mp4",
+    image: "/media/portrn.mp4",
     title: "Portfolio Generator",
     description:
       "Startup venture: AI-powered portfolio generator that creates personalized portfolios from user forms and resumes",
