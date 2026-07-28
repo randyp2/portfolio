@@ -23,6 +23,7 @@ import {
   SKILL_SECTION_SPACING_MULTIPLIER,
   type SectionId,
   SECTION_ORDER,
+  WORLD_FLOOR_OFFSET,
 } from "../typesConstants";
 import Ball from "./Ball";
 import StarField from "./StarField";
@@ -50,7 +51,7 @@ const WorldCanvas: React.FC = () => {
   const ballRef = useRef<HTMLDivElement>(null);
   const liveBallPositionRef = useRef<BallCoordinates>({
     x: 0,
-    y: window.innerHeight - 80,
+    y: window.innerHeight - WORLD_FLOOR_OFFSET - BALL_RADIUS,
   });
   const cameraXRef = useRef<number>(0);
   const lastStoreUpdateRef = useRef<number>(0);
@@ -132,10 +133,10 @@ const WorldCanvas: React.FC = () => {
     // Initialize physics engine
     physicsRef.current = new SimplePhysics(
       0, // start ballX
-      viewportHeight - 80, // start ballY
+      viewportHeight - WORLD_FLOOR_OFFSET - BALL_RADIUS,
       BALL_RADIUS, // ball radius
       worldWidth + 400, // ending world position
-      viewportHeight - 80, // world height
+      viewportHeight - WORLD_FLOOR_OFFSET, // floor collision plane
       viewportCenterX, // center of viewpointX
     );
     physicsRef.current.onColliderCollision = (title: string) => {
@@ -153,7 +154,9 @@ const WorldCanvas: React.FC = () => {
     // This prevents the ball from briefly appearing at (0,0)
     if (ballRef.current) {
       const initialBallScreenX = 0 + viewportCenterX - currentCameraX;
-      ballRef.current.style.transform = `translate3d(${initialBallScreenX - BALL_RADIUS}px, ${viewportHeight - 80 - BALL_RADIUS}px, 0)`;
+      const initialBallTop =
+        viewportHeight - WORLD_FLOOR_OFFSET - BALL_RADIUS * 2;
+      ballRef.current.style.transform = `translate3d(${initialBallScreenX - BALL_RADIUS}px, ${initialBallTop}px, 0)`;
     }
 
     // Physics/animation loop - using rAF timestamp for frame-rate independent physics
@@ -271,7 +274,8 @@ const WorldCanvas: React.FC = () => {
       setViewportWidth(window.innerWidth);
       setViewportHeight(window.innerHeight);
       if (physicsRef.current) {
-        physicsRef.current.worldHeight = window.innerHeight;
+        physicsRef.current.worldHeight =
+          window.innerHeight - WORLD_FLOOR_OFFSET;
       }
     };
     window.addEventListener("resize", handleResize);
@@ -453,6 +457,12 @@ const WorldCanvas: React.FC = () => {
           ballX={ballX}
         />
       </div>
+
+      <div
+        className="world-floor-line"
+        style={{ bottom: `${WORLD_FLOOR_OFFSET}px` }}
+        aria-hidden="true"
+      />
 
       {/* Block masses - using direct DOM manipulation for smooth 60fps animation */}
       {physicsRef.current?.blocks.map((block) => (

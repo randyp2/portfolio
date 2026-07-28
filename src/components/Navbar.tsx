@@ -260,38 +260,46 @@ const Navbar: React.FC = () => {
             <Linkedin aria-hidden="true" />
           </motion.a>
 
-          <motion.button
-            type="button"
-            className="navbar-icon-link lg:hidden"
-            onClick={() => setIsMobileMenuOpen((current) => !current)}
-            whileTap={{ scale: 0.94 }}
-            aria-label={isMobileMenuOpen ? "Close navigation" : "Open navigation"}
-            aria-expanded={isMobileMenuOpen}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {isMobileMenuOpen ? (
-                <motion.span
-                  key="close"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  <X className="h-4 w-4" />
-                </motion.span>
-              ) : (
-                <motion.span
-                  key="menu"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  <Menu className="h-4 w-4" />
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </motion.button>
+          {!isDesktop && (
+            <motion.button
+              type="button"
+              className="navbar-icon-link"
+              onClick={() =>
+                setIsMobileMenuOpen((current) => !current)
+              }
+              whileTap={{ scale: 0.94 }}
+              aria-label={
+                isMobileMenuOpen
+                  ? "Close navigation"
+                  : "Open navigation"
+              }
+              aria-expanded={isMobileMenuOpen}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {isMobileMenuOpen ? (
+                  <motion.span
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <X className="h-4 w-4" />
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="menu"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <Menu className="h-4 w-4" />
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          )}
         </div>
 
         <AnimatePresence>

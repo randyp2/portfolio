@@ -49,6 +49,8 @@ export const isExperienceSectionId = (
 
 export const FADE_RADIUS = 1500; // How far sections shoudl fade in/out based on distance from ball
 export const BALL_RADIUS = 18;
+/** Distance between the physics floor plane and the viewport bottom. */
+export const WORLD_FLOOR_OFFSET = 80;
 export const CAMERA_LERP = 0.18; // Move 18% of distance towards ball for each frame
 
 export interface BallCoordinates {
