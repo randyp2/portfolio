@@ -6,7 +6,7 @@ Live site: https://randypahangii.vercel.app
 Interactive portfolio built with React and Vite. On desktop it renders a physics-driven “world” you can navigate by dragging and launching a glowing ball; on mobile it switches to a scrollable, card-based layout. Smooth navigation, animated sections, and downloadable assets are included.
 
 ## Features
-- **Desktop experience**: Matter.js physics world with ball navigation, animated folders and sections, and framer-motion transitions.
+- **Desktop experience**: Custom physics world with ball navigation, animated folders and sections, and framer-motion transitions.
 - **Mobile experience**: Responsive, touch-friendly sections (Intro, About, Projects, Skills tabs, Contact) with smooth in-page scrolling.
 - **Projects & media**: Expandable project cards with video/image previews and status tags.
 - **Skills browser**: Tabbed skills grid and carousel preview for languages/tools/frameworks.

@@ -21,6 +21,8 @@ const Ball: React.FC<BallProps> = ({
   isScrolling = false,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [hasBeenInteractedWith, setHasBeenInteractedWith] =
+    useState(false);
   const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
   const [currentMouse, setCurrentMouse] = useState({ x: 0, y: 0 });
   const isLightboxOpen = useWorldStore((state) => state.isLightboxOpen);
@@ -30,6 +32,7 @@ const Ball: React.FC<BallProps> = ({
     // Disable dragging when lightbox is open
     if (isLightboxOpen) return;
 
+    setHasBeenInteractedWith(true);
     setIsDragging(true);
 
     // Save mouse start position for consistent coordinate space
@@ -134,7 +137,8 @@ const Ball: React.FC<BallProps> = ({
     <>
       <div
         ref={ballRef}
-        className="absolute cursor-grab select-none rounded-full border border-[#6be28f] bg-[#2ed465] active:cursor-grabbing"
+        className="portfolio-ball absolute cursor-grab select-none rounded-full border border-[#6be28f] bg-[#2ed465] active:cursor-grabbing"
+        data-unused={!hasBeenInteractedWith}
         style={{
           width: `${BALL_RADIUS * 2}px`,
           height: `${BALL_RADIUS * 2}px`,

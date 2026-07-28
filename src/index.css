@@ -373,6 +373,24 @@
   background: #ffffff;
 }
 
+.portfolio-ball[data-unused="true"] {
+  animation: ball-first-use-glow 1.45s ease-in-out infinite;
+}
+
+.portfolio-ball::after {
+  position: absolute;
+  inset: -0.6rem;
+  border: 1px solid var(--terminal-green-bright);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  content: "";
+}
+
+.portfolio-ball[data-unused="true"]::after {
+  animation: ball-first-use-ring 1.45s ease-out infinite;
+}
+
 .mobile-contact-section {
   padding: 4rem 1rem;
 }
@@ -3761,6 +3779,38 @@ a:focus-visible {
   }
 }
 
+@keyframes ball-first-use-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 28px rgba(46, 212, 101, 0.58),
+      0 0 8px rgba(107, 226, 143, 0.72),
+      inset 0 0 8px rgba(255, 255, 255, 0.35);
+    filter: brightness(1);
+  }
+
+  50% {
+    box-shadow:
+      0 0 76px rgba(46, 212, 101, 0.92),
+      0 0 30px rgba(107, 226, 143, 0.98),
+      inset 0 0 12px rgba(255, 255, 255, 0.65);
+    filter: brightness(1.28);
+  }
+}
+
+@keyframes ball-first-use-ring {
+  0% {
+    opacity: 0.72;
+    transform: scale(0.72);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    transform: scale(1.62);
+  }
+}
+
 @keyframes checkpoint-detail-enter {
   from {
     opacity: 0;
@@ -3789,6 +3839,16 @@ a:focus-visible {
   .experience-journey-character,
   .experience-stop-card,
   .experience-stop-expanded {
+    animation: none;
+  }
+
+  .portfolio-ball[data-unused="true"] {
+    animation: none;
+    outline: 2px solid var(--terminal-green-bright);
+    outline-offset: 0.35rem;
+  }
+
+  .portfolio-ball[data-unused="true"]::after {
     animation: none;
   }
 }
