@@ -2,19 +2,10 @@
 
 import { useState, useRef, useCallback, useEffect, useLayoutEffect, forwardRef } from "react"
 import { cn } from "@/lib/utils"
-import { X, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react"
+import { X, ExternalLink, ChevronLeft, ChevronRight, FileText, Play } from "lucide-react"
 import type React from "react"
 import { useWorldStore } from "@/state/useWorldStore"
-
-interface Project {
-  id: string
-  image: string
-  title: string
-  description?: string
-  tags?: string[]
-  status?: "In Development" | "Finished" | "Archived"
-  link?: string
-}
+import type { Project } from "@/content/projects"
 
 // Helper to detect if media is a video file
 const isVideoFile = (url: string): boolean => {
@@ -24,7 +15,7 @@ const isVideoFile = (url: string): boolean => {
 
 interface AnimatedFolderProps {
   title: string
-  projects: Project[]
+  projects: readonly Project[]
   className?: string
   collisionTrigger?: number  // Changes for each new physics impact
   isDisabled?: boolean   // Disable folder interaction (shows "0 projects")
@@ -127,7 +118,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
               zIndex: 20,
             }}
           >
-            {projects.slice(0, 3).map((project, index) => (
+            {projects.map((project, index) => (
               <ProjectCard
                 key={project.id}
                 ref={(el) => {
@@ -138,6 +129,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
                 delay={index * 40}
                 isVisible={isOpen}
                 index={index}
+                totalProjects={projects.length}
                 onClick={() => handleProjectClick(project, index)}
                 isSelected={hiddenCardId === project.id}
               />
@@ -205,7 +197,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
       </div>
 
       <ImageLightbox
-        projects={projects.slice(0, 3)}
+        projects={projects}
         currentIndex={selectedIndex ?? 0}
         isOpen={selectedIndex !== null}
         onClose={handleCloseLightbox}
@@ -218,7 +210,7 @@ export const AnimatedFolder = forwardRef<HTMLDivElement, AnimatedFolderProps>(
 })
 
 interface ImageLightboxProps {
-  projects: Project[]
+  projects: readonly Project[]
   currentIndex: number
   isOpen: boolean
   onClose: () => void
@@ -240,6 +232,7 @@ function ImageLightbox({
   const [isClosing, setIsClosing] = useState(false)
   const [internalIndex, setInternalIndex] = useState(currentIndex)
   const [isSliding, setIsSliding] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const totalProjects = projects.length
@@ -247,6 +240,12 @@ function ImageLightbox({
   const hasPrev = internalIndex > 0
 
   const currentProject = projects[internalIndex]
+  const readMoreLinks =
+    currentProject?.links.filter(
+      (link) => link.includeInReadMore !== false,
+    ) ?? []
+  const cardLinks =
+    currentProject?.links.filter((link) => link.includeOnCard) ?? []
 
   useEffect(() => {
     if (isOpen && currentIndex !== internalIndex && !isSliding) {
@@ -265,6 +264,7 @@ function ImageLightbox({
     if (isOpen) {
       setInternalIndex(currentIndex)
       setIsSliding(false)
+      setShowDetails(false)
     }
   }, [isOpen, currentIndex])
 
@@ -398,39 +398,94 @@ function ImageLightbox({
             transition: "border-radius 500ms cubic-bezier(0.16, 1, 0.3, 1)",
           }}
         >
-          <div className="relative overflow-hidden">
-            <div
-              className="flex transition-transform duration-400 ease-out"
-              style={{
-                transform: `translateX(-${internalIndex * 100}%)`,
-                transition: isSliding ? "transform 400ms cubic-bezier(0.32, 0.72, 0, 1)" : "none",
-              }}
-            >
-              {projects.map((project) => (
-                isVideoFile(project.image) ? (
-                  <video
-                    key={project.id}
-                    src={project.image}
-                    className="w-full h-auto max-h-[70vh] object-contain bg-background flex-shrink-0"
-                    style={{ minWidth: "100%" }}
-                    onClick={(e) => e.stopPropagation()}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                  />
-                ) : (
-                  <img
-                    key={project.id}
-                    src={project.image || "/placeholder.svg"}
-                    alt={project.title}
-                    className="w-full h-auto max-h-[70vh] object-contain bg-background flex-shrink-0"
-                    style={{ minWidth: "100%" }}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                )
-              ))}
-            </div>
+          <div className="project-lightbox-media relative overflow-hidden">
+            {showDetails ? (
+              <article
+                className="project-lightbox-detail"
+                aria-label={`${currentProject.title} project details`}
+              >
+                <header>
+                  <span className="project-lightbox-detail-path">
+                    project://{currentProject.id}/readme
+                  </span>
+                  <h4>{currentProject.title}</h4>
+                  <p className="project-lightbox-detail-summary">
+                    {currentProject.description}
+                  </p>
+                </header>
+
+                <div className="project-lightbox-detail-copy">
+                  <p>{currentProject.details}</p>
+                </div>
+
+                {readMoreLinks.length > 0 ? (
+                  <footer className="project-lightbox-detail-resources">
+                    <span>Explore further</span>
+                    <nav
+                      className="project-lightbox-detail-links"
+                      aria-label={`${currentProject.title} links`}
+                    >
+                      {readMoreLinks.map((link) => (
+                        <a
+                          key={`${link.label}-${link.href}`}
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <span>{link.label}</span>
+                          <ExternalLink aria-hidden="true" />
+                        </a>
+                      ))}
+                    </nav>
+                  </footer>
+                ) : null}
+              </article>
+            ) : (
+              <div
+                className="flex transition-transform duration-400 ease-out"
+                style={{
+                  transform: `translateX(-${internalIndex * 100}%)`,
+                  transition: isSliding ? "transform 400ms cubic-bezier(0.32, 0.72, 0, 1)" : "none",
+                }}
+              >
+                {projects.map((project) => (
+                  project.embedUrl ? (
+                    <iframe
+                      key={project.id}
+                      src={project.embedUrl}
+                      title={`${project.title} video`}
+                      className="aspect-video w-full flex-shrink-0 bg-black"
+                      style={{ minWidth: "100%" }}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      loading="lazy"
+                      allowFullScreen
+                    />
+                  ) : isVideoFile(project.image) ? (
+                    <video
+                      key={project.id}
+                      src={project.image}
+                      className="w-full h-auto max-h-[70vh] object-contain bg-background flex-shrink-0"
+                      style={{ minWidth: "100%" }}
+                      onClick={(e) => e.stopPropagation()}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                    />
+                  ) : (
+                    <img
+                      key={project.id}
+                      src={project.image || "/placeholder.svg"}
+                      alt={project.title}
+                      className="w-full h-auto max-h-[70vh] object-contain bg-background flex-shrink-0"
+                      style={{ minWidth: "100%" }}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  )
+                ))}
+              </div>
+            )}
 
             {/* Close button - top right of image */}
             <button
@@ -461,7 +516,7 @@ function ImageLightbox({
                 e.stopPropagation()
                 navigatePrev()
               }}
-              disabled={!hasPrev || isSliding}
+              disabled={!hasPrev || isSliding || showDetails}
               className={cn(
                 "absolute left-3 top-1/2 -translate-y-1/2 z-50",
                 "w-12 h-12 flex items-center justify-center",
@@ -472,7 +527,7 @@ function ImageLightbox({
                 "disabled:opacity-0 disabled:pointer-events-none",
               )}
               style={{
-                opacity: animationPhase === "complete" && !isClosing && hasPrev ? 1 : 0,
+                opacity: animationPhase === "complete" && !isClosing && hasPrev && !showDetails ? 1 : 0,
                 transition: "opacity 300ms ease-out 150ms",
               }}
             >
@@ -485,7 +540,7 @@ function ImageLightbox({
                 e.stopPropagation()
                 navigateNext()
               }}
-              disabled={!hasNext || isSliding}
+              disabled={!hasNext || isSliding || showDetails}
               className={cn(
                 "absolute right-3 top-1/2 -translate-y-1/2 z-50",
                 "w-12 h-12 flex items-center justify-center",
@@ -496,7 +551,7 @@ function ImageLightbox({
                 "disabled:opacity-0 disabled:pointer-events-none",
               )}
               style={{
-                opacity: animationPhase === "complete" && !isClosing && hasNext ? 1 : 0,
+                opacity: animationPhase === "complete" && !isClosing && hasNext && !showDetails ? 1 : 0,
                 transition: "opacity 300ms ease-out 150ms",
               }}
             >
@@ -515,7 +570,7 @@ function ImageLightbox({
               transition: "opacity 300ms ease-out 100ms, transform 300ms ease-out 100ms",
             }}
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3">
                   <h3 className="text-lg font-semibold text-white tracking-tight truncate">
@@ -525,7 +580,9 @@ function ImageLightbox({
                     <span
                       className={cn(
                         "px-2 py-0.5 text-xs font-medium rounded-full whitespace-nowrap",
-                        currentProject.status === "Finished"
+                        currentProject.status === "Finished" ||
+                          currentProject.status === "Current Internship" ||
+                          currentProject.status === "1st Place"
                           ? "bg-green-500/20 text-green-400 border border-green-500/30"
                           : currentProject.status === "In Development"
                           ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
@@ -559,6 +616,7 @@ function ImageLightbox({
                       <button
                         key={idx}
                         onClick={() => handleDotClick(idx)}
+                        aria-label={`Show ${projects[idx].title}`}
                         className={cn(
                           "w-2 h-2 rounded-full transition-all duration-300",
                           idx === internalIndex
@@ -571,24 +629,51 @@ function ImageLightbox({
                 </div>
               </div>
 
-              {currentProject?.link && (
-                <a
-                  href={currentProject.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2">
+                <button
+                  type="button"
+                  aria-pressed={showDetails}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    setShowDetails((currentValue) => !currentValue)
+                  }}
                   className={cn(
                     "flex items-center gap-2 px-4 py-2",
-                    "text-sm font-medium text-zinc-300",
-                    "bg-zinc-800 hover:bg-zinc-700",
-                    "rounded-lg border border-zinc-700",
-                    "transition-all duration-200 ease-out",
-                    "hover:text-white",
+                    "text-sm font-medium text-[var(--terminal-green)]",
+                    "bg-black hover:bg-[#001d00]",
+                    "rounded-lg border border-[var(--terminal-line-strong)]",
+                    "transition-colors duration-150",
                   )}
                 >
-                  <span>View</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
+                  {showDetails ? (
+                    <Play className="w-3.5 h-3.5" />
+                  ) : (
+                    <FileText className="w-3.5 h-3.5" />
+                  )}
+                  <span>
+                    {showDetails ? "View media" : "Read more"}
+                  </span>
+                </button>
+
+                {cardLinks.map((link) => (
+                  <a
+                    key={`${link.label}-${link.href}`}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2",
+                      "text-sm font-medium text-[var(--terminal-green)]",
+                      "bg-black hover:bg-[#001d00]",
+                      "rounded-lg border border-[var(--terminal-line-strong)]",
+                      "transition-colors duration-150",
+                    )}
+                  >
+                    <span>{link.label}</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -603,14 +688,21 @@ interface ProjectCardProps {
   delay: number
   isVisible: boolean
   index: number
+  totalProjects: number
   onClick: () => void
   isSelected: boolean
 }
 
 export const ProjectCard = forwardRef<HTMLDivElement, ProjectCardProps>(
-  ({ image, title, delay, isVisible, index, onClick, isSelected }, ref) => {
-    const rotations = [-12, 0, 12]
-    const translations = [-55, 0, 55]
+  ({ image, title, delay, isVisible, index, totalProjects, onClick, isSelected }, ref) => {
+    const centerOffset = index - (totalProjects - 1) / 2
+    const cardSpacing =
+      totalProjects <= 3
+        ? 55
+        : Math.max(30, 138 / (totalProjects - 1))
+    const rotationStep = totalProjects <= 3 ? 12 : 8
+    const rotation = centerOffset * rotationStep
+    const translation = centerOffset * cardSpacing
     const transitionDelay = isVisible ? delay : 0
 
     return (
@@ -622,11 +714,11 @@ export const ProjectCard = forwardRef<HTMLDivElement, ProjectCardProps>(
         )}
         style={{
           transform: isVisible
-            ? `translateY(-90px) translateX(${translations[index]}px) rotate(${rotations[index]}deg) scale(1)`
+            ? `translateY(-90px) translateX(${translation}px) rotate(${rotation}deg) scale(1)`
             : "translateY(0px) translateX(0px) rotate(0deg) scale(0.5)",
           opacity: isSelected ? 0 : isVisible ? 1 : 0,
           transition: `transform 280ms cubic-bezier(0.16, 1, 0.3, 1) ${transitionDelay}ms, opacity 100ms ease-out ${transitionDelay}ms`,
-          zIndex: 10 - index,
+          zIndex: totalProjects - index,
           left: "-40px",
           top: "-56px",
         }}

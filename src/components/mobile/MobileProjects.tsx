@@ -1,76 +1,23 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ExternalLink } from "lucide-react";
+import {
+  ChevronDown,
+  ExternalLink,
+  FileText,
+  Play,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface Project {
-  id: string;
-  image: string;
-  title: string;
-  description?: string;
-  tags?: string[];
-  status?: "In Development" | "Finished" | "Archived";
-  link?: string;
-}
+import {
+  LEARNING_PROJECTS,
+  PERSONAL_PROJECTS,
+  WORK_PROJECTS,
+  type Project,
+} from "@/content/projects";
 
 const isVideoFile = (url: string): boolean => {
   const videoExtensions = [".mp4", ".webm", ".ogg", ".mov"];
   return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
 };
-
-const personalProjects: Project[] = [
-  {
-    id: "p1",
-    image: "/media/portrn.mp4",
-    title: "Portfolio Generator",
-    description: "Generates a portfolio based on user form and user resume",
-    tags: ["Next.js", "TailwindCSS", "Java", "Spring Boot", "Docker", "AWS"],
-    status: "In Development",
-    link: "https://example.com",
-  },
-  {
-    id: "p2",
-    image: "/media/dsa_prev.mp4",
-    title: "DSA Visualizer",
-    description:
-      "Sorting visualizer and linked list visualizer that analyzes sorting algorithms, comparisons, and run times",
-    tags: ["C#", ".NET Framework"],
-    status: "Finished",
-    link: "https://github.com/randyp2/DSA_Visualizer",
-  },
-  {
-    id: "p3",
-    image: "/media/conway_prev.mp4",
-    title: "Conway's Game of Life",
-    description: "Cellular automaton simulation",
-    tags: ["C++", "Raylib"],
-    status: "Finished",
-    link: "https://github.com/randyp2/conways-game-of-life-cpp",
-  },
-];
-
-const workProjects: Project[] = [
-  {
-    id: "w1",
-    image: "/media/crj_prev.mp4",
-    title: "CRJ Website",
-    description:
-      "Lead Full Stack Developer for client website redesign and development",
-    tags: ["Next.js", "Supabase", "Vercel"],
-    status: "In Development",
-    link: "https://example.com",
-  },
-  {
-    id: "w2",
-    image: "/media/portrn.mp4",
-    title: "Portfolio Generator",
-    description:
-      "Startup venture: AI-powered portfolio generator that creates personalized portfolios from user forms and resumes",
-    tags: ["Next.js", "Supabase", "Spring Boot", "AWS", "Docker", "Vercel"],
-    status: "In Development",
-    link: "https://example.com",
-  },
-];
 
 interface MobileProjectCardProps {
   project: Project;
@@ -78,7 +25,22 @@ interface MobileProjectCardProps {
 
 const MobileProjectCard = ({ project }: MobileProjectCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isReadingMore, setIsReadingMore] = useState(false);
   const isVideo = isVideoFile(project.image);
+  const readMoreLinks = project.links.filter(
+    (link) => link.includeInReadMore !== false,
+  );
+  const cardLinks = project.links.filter(
+    (link) => link.includeOnCard,
+  );
+
+  const toggleExpanded = () => {
+    if (isExpanded) {
+      setIsReadingMore(false);
+    }
+
+    setIsExpanded((currentValue) => !currentValue);
+  };
 
   return (
     <motion.div
@@ -90,7 +52,7 @@ const MobileProjectCard = ({ project }: MobileProjectCardProps) => {
     >
       {/* Header - always visible */}
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={toggleExpanded}
         className="w-full text-left"
       >
         <div className="flex items-center gap-4 p-4">
@@ -121,7 +83,9 @@ const MobileProjectCard = ({ project }: MobileProjectCardProps) => {
               <span
                 className={cn(
                   "inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full",
-                  project.status === "Finished"
+                  project.status === "Finished" ||
+                    project.status === "Current Internship" ||
+                    project.status === "1st Place"
                     ? "border border-[var(--terminal-line-strong)] bg-[#001d00] text-[var(--terminal-green)]"
                     : project.status === "In Development"
                     ? "border border-[var(--terminal-line)] bg-black text-[var(--terminal-muted)]"
@@ -154,9 +118,50 @@ const MobileProjectCard = ({ project }: MobileProjectCardProps) => {
             className="overflow-hidden"
           >
             <div className="px-4 pb-4">
-              {/* Full media preview */}
+              {/* Media and project readme share the same stage. */}
               <div className="mb-3 overflow-hidden border border-[var(--terminal-line)] bg-black">
-                {isVideo ? (
+                {isReadingMore ? (
+                  <article className="mobile-project-readme">
+                    <header>
+                      <span>project://{project.id}/readme</span>
+                      <h5>{project.title}</h5>
+                      <p>{project.description}</p>
+                    </header>
+
+                    <div>
+                      <p>{project.details}</p>
+                    </div>
+
+                    {readMoreLinks.length > 0 ? (
+                      <footer>
+                        <span>Explore further</span>
+                        <nav aria-label={`${project.title} links`}>
+                          {readMoreLinks.map((link) => (
+                            <a
+                              key={`${link.label}-${link.href}`}
+                              href={link.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <span>{link.label}</span>
+                              <ExternalLink aria-hidden="true" />
+                            </a>
+                          ))}
+                        </nav>
+                      </footer>
+                    ) : null}
+                  </article>
+                ) : project.embedUrl ? (
+                  <iframe
+                    src={project.embedUrl}
+                    title={`${project.title} video`}
+                    className="aspect-video w-full bg-black"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    loading="lazy"
+                    allowFullScreen
+                  />
+                ) : isVideo ? (
                   <video
                     src={project.image}
                     className="w-full h-auto"
@@ -175,14 +180,16 @@ const MobileProjectCard = ({ project }: MobileProjectCardProps) => {
               </div>
 
               {/* Description */}
-              {project.description && (
+              {!isReadingMore && project.description && (
                 <p className="text-zinc-400 text-sm mb-3">
                   {project.description}
                 </p>
               )}
 
               {/* Tags */}
-              {project.tags && project.tags.length > 0 && (
+              {!isReadingMore &&
+                project.tags &&
+                project.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {project.tags.map((tag) => (
                     <span
@@ -195,18 +202,38 @@ const MobileProjectCard = ({ project }: MobileProjectCardProps) => {
                 </div>
               )}
 
-              {/* Link button */}
-              {project.link && (
-                <a
-                  href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  aria-pressed={isReadingMore}
+                  onClick={() =>
+                    setIsReadingMore(
+                      (currentValue) => !currentValue,
+                    )
+                  }
                   className="terminal-button inline-flex items-center gap-2 px-4 py-2 text-sm font-medium"
                 >
-                  View Project
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
+                  {isReadingMore ? (
+                    <Play className="w-3.5 h-3.5" />
+                  ) : (
+                    <FileText className="w-3.5 h-3.5" />
+                  )}
+                  {isReadingMore ? "View media" : "Read more"}
+                </button>
+
+                {cardLinks.map((link) => (
+                  <a
+                    key={`${link.label}-${link.href}`}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="terminal-button inline-flex items-center gap-2 px-4 py-2 text-sm font-medium"
+                  >
+                    {link.label}
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                ))}
+              </div>
             </div>
           </motion.div>
         )}
@@ -228,7 +255,7 @@ const MobileProjects: React.FC = () => {
         <h3 className="terminal-command mb-3 text-sm font-medium">
           ls ./personal
         </h3>
-        {personalProjects.map((project) => (
+        {PERSONAL_PROJECTS.map((project) => (
           <MobileProjectCard key={project.id} project={project} />
         ))}
       </div>
@@ -238,19 +265,19 @@ const MobileProjects: React.FC = () => {
         <h3 className="terminal-command mb-3 text-sm font-medium">
           ls ./work
         </h3>
-        {workProjects.map((project) => (
+        {WORK_PROJECTS.map((project) => (
           <MobileProjectCard key={project.id} project={project} />
         ))}
       </div>
 
-      {/* Learning - Coming Soon */}
+      {/* Learning Projects */}
       <div>
         <h3 className="terminal-command mb-3 text-sm font-medium">
           ls ./learning
         </h3>
-        <div className="terminal-panel p-6 text-center">
-          <p className="text-zinc-500 text-sm">[empty directory]</p>
-        </div>
+        {LEARNING_PROJECTS.map((project) => (
+          <MobileProjectCard key={project.id} project={project} />
+        ))}
       </div>
     </section>
   );

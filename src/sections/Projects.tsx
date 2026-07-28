@@ -5,6 +5,11 @@ import {
   type COLLIDERES_RECT,
 } from "../typesConstants";
 import { AnimatedFolder } from "../components/ui/3d-folder";
+import {
+  LEARNING_PROJECTS,
+  PERSONAL_PROJECTS,
+  WORK_PROJECTS,
+} from "../content/projects";
 import { ChevronRight } from "lucide-react";
 
 interface ProjectsProps {
@@ -132,44 +137,7 @@ const Projects: React.FC<ProjectsProps> = ({
             ? lastColliderHit.sequence
             : undefined
         }
-        projects={[
-          {
-            id: "p1",
-            image: "/media/portrn.mp4",
-            title: "Portfolio Generator",
-            description:
-              "Generates a portfolio based on user form and user resume",
-            tags: [
-              "Next.js",
-              "TailwindCSS",
-              "Java",
-              "Spring Boot",
-              "Docker",
-              "AWS",
-            ],
-            status: "In Development",
-            link: "https://example.com",
-          },
-          {
-            id: "p2",
-            image: "/media/dsa_prev.mp4",
-            title: "DSA Visualizer",
-            description:
-              "Sorting visualizer and linked list visualizer that analyzes sorting algorithms, comparisons, and run times",
-            tags: ["C#", ".NET Framework"],
-            status: "Finished",
-            link: "https://github.com/randyp2/DSA_Visualizer",
-          },
-          {
-            id: "p3",
-            image: "/media/conway_prev.mp4",
-            title: "Conway's Game of Life",
-            description: "Cellular automaton simulation",
-            tags: ["C++", "Raylib"],
-            status: "Finished",
-            link: "https://github.com/randyp2/conways-game-of-life-cpp",
-          },
-        ]}
+        projects={PERSONAL_PROJECTS}
       />
 
       <AnimatedFolder
@@ -180,35 +148,7 @@ const Projects: React.FC<ProjectsProps> = ({
             ? lastColliderHit.sequence
             : undefined
         }
-        projects={[
-          {
-            id: "w1",
-            image: "/media/crj_prev.mp4",
-            title: "CRJ Website",
-            description:
-              "Lead Full Stack Developer for client website redesign and development",
-            tags: ["Next.js", "Supabase", "Vercel"],
-            status: "In Development",
-            link: "https://example.com",
-          },
-          {
-            id: "w2",
-            image: "/media/portrn.mp4",
-            title: "Portfolio Generator",
-            description:
-              "Startup venture: AI-powered portfolio generator that creates personalized portfolios from user forms and resumes",
-            tags: [
-              "Next.js",
-              "Supabase",
-              "Spring Boot",
-              "AWS",
-              "Docker",
-              "Vercel",
-            ],
-            status: "In Development",
-            link: "https://example.com",
-          },
-        ]}
+        projects={WORK_PROJECTS}
       />
 
       <AnimatedFolder
@@ -219,8 +159,7 @@ const Projects: React.FC<ProjectsProps> = ({
             ? lastColliderHit.sequence
             : undefined
         }
-        isDisabled={true}
-        projects={[]}
+        projects={LEARNING_PROJECTS}
       />
 
       {/* Navigation arrow - keep going indicator */}
