@@ -44,7 +44,7 @@ const AboutMeContent: React.FC<AboutMeContentProps> = ({
               {ABOUT_IDENTITY.role}
             </p>
 
-            <div className="mt-8 space-y-5 text-base leading-relaxed text-[var(--terminal-text)] md:text-lg">
+            <div className="about-readable-copy mt-8 space-y-5 text-base leading-relaxed text-[var(--terminal-text)] md:text-lg">
               <p>{ABOUT_PARAGRAPHS[0]}</p>
               <p className="text-[var(--terminal-muted)]">
                 {ABOUT_PARAGRAPHS[1]}

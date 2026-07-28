@@ -17,10 +17,18 @@ export const COEFFICIENT_OF_FRICTION = 0.0005; // Friction coefficient for secon
 // } as const;
 export const SECTION_SPACING_MULTIPLIER = 1.6; // Multiplier for spacing between sections
 export const SKILL_SECTION_SPACING_MULTIPLIER = 0.5; // Smaller spacing for skill sections (closer together)
+export const EXPERIENCE_SECTION_IDS = [
+  "experience",
+  "experience-unlv-tutor",
+  "experience-crj",
+  "experience-stars",
+  "experience-jt4",
+] as const;
+
 export const SECTION_ORDER = [
   "intro",
   "about",
-  "experience",
+  ...EXPERIENCE_SECTION_IDS,
   "projects",
   "languages",
   "tools",
@@ -29,6 +37,15 @@ export const SECTION_ORDER = [
   "thanks",
 ] as const;
 export type SectionId = (typeof SECTION_ORDER)[number];
+export type ExperienceSectionId =
+  (typeof EXPERIENCE_SECTION_IDS)[number];
+
+export const isExperienceSectionId = (
+  sectionId: SectionId,
+): sectionId is ExperienceSectionId =>
+  (EXPERIENCE_SECTION_IDS as readonly SectionId[]).includes(
+    sectionId,
+  );
 
 export const FADE_RADIUS = 1500; // How far sections shoudl fade in/out based on distance from ball
 export const BALL_RADIUS = 18;

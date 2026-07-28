@@ -13,7 +13,7 @@ const PRIMARY_CLASS_NAME =
 const ACCENT_CLASS_NAME =
   "about-education-program text-[0.78rem] font-bold uppercase tracking-[0.1em] text-[var(--terminal-green)]";
 const DETAIL_CLASS_NAME =
-  "text-[0.95rem] leading-[1.55] text-[var(--terminal-muted)]";
+  "about-readable-copy text-[0.95rem] leading-[1.55] text-[var(--terminal-muted)]";
 
 const DEGREE_TEXT_BLOCKS: readonly DynamicTextBlock[] = [
   {

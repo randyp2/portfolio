@@ -17,6 +17,8 @@ import {
   type BallCoordinates,
   CAMERA_LERP,
   type COLLIDERES_RECT,
+  EXPERIENCE_SECTION_IDS,
+  isExperienceSectionId,
   SECTION_SPACING_MULTIPLIER,
   SKILL_SECTION_SPACING_MULTIPLIER,
   type SectionId,
@@ -93,13 +95,22 @@ const WorldCanvas: React.FC = () => {
       // Use smaller spacing for skill sections (languages, tools) so they're closer together
       if (id === "languages" || id === "tools") {
         x += SKILL_SECTION_SPACING;
+      } else if (isExperienceSectionId(id)) {
+        const checkpointIndex =
+          EXPERIENCE_SECTION_IDS.indexOf(id);
+        const isFinalCheckpoint =
+          checkpointIndex === EXPERIENCE_SECTION_IDS.length - 1;
+
+        x += isFinalCheckpoint
+          ? SECTION_SPACING
+          : viewportWidth;
       } else {
         x += SECTION_SPACING;
       }
     }
 
     return map;
-  }, [SECTION_SPACING, SKILL_SECTION_SPACING]);
+  }, [SECTION_SPACING, SKILL_SECTION_SPACING, viewportWidth]);
 
   /**
    * @brief Initialize physics engine and run animation loop
@@ -370,8 +381,10 @@ const WorldCanvas: React.FC = () => {
         />
 
         <Experience
+          ballPositionRef={liveBallPositionRef}
           centerX={dynamicSections.experience.x}
           ballX={ballX}
+          viewportWidth={viewportWidth}
         />
 
         <Projects

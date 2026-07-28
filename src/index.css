@@ -63,6 +63,8 @@
   --font-terminal: "SFMono-Regular", "Cascadia Code", "Roboto Mono",
     "Liberation Mono", Menlo, Consolas, monospace;
   --font-pixel: "Pixelify Sans", var(--font-terminal);
+  --font-readable: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+    Arial, sans-serif;
   --font-alfa: var(--font-terminal);
 }
 
@@ -752,6 +754,12 @@ a:focus-visible {
   font-family: var(--font-pixel);
 }
 
+.about-details-body,
+.about-readable-copy {
+  font-family: var(--font-readable);
+  letter-spacing: 0.01em;
+}
+
 .about-panel-eyebrow {
   margin: 0 0 2rem;
   color: var(--terminal-green);
@@ -855,18 +863,19 @@ a:focus-visible {
 .about-education-institution {
   margin: 0;
   color: var(--terminal-text);
-  font-family: var(--font-pixel);
+  font-family: var(--font-readable);
   font-size: clamp(1.3rem, 2vw, 1.75rem);
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .about-education-program {
   margin: 0.25rem 0 0;
   color: var(--terminal-green);
-  font-family: var(--font-pixel);
+  font-family: var(--font-readable);
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -874,6 +883,7 @@ a:focus-visible {
   max-width: 34rem;
   margin: 0.65rem 0 0;
   color: var(--terminal-muted);
+  font-family: var(--font-readable);
   font-size: 0.95rem;
   line-height: 1.55;
 }
@@ -1084,6 +1094,7 @@ a:focus-visible {
   max-width: 25rem;
   margin-top: 0.55rem;
   color: var(--terminal-muted);
+  font-family: var(--font-readable);
   font-size: 0.7rem;
   line-height: 1.5;
 }
@@ -1171,6 +1182,7 @@ a:focus-visible {
 .youtube-heading-channel > p {
   margin: 1rem 0 0;
   color: var(--terminal-muted);
+  font-family: var(--font-readable);
   font-size: 0.76rem;
   line-height: 1.6;
 }
@@ -1370,6 +1382,7 @@ a:focus-visible {
 
 .linkedin-post-body {
   margin-top: 0.7rem;
+  font-family: var(--font-readable);
   font-size: 0.68rem;
   line-height: 1.55;
 }
@@ -1567,6 +1580,7 @@ a:focus-visible {
   padding-top: 0.45rem;
   overflow: hidden;
   color: var(--terminal-muted);
+  font-family: var(--font-readable);
   font-size: 0.58rem;
   line-height: 1.35;
   -webkit-box-orient: vertical;
@@ -1658,6 +1672,7 @@ a:focus-visible {
   margin-top: 0.35rem;
   overflow: hidden;
   color: var(--terminal-muted);
+  font-family: var(--font-readable);
   font-size: 0.58rem;
   line-height: 1.35;
   -webkit-box-orient: vertical;
@@ -1869,147 +1884,1016 @@ a:focus-visible {
 .experience-section {
   position: absolute;
   top: 50%;
-  display: grid;
-  padding: 2rem 2.5rem 7.5rem;
-  grid-template-columns: minmax(15rem, 0.65fr) minmax(0, 1.35fr);
-  align-items: start;
-  gap: clamp(3rem, 6vw, 6rem);
+  padding: 2rem 2.5rem 6rem;
   transform: translateY(-50%);
 }
 
 .mobile-experience-section {
+  overflow: hidden;
   padding: 6rem 1.25rem;
 }
 
-.experience-section-header > p {
-  margin: 0 0 1rem;
-  color: var(--terminal-green);
-  font-family: var(--font-pixel);
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+.experience-wave-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
 }
 
-.experience-section-header > h2 {
+.experience-wave-header > h2,
+.experience-wave-header > p {
   margin: 0;
+}
+
+.experience-wave-header > h2 {
   color: var(--terminal-green);
   font-family: var(--font-pixel);
-  font-size: clamp(3.2rem, 5.8vw, 5.8rem);
+  font-size: clamp(3.4rem, 6vw, 6.25rem);
   font-weight: 700;
   line-height: 0.88;
   letter-spacing: -0.04em;
 }
 
-.experience-section-header > span {
-  display: block;
-  max-width: 24rem;
-  margin-top: 1.5rem;
+.experience-wave-header > p {
+  max-width: 27rem;
   color: var(--terminal-muted);
-  font-size: 0.78rem;
+  font-size: 1rem;
   line-height: 1.6;
-}
-
-.experience-timeline {
-  position: relative;
-  display: grid;
-  gap: 1.1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.experience-timeline::before {
-  position: absolute;
-  top: 1rem;
-  bottom: 1rem;
-  left: 9.65rem;
-  width: 1px;
-  content: "";
-  background: var(--terminal-line-strong);
-}
-
-.experience-timeline > li {
-  position: relative;
-  display: grid;
-  grid-template-columns: 8.4rem 2.5rem minmax(0, 1fr);
-  align-items: start;
-}
-
-.experience-timeline-period {
-  padding-top: 0.45rem;
-  color: var(--terminal-muted);
-  font-family: var(--font-pixel);
-  font-size: 0.6rem;
-  letter-spacing: 0.08em;
   text-align: right;
+}
+
+.experience-flow-shell {
+  position: relative;
+  width: 100%;
+  height: clamp(31rem, 57vh, 38rem);
+  margin-top: 1.1rem;
+  border-block: 1px solid var(--terminal-line);
+  background: var(--terminal-black);
+}
+
+.experience-flow {
+  background: transparent;
+}
+
+.experience-flow .react-flow__pane {
+  cursor: default;
+}
+
+.experience-flow .react-flow__node {
+  cursor: default;
+}
+
+.experience-checkpoint {
+  position: relative;
+  width: 10rem;
+  height: 9rem;
+  color: var(--terminal-text);
+}
+
+.experience-checkpoint-pin {
+  display: flex;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  align-items: center;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  flex-direction: column;
+  font: inherit;
+}
+
+.experience-checkpoint-pin:hover .experience-checkpoint-marker,
+.experience-checkpoint-pin:focus-visible .experience-checkpoint-marker,
+.experience-checkpoint[data-expanded="true"]
+  .experience-checkpoint-marker {
+  background: var(--terminal-green-bright);
+  transform: translateY(-0.2rem);
+}
+
+.experience-checkpoint-pin:focus-visible {
+  outline: 1px solid var(--terminal-green);
+  outline-offset: 0.4rem;
+}
+
+.experience-checkpoint-marker {
+  position: relative;
+  display: grid;
+  width: 3.15rem;
+  height: 3.15rem;
+  place-items: center;
+  color: var(--terminal-green-bright);
+  background: var(--terminal-green);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.experience-checkpoint-marker::before {
+  position: absolute;
+  inset: 2px;
+  background: var(--terminal-black);
+  clip-path: inherit;
+  content: "";
+}
+
+.experience-checkpoint-marker > span {
+  position: relative;
+  z-index: 1;
+  color: inherit;
+  font-family: var(--font-pixel);
+  font-size: 0.88rem;
+}
+
+.experience-checkpoint-dot {
+  width: 0.72rem;
+  height: 0.72rem;
+  margin-top: 0.32rem;
+  border: 1px solid var(--terminal-green);
+  background: var(--terminal-green-dark);
+  transform: rotate(45deg);
+}
+
+.experience-checkpoint-label {
+  display: flex;
+  max-width: 10rem;
+  margin-top: 0.65rem;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.experience-checkpoint-label > strong {
+  color: var(--terminal-text);
+  font-family: var(--font-pixel);
+  font-size: 0.88rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.experience-checkpoint-label > time {
+  margin-top: 0.38rem;
+  color: var(--terminal-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.experience-timeline-marker {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  width: 1.75rem;
-  height: 1.75rem;
-  margin-inline: auto;
-  place-items: center;
+.experience-checkpoint-card {
+  position: absolute;
+  z-index: 20;
+  width: 27rem;
+  padding: 1rem 1.1rem;
   border: 1px solid var(--terminal-green);
-  color: var(--terminal-green);
-  background: var(--terminal-black);
-  font-family: var(--font-pixel);
-  font-size: 0.5rem;
+  color: var(--terminal-text);
+  background: rgba(0, 18, 0, 0.98);
+  box-shadow: 0 0 0 1px var(--terminal-black);
+  text-align: left;
+  animation: checkpoint-detail-enter 180ms ease-out both;
 }
 
-.experience-timeline-entry {
-  padding: 0 0 1rem 0.5rem;
+.experience-checkpoint-card[data-placement="below"] {
+  top: 7.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.experience-checkpoint-card[data-placement="below-right"] {
+  top: 6.4rem;
+  left: 50%;
+}
+
+.experience-checkpoint-card[data-placement="above"] {
+  bottom: 7.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.experience-checkpoint-card[data-placement="above-left"] {
+  right: 50%;
+  bottom: 6.4rem;
+}
+
+.experience-checkpoint-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.65rem;
   border-bottom: 1px solid var(--terminal-line);
+  font-family: var(--font-pixel);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.experience-timeline-entry > p,
-.experience-timeline-entry > h3,
-.experience-timeline-entry > span {
-  margin: 0;
-}
-
-.experience-timeline-entry > p {
+.experience-checkpoint-meta > span {
   color: var(--terminal-green);
-  font-size: 0.65rem;
+  font-size: 0.82rem;
+}
+
+.experience-checkpoint-meta > time {
+  color: var(--terminal-muted);
+  font-size: 0.7rem;
+}
+
+.experience-checkpoint-organization,
+.experience-checkpoint-role,
+.experience-checkpoint-summary,
+.experience-checkpoint-details,
+.experience-checkpoint-tags {
+  display: block;
+}
+
+.experience-checkpoint-organization {
+  margin-top: 0.75rem;
+  color: var(--terminal-green);
+  font-family: var(--font-readable);
+  font-size: 0.78rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.experience-timeline-entry > h3 {
+.experience-checkpoint-role {
   margin-top: 0.35rem;
   color: var(--terminal-text);
-  font-family: var(--font-pixel);
-  font-size: 1rem;
-  line-height: 1.4;
+  font-family: var(--font-readable);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
-.experience-timeline-entry > span {
-  display: block;
+.experience-checkpoint-summary {
   margin-top: 0.45rem;
   color: var(--terminal-muted);
-  font-size: 0.72rem;
+  font-family: var(--font-readable);
+  font-size: 0.88rem;
   line-height: 1.5;
 }
 
-.experience-timeline-entry > ul {
+.experience-checkpoint-details {
+  margin-top: 0.75rem;
+  padding: 0.7rem 0 0 1rem;
+  border-top: 1px solid var(--terminal-line);
+  list-style: none;
+}
+
+.experience-checkpoint-details > li {
+  position: relative;
+  margin-top: 0.4rem;
+  color: var(--terminal-text);
+  font-family: var(--font-readable);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.experience-checkpoint-details > li::before {
+  position: absolute;
+  top: 0;
+  left: -1rem;
+  color: var(--terminal-green);
+  content: ">";
+}
+
+.experience-checkpoint-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
-  margin: 0.65rem 0 0;
+  gap: 0.3rem;
+  margin-top: 0.65rem;
   padding: 0;
   list-style: none;
 }
 
-.experience-timeline-entry > ul > li {
-  padding: 0.18rem 0.35rem;
+.experience-checkpoint-tags > li {
+  padding: 0.18rem 0.34rem;
   border: 1px solid var(--terminal-line);
   color: var(--terminal-green);
-  font-size: 0.52rem;
+  font-size: 0.66rem;
   letter-spacing: 0.05em;
+}
+
+.experience-checkpoint-close {
+  display: block;
+  margin: 0.8rem 0 0 auto;
+  padding: 0;
+  border: 0;
+  color: var(--terminal-green);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.experience-checkpoint-close:hover,
+.experience-checkpoint-close:focus-visible {
+  color: var(--terminal-green-bright);
+}
+
+.experience-checkpoint-handle.react-flow__handle {
+  top: 3.83rem;
+  right: auto;
+  left: 50%;
+  width: 2px;
+  min-width: 0;
+  height: 2px;
+  min-height: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.experience-journey-edge {
+  fill: none;
+  stroke: var(--terminal-green);
+  stroke-width: 2.5;
+  stroke-dasharray: 2 15;
+  stroke-linecap: round;
+  animation: experience-wave-drift 18s linear infinite;
+}
+
+.experience-flow-status {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--terminal-line);
+  color: var(--terminal-muted);
+  background: rgba(0, 0, 0, 0.9);
+  font-size: 0.7rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.experience-flow-status > span:first-child {
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+}
+
+.experience-flow .react-flow__attribution {
+  color: var(--terminal-muted);
+  background: rgba(0, 0, 0, 0.82);
+  font-size: 0.45rem;
+}
+
+.experience-flow .react-flow__attribution a {
+  color: inherit;
+}
+
+.experience-wave-mobile-hint {
+  display: none;
+}
+
+.experience-mobile-character {
+  display: block;
+  width: auto;
+  height: clamp(8rem, 28vw, 11rem);
+  margin: 2rem 0 -2rem 0.25rem;
+  image-rendering: pixelated;
+  object-fit: contain;
+  user-select: none;
+}
+
+.experience-journey {
+  position: absolute;
+  top: 0;
+  height: 100vh;
+  overflow: visible;
+}
+
+.experience-journey-header {
+  position: absolute;
+  top: clamp(2rem, 5vh, 4.5rem);
+  left: clamp(2.5rem, 4vw, 5rem);
+  z-index: 3;
+  max-width: min(45rem, 46vw);
+  pointer-events: none;
+}
+
+.experience-journey-header > h2,
+.experience-journey-header > p {
+  margin: 0;
+}
+
+.experience-journey-header > h2 {
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+  font-size: clamp(5rem, 8vw, 10rem);
+  font-weight: 700;
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+}
+
+.experience-journey-header > p {
+  margin-top: 1.1rem;
+  color: var(--terminal-muted);
+  font-size: clamp(1.05rem, 1.25vw, 1.45rem);
+  line-height: 1.5;
+}
+
+.experience-journey-character-runner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity 180ms ease;
+}
+
+.experience-journey-character-cycle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: experience-character-idle 1.4s steps(2, end)
+    infinite;
+}
+
+.experience-journey-character {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: clamp(8.75rem, 21.45vh, 14.3rem);
+  max-width: none;
+  height: clamp(11rem, 27vh, 18rem);
+  image-rendering: pixelated;
+  object-fit: contain;
+  transform: translate(-50%, -98%) scaleX(1);
+  transform-origin: bottom center;
+  user-select: none;
+}
+
+.experience-journey-character-runner[data-direction="left"]
+  .experience-journey-character {
+  transform: translate(-50%, -98%) scaleX(-1);
+}
+
+.experience-journey-character-sprint {
+  opacity: 0;
+}
+
+.experience-journey-character-runner[data-running="true"]
+  .experience-journey-character-cycle {
+  animation: experience-character-run 240ms steps(2, end) infinite;
+}
+
+.experience-journey-character-runner[data-running="true"]
+  .experience-journey-character-idle {
+  opacity: 0;
+}
+
+.experience-journey-character-runner[data-running="true"]
+  .experience-journey-character-sprint-a {
+  animation: experience-character-sprint-a 240ms steps(1, end)
+    infinite;
+}
+
+.experience-journey-character-runner[data-running="true"]
+  .experience-journey-character-sprint-b {
+  animation: experience-character-sprint-b 240ms steps(1, end)
+    infinite;
+}
+
+.experience-journey[data-checkpoint-open="true"]
+  .experience-journey-character-runner {
+  opacity: 0.18;
+}
+
+.experience-journey-route {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+
+.experience-journey[data-checkpoint-open="true"]
+  .experience-journey-route {
+  opacity: 0.26;
+}
+
+.experience-journey-route > path {
+  fill: none;
+  stroke: var(--terminal-green);
+  stroke-width: 3;
+  stroke-dasharray: 2 17;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  animation: experience-wave-drift 18s linear infinite;
+}
+
+.experience-journey-checkpoints {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.experience-journey-checkpoint {
+  position: absolute;
+  top: 0;
+  height: 100vh;
+  transform-origin: center;
+}
+
+.experience-stop-layout {
+  position: absolute;
+  top: var(--experience-checkpoint-y);
+  left: clamp(4rem, 10vw, 12rem);
+  z-index: 2;
+  display: grid;
+  width: min(78vw, 74rem);
+  align-items: center;
+  gap: clamp(2.25rem, 4vw, 5rem);
+  grid-template-columns:
+    clamp(7rem, 8vw, 10rem)
+    minmax(0, 1fr);
+  transform: translateY(-50%);
+}
+
+.experience-stop-layout:not([data-expanded="true"]) {
+  width: clamp(7rem, 8vw, 10rem);
+  grid-template-columns: 1fr;
+}
+
+.experience-stop-layout[data-expanded="true"] {
+  top: 50%;
+  left: 50%;
+  z-index: 20;
+  display: block;
+  width: min(84vw, 78rem);
+  transform: translate(-50%, -50%);
+}
+
+.experience-stop-marker-button {
+  position: relative;
+  display: grid;
+  width: clamp(6rem, 7vw, 8.5rem);
+  height: clamp(6rem, 7vw, 8.5rem);
+  margin-inline: auto;
+  padding: 0;
+  border: 0;
+  place-items: center;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.experience-stop-marker-button:focus-visible {
+  outline: 2px solid var(--terminal-green-bright);
+  outline-offset: 0.65rem;
+}
+
+.experience-stop-marker {
+  position: relative;
+  display: grid;
+  width: clamp(6rem, 7vw, 8.5rem);
+  height: clamp(6rem, 7vw, 8.5rem);
+  place-items: center;
+  color: var(--terminal-green-bright);
+  background: var(--terminal-green);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.experience-stop-marker::before {
+  position: absolute;
+  inset: 3px;
+  background: var(--terminal-black);
+  clip-path: inherit;
+  content: "";
+}
+
+.experience-stop-marker > span {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-pixel);
+  font-size: clamp(1.25rem, 1.45vw, 1.75rem);
+}
+
+.experience-stop-marker-button:hover .experience-stop-marker,
+.experience-stop-marker-button:focus-visible .experience-stop-marker,
+.experience-stop-layout[data-expanded="true"]
+  .experience-stop-marker {
+  background: var(--terminal-green-bright);
+  transform: translateY(-0.45rem);
+}
+
+.experience-stop-panel-marker {
+  position: absolute;
+  top: -2.7rem;
+  left: -2.9rem;
+  z-index: 3;
+  display: grid;
+  width: clamp(6rem, 7vw, 8.5rem);
+  height: clamp(6rem, 7vw, 8.5rem);
+  padding: 0;
+  border: 0;
+  place-items: center;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.experience-stop-layout[data-expanded="true"]
+  .experience-stop-marker {
+  transform: none;
+}
+
+.experience-stop-panel-marker .experience-stop-marker {
+  width: 100%;
+  height: 100%;
+}
+
+.experience-stop-panel-marker:hover .experience-stop-marker,
+.experience-stop-panel-marker:focus-visible
+  .experience-stop-marker {
+  background: var(--terminal-green-bright);
+}
+
+.experience-stop-panel-marker:focus-visible {
+  outline: 2px solid var(--terminal-green-bright);
+  outline-offset: 0.4rem;
+}
+
+.experience-stop-dot {
+  position: absolute;
+  top: calc(100% + 0.65rem);
+  left: 50%;
+  width: clamp(1.1rem, 1.25vw, 1.5rem);
+  height: clamp(1.1rem, 1.25vw, 1.5rem);
+  border: 2px solid var(--terminal-green);
+  background: var(--terminal-green-dark);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.experience-stop-inspect {
+  position: absolute;
+  top: calc(100% + 3rem);
+  left: 50%;
+  color: var(--terminal-green);
+  font-family: var(--font-pixel);
+  font-size: clamp(0.68rem, 0.75vw, 0.88rem);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.experience-stop-card {
+  --experience-card-padding: clamp(1.5rem, 2.5vw, 3rem);
+
+  position: relative;
+  width: 100%;
+  max-height: calc(100vh - 8.5rem);
+  padding: var(--experience-card-padding);
+  overflow-y: auto;
+  border: 2px solid var(--terminal-line-strong);
+  color: var(--terminal-text);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0, 29, 0, 0.98),
+      rgba(0, 8, 0, 0.99) 38%,
+      rgba(0, 0, 0, 0.99)
+    );
+  box-shadow:
+    inset 0 0 0 4px var(--terminal-black),
+    inset 0 0 0 5px var(--terminal-line);
+  clip-path: polygon(
+    0 1.1rem,
+    1.1rem 0,
+    calc(100% - 1.1rem) 0,
+    100% 1.1rem,
+    100% calc(100% - 1.1rem),
+    calc(100% - 1.1rem) 100%,
+    1.1rem 100%,
+    0 calc(100% - 1.1rem)
+  );
+  scrollbar-color: var(--terminal-green) var(--terminal-black);
+  scrollbar-width: thin;
+  transform-origin: center;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.experience-stop-card::before,
+.experience-stop-card::after {
+  position: absolute;
+  z-index: 2;
+  width: 3.25rem;
+  height: 0.35rem;
+  background: var(--terminal-green-bright);
+  content: "";
+  pointer-events: none;
+}
+
+.experience-stop-card::before {
+  top: 0;
+  left: 2.25rem;
+}
+
+.experience-stop-card::after {
+  right: 2.25rem;
+  bottom: 0;
+}
+
+.experience-stop-card::-webkit-scrollbar {
+  width: 5px;
+}
+
+.experience-stop-card::-webkit-scrollbar-track {
+  background: var(--terminal-black);
+}
+
+.experience-stop-card::-webkit-scrollbar-thumb {
+  background: var(--terminal-green);
+}
+
+.experience-stop-layout[data-expanded="true"]
+  .experience-stop-card {
+  border-color: var(--terminal-green);
+}
+
+.experience-stop-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin:
+    calc(var(--experience-card-padding) * -1)
+    calc(var(--experience-card-padding) * -1)
+    0;
+  padding:
+    clamp(0.8rem, 1vw, 1.1rem)
+    var(--experience-card-padding);
+  border-bottom: 1px solid var(--terminal-line-strong);
+  color: var(--terminal-muted);
+  background: rgba(0, 29, 0, 0.86);
+  font-family: var(--font-pixel);
+  font-size: clamp(0.75rem, 0.85vw, 1rem);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.experience-stop-meta > span {
+  color: var(--terminal-green);
+}
+
+.experience-stop-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.experience-stop-status > i {
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--terminal-green-bright);
+  animation: terminal-blink 1.3s steps(2, end) infinite;
+}
+
+.experience-stop-organization,
+.experience-stop-role,
+.experience-stop-summary {
+  margin: 0;
+}
+
+.experience-stop-organization {
+  margin-top: clamp(1.2rem, 1.8vw, 2rem);
+  color: var(--terminal-green);
+  font-family: var(--font-readable);
+  font-size: clamp(1rem, 1.15vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.experience-stop-role {
+  max-width: 58rem;
+  margin-top: 0.55rem;
+  color: var(--terminal-text);
+  font-family: var(--font-readable);
+  font-size: clamp(2.35rem, 3.7vw, 4.6rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.experience-stop-summary {
+  max-width: 52rem;
+  margin-top: clamp(1rem, 1.5vw, 1.7rem);
+  color: var(--terminal-muted);
+  font-family: var(--font-readable);
+  font-size: clamp(1.1rem, 1.25vw, 1.48rem);
+  line-height: 1.6;
+}
+
+.experience-stop-expanded {
+  animation: checkpoint-detail-enter 180ms ease-out both;
+}
+
+.experience-stop-details {
+  display: grid;
+  gap: 0.65rem;
+  max-width: 54rem;
+  margin: clamp(1.2rem, 1.8vw, 2rem) 0 0;
+  padding: clamp(1rem, 1.5vw, 1.6rem) 0 0 1.35rem;
+  border-top: 1px solid var(--terminal-line);
+  list-style: none;
+}
+
+.experience-stop-details > li {
+  position: relative;
+  color: var(--terminal-text);
+  font-family: var(--font-readable);
+  font-size: clamp(1rem, 1.08vw, 1.26rem);
+  line-height: 1.5;
+}
+
+.experience-stop-details > li::before {
+  position: absolute;
+  top: 0;
+  left: -1.3rem;
+  color: var(--terminal-green);
+  content: ">";
+}
+
+.experience-stop-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 1.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.experience-stop-tags > li {
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--terminal-line-strong);
+  color: var(--terminal-green);
+  font-size: clamp(0.72rem, 0.78vw, 0.9rem);
+  letter-spacing: 0.06em;
+}
+
+.experience-stop-toggle {
+  display: block;
+  margin: clamp(1.2rem, 1.7vw, 1.8rem) 0 0 auto;
+  padding: 0;
+  border: 0;
+  color: var(--terminal-green);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: clamp(0.72rem, 0.78vw, 0.9rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.experience-stop-toggle:hover,
+.experience-stop-toggle:focus-visible {
+  color: var(--terminal-green-bright);
+}
+
+.experience-mobile-route {
+  position: relative;
+  display: grid;
+  gap: 6rem;
+  margin: 4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.experience-mobile-route::before {
+  position: absolute;
+  top: 2rem;
+  bottom: 2rem;
+  left: 2.5rem;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--terminal-green) 0 3px,
+    transparent 3px 15px
+  );
+  content: "";
+}
+
+.experience-mobile-route > li {
+  position: relative;
+}
+
+.experience-mobile-route .experience-stop-layout {
+  position: relative;
+  top: auto;
+  left: auto;
+  display: grid;
+  width: 100%;
+  align-items: start;
+  gap: 1.5rem;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  transform: none;
+}
+
+.experience-mobile-route
+  .experience-stop-layout[data-expanded="true"] {
+  position: relative;
+  top: auto;
+  left: auto;
+  display: block;
+  width: 100%;
+  transform: none;
+}
+
+.experience-mobile-route
+  .experience-stop-layout[data-expanded="true"]
+  .experience-stop-panel-marker {
+  top: -1.75rem;
+  left: -1.25rem;
+  width: 4rem;
+  height: 4rem;
+}
+
+.experience-mobile-route
+  .experience-stop-panel-marker
+  .experience-stop-marker {
+  width: 4rem;
+  height: 4rem;
+}
+
+.experience-mobile-route
+  .experience-stop-layout:not([data-expanded="true"]) {
+  width: 5rem;
+  grid-template-columns: 1fr;
+}
+
+.experience-mobile-route .experience-stop-marker-button {
+  width: 4rem;
+  height: 4rem;
+}
+
+.experience-mobile-route .experience-stop-marker {
+  width: 4rem;
+  height: 4rem;
+}
+
+.experience-mobile-route .experience-stop-marker > span {
+  font-size: 0.9rem;
+}
+
+.experience-mobile-route .experience-stop-dot {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-width: 1px;
+}
+
+.experience-mobile-route .experience-stop-inspect {
+  font-size: 0.56rem;
+}
+
+.experience-mobile-route .experience-stop-card {
+  --experience-card-padding: 1rem;
+
+  max-height: none;
+  padding: var(--experience-card-padding);
+  overflow: visible;
+  background: rgba(0, 0, 0, 0.94);
+}
+
+.experience-mobile-route .experience-stop-meta {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.68rem;
+}
+
+.experience-mobile-route .experience-stop-organization {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+}
+
+.experience-mobile-route .experience-stop-role {
+  font-size: clamp(1.8rem, 8vw, 2.65rem);
+}
+
+.experience-mobile-route .experience-stop-summary {
+  font-size: 1.02rem;
+}
+
+.experience-mobile-route .experience-stop-details > li {
+  font-size: 0.96rem;
+}
+
+.experience-mobile-route .experience-stop-tags > li,
+.experience-mobile-route .experience-stop-toggle {
+  font-size: 0.68rem;
 }
 
 .terminal-app [class*="text-zinc-"],
@@ -2103,6 +2987,74 @@ a:focus-visible {
   }
 }
 
+@keyframes experience-wave-drift {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: -156;
+  }
+}
+
+@keyframes experience-character-idle {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -3px;
+  }
+}
+
+@keyframes experience-character-run {
+  0%,
+  100% {
+    rotate: -1deg;
+    translate: 0 0;
+  }
+
+  50% {
+    rotate: 1deg;
+    translate: 0 -7px;
+  }
+}
+
+@keyframes experience-character-sprint-a {
+  0%,
+  49.999% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes experience-character-sprint-b {
+  0%,
+  49.999% {
+    opacity: 0;
+  }
+
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes checkpoint-detail-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .terminal-cursor,
   .gravity-chamber-drift,
@@ -2113,7 +3065,13 @@ a:focus-visible {
   .youtube-channel-preview,
   .github-repository-preview,
   .github-activity-preview,
-  .github-activity-day {
+  .github-activity-day,
+  .experience-journey-edge,
+  .experience-journey-route > path,
+  .experience-journey-character-cycle,
+  .experience-journey-character,
+  .experience-stop-card,
+  .experience-stop-expanded {
     animation: none;
   }
 }
@@ -2221,40 +3179,46 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .experience-section-header > h2 {
-    font-size: clamp(3rem, 16vw, 5rem);
+  .experience-wave-header {
+    display: block;
   }
 
-  .experience-section-header > span {
+  .experience-wave-header > h2 {
+    font-size: clamp(3rem, 15vw, 5rem);
+  }
+
+  .experience-wave-header > p {
     margin-top: 1rem;
-  }
-
-  .mobile-experience-section .experience-timeline {
-    margin-top: 3rem;
-  }
-
-  .experience-timeline::before {
-    left: 0.85rem;
-  }
-
-  .experience-timeline > li {
-    grid-template-columns: 2.5rem minmax(0, 1fr);
-  }
-
-  .experience-timeline-period {
-    grid-column: 2;
-    padding-top: 0;
     text-align: left;
   }
 
-  .experience-timeline-marker {
-    grid-row: 1 / span 2;
-    grid-column: 1;
+  .experience-wave-mobile-hint {
+    display: block;
+    margin: 2rem 0 0;
+    color: var(--terminal-green);
+    font-family: var(--font-pixel);
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
-  .experience-timeline-entry {
-    grid-column: 2;
-    padding-left: 0;
+  .experience-flow-shell {
+    width: calc(100% + 2.5rem);
+    height: 34rem;
+    margin-inline: -1.25rem;
+    border-block-color: var(--terminal-line-strong);
+  }
+
+  .experience-flow-status {
+    left: 0.25rem;
+  }
+
+  .experience-flow-status > span:last-child {
+    display: none;
+  }
+
+  .experience-checkpoint {
+    width: 10rem;
   }
 
   .github-activity-header,
