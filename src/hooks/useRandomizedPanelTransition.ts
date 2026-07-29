@@ -9,6 +9,7 @@ import {
 const DISSOLVE_DURATION_MS = 520;
 const REVEAL_DURATION_MS = 900;
 const MAX_CONTENT_READY_WAIT_MS = 800;
+const TRANSITION_EXCLUDED_SELECTOR = ".about-education-ascii";
 
 type TransitionPhase = "dissolve" | "reveal";
 
@@ -49,7 +50,9 @@ const wrapVisibleCharacters = (root: HTMLElement): HTMLElement[] => {
     if (
       !textNode.data.trim() ||
       !parent ||
-      parent.closest(".sr-only, .invisible, [hidden]")
+      parent.closest(
+        `.sr-only, .invisible, [hidden], ${TRANSITION_EXCLUDED_SELECTOR}`,
+      )
     ) {
       continue;
     }

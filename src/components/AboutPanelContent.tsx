@@ -4,6 +4,7 @@ import {
   type ReactNode,
 } from "react";
 import {
+  ExternalLink,
   FileText,
   Github,
   Linkedin,
@@ -181,6 +182,7 @@ interface LinksDetailsProps {
   navigateFromLinkedIn: (
     destination: LinkedInPreviewDestination,
   ) => void;
+  isTouchInput: boolean;
   selectLink: (label: AboutLinkLabel) => void;
 }
 
@@ -221,6 +223,7 @@ const LinksDetails: React.FC<LinksDetailsProps> = ({
   activeLink,
   handleLinkClick,
   navigateFromLinkedIn,
+  isTouchInput,
   selectLink,
 }) => (
   <div className="about-panel-static-details">
@@ -236,7 +239,9 @@ const LinksDetails: React.FC<LinksDetailsProps> = ({
           <div
             key={link.label}
             className="about-social-link-region"
-            onMouseEnter={() => selectLink(link.label)}
+            onMouseEnter={() => {
+              if (!isTouchInput) selectLink(link.label);
+            }}
           >
             <a
               className={`about-social-link ${
@@ -288,6 +293,21 @@ const LinksDetails: React.FC<LinksDetailsProps> = ({
       })}
     </div>
 
+    {isTouchInput && activeLink ? (
+      <a
+        className="about-social-mobile-action"
+        href={getLinkHref(
+          activeLink.href,
+          activeLink.usesBasePath,
+        )}
+        target={activeLink.newTab ? "_blank" : undefined}
+        rel={activeLink.newTab ? "noreferrer" : undefined}
+      >
+        <span>Open {activeLink.label}</span>
+        <ExternalLink aria-hidden="true" />
+      </a>
+    ) : null}
+
     {activeLink?.label === "GitHub" ? (
       <div
         id="github-activity-preview"
@@ -305,7 +325,8 @@ const LinksDetails: React.FC<LinksDetailsProps> = ({
       <SocialLinkPreview link={activeLink} />
     ) : (
       <p className="about-social-hover-prompt">
-        Hover over a link:<span className="terminal-cursor" />
+        {isTouchInput ? "Tap a link to preview:" : "Hover over a link:"}
+        <span className="terminal-cursor" />
       </p>
     )}
   </div>
@@ -313,6 +334,9 @@ const LinksDetails: React.FC<LinksDetailsProps> = ({
 
 const LinksPanel: React.FC = () => {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const isTouchInput = useMediaQuery(
+    "(hover: none), (pointer: coarse)",
+  );
   const jumpTo = useWorldStore((state) => state.jumpTo);
   const [activeLinkLabel, setActiveLinkLabel] =
     useState<AboutLinkLabel | null>(null);
@@ -324,10 +348,7 @@ const LinksPanel: React.FC = () => {
     event: MouseEvent<HTMLAnchorElement>,
     label: AboutLinkLabel,
   ) => {
-    if (
-      window.matchMedia("(hover: none), (pointer: coarse)").matches &&
-      activeLinkLabel !== label
-    ) {
+    if (isTouchInput) {
       event.preventDefault();
       setActiveLinkLabel(label);
     }
@@ -382,6 +403,7 @@ const LinksPanel: React.FC = () => {
             activeLink={activeLink}
             handleLinkClick={handleLinkClick}
             navigateFromLinkedIn={handleLinkedInNavigation}
+            isTouchInput={isTouchInput}
             selectLink={setActiveLinkLabel}
           />
         }

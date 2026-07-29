@@ -1596,6 +1596,37 @@ a:focus-visible {
   width: 100%;
 }
 
+.about-social-mobile-action {
+  display: flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--terminal-line-strong);
+  color: var(--terminal-green);
+  background: var(--terminal-surface);
+  font-family: var(--font-pixel);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  touch-action: manipulation;
+}
+
+.about-social-mobile-action:hover,
+.about-social-mobile-action:focus-visible,
+.about-social-mobile-action:active {
+  border-color: var(--terminal-green-bright);
+  color: var(--terminal-green-bright);
+  background: #001d00;
+}
+
+.about-social-mobile-action > svg {
+  width: 1rem;
+  height: 1rem;
+}
+
 .about-social-hover-prompt {
   display: flex;
   min-height: 10rem;
