@@ -1596,35 +1596,37 @@ a:focus-visible {
   width: 100%;
 }
 
-.about-social-mobile-action {
-  display: flex;
-  min-height: 3rem;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 1rem;
-  padding: 0.75rem 0.9rem;
-  border: 1px solid var(--terminal-line-strong);
+.randomized-inline-text {
+  display: inline-grid;
+  max-width: 100%;
+  vertical-align: top;
+}
+
+.randomized-inline-text-layer {
+  min-width: 0;
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+.randomized-inline-text-character {
+  display: inline-block;
+}
+
+.randomized-inline-text-layer.is-outgoing
+  .randomized-inline-text-character {
+  animation: randomized-inline-text-out 70ms steps(1, end)
+    var(--random-character-delay) both;
+}
+
+.randomized-inline-text-layer.is-incoming
+  .randomized-inline-text-character {
+  opacity: 0;
+  animation: randomized-inline-text-in 70ms steps(1, end)
+    calc(180ms + var(--random-character-delay)) both;
+}
+
+.about-social-link.is-selected small {
   color: var(--terminal-green);
-  background: var(--terminal-surface);
-  font-family: var(--font-pixel);
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  touch-action: manipulation;
-}
-
-.about-social-mobile-action:hover,
-.about-social-mobile-action:focus-visible,
-.about-social-mobile-action:active {
-  border-color: var(--terminal-green-bright);
-  color: var(--terminal-green-bright);
-  background: #001d00;
-}
-
-.about-social-mobile-action > svg {
-  width: 1rem;
-  height: 1rem;
 }
 
 .about-social-hover-prompt {
@@ -4183,6 +4185,36 @@ a:focus-visible {
   }
 }
 
+@keyframes randomized-inline-text-out {
+  from {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(
+      var(--random-character-x),
+      0.15rem
+    );
+  }
+}
+
+@keyframes randomized-inline-text-in {
+  from {
+    opacity: 0;
+    transform: translate(
+      var(--random-character-x),
+      -0.15rem
+    );
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
 @keyframes gravity-chamber-drift {
   0% {
     opacity: 0;
@@ -4435,6 +4467,16 @@ a:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .randomized-inline-text-layer.is-outgoing {
+    display: none;
+  }
+
+  .randomized-inline-text-layer.is-incoming
+    .randomized-inline-text-character {
+    opacity: 1;
+    animation: none;
+  }
+
   .terminal-cursor,
   .gravity-chamber-drift,
   .about-social-selection-preview,

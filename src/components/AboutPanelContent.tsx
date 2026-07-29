@@ -1,10 +1,11 @@
 import {
+  useEffect,
   useState,
+  type CSSProperties,
   type MouseEvent,
   type ReactNode,
 } from "react";
 import {
-  ExternalLink,
   FileText,
   Github,
   Linkedin,
@@ -58,6 +59,113 @@ const LINK_ICONS: Record<
 
 type AboutLink = (typeof ABOUT_LINKS)[number];
 type AboutLinkLabel = AboutLink["label"];
+
+const MOBILE_LINK_ACTION_COPY: Record<AboutLinkLabel, string> = {
+  GitHub: "Open GitHub profile",
+  LinkedIn: "Open LinkedIn profile",
+  Resume: "Open resume",
+  YouTube: "Open YouTube channel",
+};
+
+interface RandomCharacterStyle extends CSSProperties {
+  "--random-character-delay": string;
+  "--random-character-x": string;
+}
+
+interface RandomizedInlineTextProps {
+  text: string;
+}
+
+interface RandomizedInlineTextState {
+  current: string;
+  previous: string | null;
+  revision: number;
+}
+
+const getRandomCharacterStyle = (
+  index: number,
+  revision: number,
+): RandomCharacterStyle => ({
+  "--random-character-delay": `${
+    ((index * 47 + revision * 31) % 17) * 9
+  }ms`,
+  "--random-character-x": `${(index + revision) % 2 === 0 ? -2 : 2}px`,
+});
+
+/**
+ * Dissolves the previous phrase and reveals the next phrase in random order.
+ */
+const RandomizedInlineText: React.FC<
+  RandomizedInlineTextProps
+> = ({ text }) => {
+  const [textState, setTextState] =
+    useState<RandomizedInlineTextState>({
+      current: text,
+      previous: null,
+      revision: 0,
+    });
+
+  useEffect(() => {
+    setTextState((currentState) => {
+      if (currentState.current === text) return currentState;
+
+      return {
+        current: text,
+        previous: currentState.current,
+        revision: currentState.revision + 1,
+      };
+    });
+  }, [text]);
+
+  useEffect(() => {
+    if (!textState.previous) return;
+
+    const timer = window.setTimeout(() => {
+      setTextState((currentState) =>
+        currentState.revision === textState.revision
+          ? { ...currentState, previous: null }
+          : currentState,
+      );
+    }, 430);
+
+    return () => window.clearTimeout(timer);
+  }, [textState.previous, textState.revision]);
+
+  const renderCharacters = (
+    value: string,
+    phase: "current" | "incoming" | "outgoing",
+  ) => (
+    <span
+      className={`randomized-inline-text-layer is-${phase}`}
+      aria-hidden="true"
+    >
+      {Array.from(value).map((character, index) => (
+        <span
+          key={`${textState.revision}-${phase}-${index}`}
+          className="randomized-inline-text-character"
+          style={getRandomCharacterStyle(
+            index,
+            textState.revision,
+          )}
+        >
+          {character}
+        </span>
+      ))}
+    </span>
+  );
+
+  return (
+    <span className="randomized-inline-text" aria-label={text}>
+      {textState.previous
+        ? renderCharacters(textState.previous, "outgoing")
+        : null}
+      {renderCharacters(
+        textState.current,
+        textState.previous ? "incoming" : "current",
+      )}
+    </span>
+  );
+};
 
 const SOCIAL_PREVIEW_COPY: Record<
   Extract<AboutLinkLabel, "Resume">,
@@ -182,7 +290,7 @@ interface LinksDetailsProps {
   navigateFromLinkedIn: (
     destination: LinkedInPreviewDestination,
   ) => void;
-  isTouchInput: boolean;
+  isMobile: boolean;
   selectLink: (label: AboutLinkLabel) => void;
 }
 
@@ -219,11 +327,52 @@ const SocialLinkPreview: React.FC<SocialLinkPreviewProps> = ({
   );
 };
 
+interface SocialHeadingDetailsProps {
+  activeLinkLabel: AboutLinkLabel | null;
+  navigateFromLinkedIn: (
+    destination: LinkedInPreviewDestination,
+  ) => void;
+}
+
+const SocialHeadingDetails: React.FC<
+  SocialHeadingDetailsProps
+> = ({ activeLinkLabel, navigateFromLinkedIn }) => {
+  if (activeLinkLabel === "GitHub") {
+    return (
+      <div
+        id="github-repository-preview"
+        className="github-repository-preview"
+      >
+        <GitHubRecentRepositories username="randyp2" />
+      </div>
+    );
+  }
+
+  if (activeLinkLabel === "LinkedIn") {
+    return (
+      <div
+        id="linkedin-post-preview"
+        className="linkedin-post-preview"
+      >
+        <LinkedInRecentWinPost
+          onNavigate={navigateFromLinkedIn}
+        />
+      </div>
+    );
+  }
+
+  if (activeLinkLabel === "YouTube") {
+    return <YouTubeHeadingPreview />;
+  }
+
+  return null;
+};
+
 const LinksDetails: React.FC<LinksDetailsProps> = ({
   activeLink,
   handleLinkClick,
   navigateFromLinkedIn,
-  isTouchInput,
+  isMobile,
   selectLink,
 }) => (
   <div className="about-panel-static-details">
@@ -240,7 +389,7 @@ const LinksDetails: React.FC<LinksDetailsProps> = ({
             key={link.label}
             className="about-social-link-region"
             onMouseEnter={() => {
-              if (!isTouchInput) selectLink(link.label);
+              if (!isMobile) selectLink(link.label);
             }}
           >
             <a
@@ -263,7 +412,9 @@ const LinksDetails: React.FC<LinksDetailsProps> = ({
               onClick={(event) =>
                 handleLinkClick(event, link.label)
               }
-              onFocus={() => selectLink(link.label)}
+              onFocus={() => {
+                if (!isMobile) selectLink(link.label);
+              }}
             >
               <span className="about-social-link-content">
                 <span
@@ -275,9 +426,15 @@ const LinksDetails: React.FC<LinksDetailsProps> = ({
                 <span>
                   <strong>{link.label}</strong>
                   <small>
-                    {isGitHubLink
-                      ? "Preview repository + activity"
-                      : link.detail}
+                    <RandomizedInlineText
+                      text={
+                        isMobile && isSelected
+                          ? MOBILE_LINK_ACTION_COPY[link.label]
+                          : isGitHubLink
+                            ? "Preview repository + activity"
+                            : link.detail
+                      }
+                    />
                   </small>
                 </span>
               </span>
@@ -293,19 +450,11 @@ const LinksDetails: React.FC<LinksDetailsProps> = ({
       })}
     </div>
 
-    {isTouchInput && activeLink ? (
-      <a
-        className="about-social-mobile-action"
-        href={getLinkHref(
-          activeLink.href,
-          activeLink.usesBasePath,
-        )}
-        target={activeLink.newTab ? "_blank" : undefined}
-        rel={activeLink.newTab ? "noreferrer" : undefined}
-      >
-        <span>Open {activeLink.label}</span>
-        <ExternalLink aria-hidden="true" />
-      </a>
+    {isMobile ? (
+      <SocialHeadingDetails
+        activeLinkLabel={activeLink?.label ?? null}
+        navigateFromLinkedIn={navigateFromLinkedIn}
+      />
     ) : null}
 
     {activeLink?.label === "GitHub" ? (
@@ -325,7 +474,7 @@ const LinksDetails: React.FC<LinksDetailsProps> = ({
       <SocialLinkPreview link={activeLink} />
     ) : (
       <p className="about-social-hover-prompt">
-        {isTouchInput ? "Tap a link to preview:" : "Hover over a link:"}
+        {isMobile ? "Tap a social link to preview:" : "Hover over a link:"}
         <span className="terminal-cursor" />
       </p>
     )}
@@ -334,9 +483,7 @@ const LinksDetails: React.FC<LinksDetailsProps> = ({
 
 const LinksPanel: React.FC = () => {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
-  const isTouchInput = useMediaQuery(
-    "(hover: none), (pointer: coarse)",
-  );
+  const isMobile = !isDesktop;
   const jumpTo = useWorldStore((state) => state.jumpTo);
   const [activeLinkLabel, setActiveLinkLabel] =
     useState<AboutLinkLabel | null>(null);
@@ -348,7 +495,7 @@ const LinksPanel: React.FC = () => {
     event: MouseEvent<HTMLAnchorElement>,
     label: AboutLinkLabel,
   ) => {
-    if (isTouchInput) {
+    if (isMobile && activeLinkLabel !== label) {
       event.preventDefault();
       setActiveLinkLabel(label);
     }
@@ -378,24 +525,11 @@ const LinksPanel: React.FC = () => {
       <AboutMeContent
         heading={["FIND", "ME"]}
         headingDetails={
-          activeLinkLabel === "GitHub" ? (
-            <div
-              id="github-repository-preview"
-              className="github-repository-preview"
-            >
-              <GitHubRecentRepositories username="randyp2" />
-            </div>
-          ) : activeLinkLabel === "LinkedIn" ? (
-            <div
-              id="linkedin-post-preview"
-              className="linkedin-post-preview"
-            >
-              <LinkedInRecentWinPost
-                onNavigate={handleLinkedInNavigation}
-              />
-            </div>
-          ) : activeLinkLabel === "YouTube" ? (
-            <YouTubeHeadingPreview />
+          !isMobile ? (
+            <SocialHeadingDetails
+              activeLinkLabel={activeLinkLabel}
+              navigateFromLinkedIn={handleLinkedInNavigation}
+            />
           ) : null
         }
         details={
@@ -403,7 +537,7 @@ const LinksPanel: React.FC = () => {
             activeLink={activeLink}
             handleLinkClick={handleLinkClick}
             navigateFromLinkedIn={handleLinkedInNavigation}
-            isTouchInput={isTouchInput}
+            isMobile={isMobile}
             selectLink={setActiveLinkLabel}
           />
         }
