@@ -335,7 +335,7 @@
 .contact-resume-preview {
   position: relative;
   height: clamp(31rem, 65vh, 43rem);
-  overflow: hidden;
+  overflow: auto;
   border: 1px solid var(--terminal-line-strong);
   border-top: 0;
   background: #ffffff;
@@ -365,12 +365,27 @@
   border-bottom: 2px solid var(--terminal-green);
 }
 
-.contact-resume-preview > iframe {
-  display: block;
+.resume-preview-document {
   width: 100%;
-  height: 100%;
-  border: 0;
+  min-height: 100%;
   background: #ffffff;
+}
+
+.resume-preview-document .react-pdf__message,
+.resume-preview-status {
+  display: grid;
+  min-height: 12rem;
+  place-items: center;
+  color: #151515;
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+}
+
+.resume-preview-document canvas {
+  display: block;
+  max-width: 100%;
+  height: auto !important;
 }
 
 .portfolio-ball[data-unused="true"] {
@@ -740,18 +755,10 @@
 .mobile-contact-resume-preview {
   display: block;
   height: min(130vw, 36rem);
-  overflow: hidden;
+  overflow: auto;
   border: 1px solid var(--terminal-line-strong);
   border-top: 0;
   background: #ffffff;
-}
-
-.mobile-contact-resume-preview > img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
 }
 
 .navbar-shell {

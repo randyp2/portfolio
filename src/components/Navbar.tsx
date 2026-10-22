@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { RESUME_URL } from "../lib/resume";
 import { useWorldStore } from "../state/useWorldStore";
 import type {
   ExperienceSectionId,
@@ -59,8 +60,6 @@ const Navbar: React.FC = () => {
     useState(false);
   const [isSkillsExpanded, setIsSkillsExpanded] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
-
-  const resumeUrl = `${import.meta.env.BASE_URL}files/resume.pdf`;
 
   const handleHomeClick = () => {
     if (isDesktop) {
@@ -218,8 +217,8 @@ const Navbar: React.FC = () => {
 
         <div className="pointer-events-auto flex items-center gap-1">
           <motion.a
-            href={resumeUrl}
-            download
+            href={RESUME_URL}
+            download="Randy-Pahang-II-Resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="navbar-icon-link"

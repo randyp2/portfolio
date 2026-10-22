@@ -1,14 +1,14 @@
 import { motion } from "framer-motion";
 import { Check, Copy, Download, ExternalLink, Mail } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { RESUME_URL } from "../../lib/resume";
+import ResumePreview from "../ResumePreview";
 
 const CONTACT_EMAIL = "rpahang2@gmail.com";
 
 const MobileContact: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const copyResetTimerRef = useRef<number | null>(null);
-  const resumeUrl = `${import.meta.env.BASE_URL}files/resume.pdf`;
-  const resumePreviewImage = `${import.meta.env.BASE_URL}images/resume-photo.png`;
 
   useEffect(
     () => () => {
@@ -75,25 +75,19 @@ const MobileContact: React.FC = () => {
           <div className="mobile-contact-resume-toolbar">
             <span>~/files/resume.pdf</span>
             <div>
-              <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
+              <a href={RESUME_URL} target="_blank" rel="noopener noreferrer">
                 <ExternalLink aria-hidden="true" />
                 OPEN
               </a>
-              <a href={resumeUrl} download>
+              <a href={RESUME_URL} download="Randy-Pahang-II-Resume.pdf">
                 <Download aria-hidden="true" />
                 SAVE
               </a>
             </div>
           </div>
-          <a
-            className="mobile-contact-resume-preview"
-            href={resumeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open Randy Pahang II resume PDF"
-          >
-            <img src={resumePreviewImage} alt="Preview of Randy Pahang II resume" />
-          </a>
+          <div className="mobile-contact-resume-preview">
+            <ResumePreview src={RESUME_URL} />
+          </div>
         </div>
       </motion.div>
     </section>

@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { Check, Copy, Download, ExternalLink, Mail } from "lucide-react";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import ResumePreview from "../components/ResumePreview";
+import { RESUME_URL } from "../lib/resume";
 import { FADE_RADIUS, type COLLIDERES_RECT } from "../typesConstants";
 
 interface ContactProps {
@@ -91,9 +93,6 @@ const Contact: React.FC<ContactProps> = ({
     }
   };
 
-  const resumeUrl = `${import.meta.env.BASE_URL}files/resume.pdf`;
-  const resumePreviewUrl = `${resumeUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
-
   return (
     <motion.section
       ref={sectionRef}
@@ -161,11 +160,11 @@ const Contact: React.FC<ContactProps> = ({
               <span>~/files/resume.pdf</span>
             </div>
             <div className="contact-resume-actions">
-              <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
+              <a href={RESUME_URL} target="_blank" rel="noopener noreferrer">
                 <ExternalLink aria-hidden="true" />
                 OPEN
               </a>
-              <a href={resumeUrl} download>
+              <a href={RESUME_URL} download="Randy-Pahang-II-Resume.pdf">
                 <Download aria-hidden="true" />
                 DOWNLOAD
               </a>
@@ -173,11 +172,7 @@ const Contact: React.FC<ContactProps> = ({
           </div>
 
           <div ref={resumePreviewRef} className="contact-resume-preview">
-            <iframe
-              src={resumePreviewUrl}
-              title="Randy Pahang II resume PDF preview"
-              loading="lazy"
-            />
+            <ResumePreview src={RESUME_URL} />
           </div>
         </motion.div>
       </div>

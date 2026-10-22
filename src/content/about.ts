@@ -1,3 +1,5 @@
+import { RESUME_URL } from "../lib/resume";
+
 /**
  * Identity details shared by static and interactive About layouts.
  */
@@ -64,10 +66,10 @@ export const ABOUT_LINKS = [
   },
   {
     label: "Resume",
-    href: "files/resume.pdf",
+    href: RESUME_URL,
     detail: "View experience",
     newTab: true,
-    usesBasePath: true,
+    usesBasePath: false,
   },
   {
     label: "YouTube",
